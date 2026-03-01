@@ -2,13 +2,13 @@
 
 > **Project**: Data-driven real estate lead generation for a licensed Realtor with MLS access
 > **Created**: 2026-02-28
-> **Status**: Research Phase Complete — Ready for Strategy Selection & Build Planning
+> **Status**: All Research Complete — Ready for Build Phase
 
 ---
 
 ## Executive Summary
 
-This document synthesizes research from 5 deep-dive analyses totaling **6,000+ lines** of actionable intelligence. The research covers MLS data mining, public records, lead scoring models, creative strategies, and competitive analysis of existing tools.
+This document synthesizes research from **17 deep-dive analyses** across two research rounds totaling **~19,800+ lines** of actionable intelligence. The research covers MLS data mining, public records, lead scoring, creative strategies, competitive analysis, dashboard design, automation, data pipelines, RESO API integration, legal compliance, outreach templates, Python implementation patterns, county-level data sources, and ROI metrics.
 
 ### The Core Insight
 
@@ -341,6 +341,8 @@ Each quadrant gets a different outreach strategy, messaging framework, and conta
 
 ## 9. Detailed Research Files
 
+### Round 1 — Strategy & Intelligence Research
+
 | File | Lines | Focus |
 |------|-------|-------|
 | [mls_data_analysis.md](mls_data_analysis.md) | 982 | 10 MLS mining strategies, daily workflow, lead scoring matrix |
@@ -349,7 +351,28 @@ Each quadrant gets a different outreach strategy, messaging framework, and conta
 | [creative_strategies.md](creative_strategies.md) | 1,343 | 22 innovative strategies, implementation roadmap, tech stack |
 | [competitive_analysis.md](competitive_analysis.md) | ~800 | 14 platforms, 5 data providers, gap analysis, build vs. buy |
 
-**Total Research**: ~6,800+ lines of actionable intelligence
+### Round 2 — Dashboard & Infrastructure Research
+
+| File | Lines | Focus |
+|------|-------|-------|
+| [dashboard_frameworks.md](dashboard_frameworks.md) | — | Dashboard technology evaluation |
+| [dashboard_ux_design.md](dashboard_ux_design.md) | — | UX design patterns for lead dashboards |
+| [dashboard_examples.md](dashboard_examples.md) | — | Real-world dashboard examples and inspiration |
+| [automation_integrations.md](automation_integrations.md) | — | CRM, email, and workflow automation |
+| [data_pipeline_architecture.md](data_pipeline_architecture.md) | — | ETL/ELT pipeline design patterns |
+
+### Round 3 — Final Research (Build-Ready)
+
+| File | Lines | Focus |
+|------|-------|-------|
+| [reso_api_integration.md](reso_api_integration.md) | 2,647 | RESO Web API standard, Python client, 10 OData queries, 6 MLS platform profiles |
+| [legal_compliance_framework.md](legal_compliance_framework.md) | 1,346 | Federal/state regulations, compliance by channel & lead source, pre-campaign checklist |
+| [outreach_templates.md](outreach_templates.md) | 1,623 | Messaging for 12 lead types, drip sequences, CMA letters, voicemail scripts |
+| [python_implementation.md](python_implementation.md) | 4,019 | Full technical blueprint: data models, connectors, scoring engine, pipeline, DB schema, tests |
+| [local_data_sources.md](local_data_sources.md) | 1,584 | County-level access, FOIA templates, 6 aggregator profiles, 10-state graded snapshot |
+| [roi_metrics_framework.md](roi_metrics_framework.md) | 1,808 | KPIs, funnel metrics, A/B testing, financial projections, feedback loops |
+
+**Total Research**: ~19,800+ lines across 16 files
 
 ---
 
@@ -361,7 +384,8 @@ Each quadrant gets a different outreach strategy, messaging framework, and conta
 - Never scrape protected data — use APIs and authorized access only
 - Maintain records of consent and opt-outs for all contact lists
 - Check state-specific regulations (some states restrict foreclosure solicitation timing)
+- See [legal_compliance_framework.md](legal_compliance_framework.md) for the comprehensive compliance guide
 
 ---
 
-*This research was compiled from 5 parallel research agents analyzing MLS strategies, public records, creative approaches, lead scoring models, and competitive tools. Each detailed file is available in the Research/ directory for deep dives into specific topics.*
+*This research was compiled across 3 rounds of parallel research agents (5 + 5 + 6 = 16 agents) covering strategy, infrastructure, and build-readiness. Each detailed file is available in the Research/ directory for deep dives into specific topics. The project is now ready to transition from research to build phase.*
