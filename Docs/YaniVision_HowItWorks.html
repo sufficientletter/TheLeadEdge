@@ -1,0 +1,2057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YaniVision — How It Works</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@700;800&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --primary-light: #818cf8;
+            --primary-bg: #eef2ff;
+            --accent: #f59e0b;
+            --accent-light: #fbbf24;
+            --accent-bg: #fffbeb;
+            --dark: #0f172a;
+            --dark-soft: #1e293b;
+            --gray-900: #111827;
+            --gray-700: #374151;
+            --gray-600: #4b5563;
+            --gray-500: #6b7280;
+            --gray-400: #9ca3af;
+            --gray-300: #d1d5db;
+            --gray-200: #e5e7eb;
+            --gray-100: #f3f4f6;
+            --gray-50: #f9fafb;
+            --white: #ffffff;
+            --success: #10b981;
+            --success-bg: #ecfdf5;
+            --danger: #ef4444;
+            --danger-bg: #fef2f2;
+            --info: #3b82f6;
+            --info-bg: #eff6ff;
+            --purple: #8b5cf6;
+            --purple-bg: #f5f3ff;
+            --s-tier: #dc2626;
+            --a-tier: #ea580c;
+            --b-tier: #2563eb;
+            --c-tier: #7c3aed;
+            --d-tier: #6b7280;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--gray-700);
+            line-height: 1.7;
+            background: var(--white);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== NAVIGATION ===== */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--gray-200);
+            z-index: 100;
+            padding: 0 2rem;
+        }
+
+        .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .nav-logo {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--gray-500);
+            font-size: 0.88rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover { color: var(--primary); }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            padding: 10rem 2rem 6rem;
+            text-align: center;
+            background: linear-gradient(180deg, var(--primary-bg) 0%, var(--white) 100%);
+        }
+
+        .hero-inner { max-width: 780px; margin: 0 auto; }
+
+        .hero-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--gray-600);
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .hero-chip-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 5.5vw, 4rem);
+            font-weight: 800;
+            color: var(--dark);
+            line-height: 1.15;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 em {
+            font-style: normal;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--gray-500);
+            max-width: 580px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        /* ===== CONTENT WRAPPER ===== */
+        .content {
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .wide-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* ===== CHAPTER HEADERS ===== */
+        .chapter {
+            padding: 5rem 0 3rem;
+            text-align: center;
+        }
+
+        .chapter-number {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .chapter h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            color: var(--dark);
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .chapter p {
+            font-size: 1.1rem;
+            color: var(--gray-500);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ===== PROSE TEXT ===== */
+        .prose {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: var(--gray-600);
+            margin-bottom: 2rem;
+        }
+
+        .prose strong { color: var(--dark); }
+
+        .prose em {
+            color: var(--primary-dark);
+            font-style: normal;
+            font-weight: 600;
+        }
+
+        /* ===== FLOW DIAGRAM ===== */
+        .flow {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            margin: 3rem 0;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 1.5rem;
+            position: relative;
+            padding-bottom: 2.5rem;
+        }
+
+        .flow-step:last-child { padding-bottom: 0; }
+
+        .flow-line {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-shrink: 0;
+            width: 3.5rem;
+        }
+
+        .flow-icon {
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .flow-connector {
+            width: 2px;
+            flex: 1;
+            min-height: 2rem;
+            margin-top: 0.5rem;
+        }
+
+        .flow-step:last-child .flow-connector { display: none; }
+
+        .flow-body { flex: 1; padding-top: 0.5rem; }
+
+        .flow-body h4 {
+            font-size: 1.05rem;
+            color: var(--dark);
+            margin-bottom: 0.35rem;
+        }
+
+        .flow-body p {
+            font-size: 0.92rem;
+            color: var(--gray-500);
+        }
+
+        .flow-purple .flow-icon { background: var(--purple-bg); color: var(--purple); }
+        .flow-purple .flow-connector { background: linear-gradient(to bottom, var(--purple-bg), var(--info-bg)); }
+        .flow-blue .flow-icon { background: var(--info-bg); color: var(--info); }
+        .flow-blue .flow-connector { background: linear-gradient(to bottom, var(--info-bg), var(--accent-bg)); }
+        .flow-amber .flow-icon { background: var(--accent-bg); color: var(--accent); }
+        .flow-amber .flow-connector { background: linear-gradient(to bottom, var(--accent-bg), var(--success-bg)); }
+        .flow-green .flow-icon { background: var(--success-bg); color: var(--success); }
+        .flow-green .flow-connector { background: linear-gradient(to bottom, var(--success-bg), var(--danger-bg)); }
+        .flow-red .flow-icon { background: var(--danger-bg); color: var(--danger); }
+
+        /* ===== EMAIL MOCKUP ===== */
+        .email-mockup {
+            background: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04);
+            overflow: hidden;
+            margin: 3rem 0;
+        }
+
+        .email-toolbar {
+            background: var(--gray-100);
+            padding: 0.75rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .email-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .email-dot-red { background: #ff5f57; }
+        .email-dot-yellow { background: #febc2e; }
+        .email-dot-green { background: #28c840; }
+
+        .email-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .email-subject {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 0.35rem;
+        }
+
+        .email-meta {
+            font-size: 0.82rem;
+            color: var(--gray-400);
+        }
+
+        .email-body { padding: 2rem; }
+
+        .email-greeting {
+            font-size: 1rem;
+            color: var(--gray-600);
+            margin-bottom: 1.5rem;
+        }
+
+        .email-section-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--gray-100);
+        }
+
+        .email-section-title.hot { color: var(--s-tier); border-color: #fee2e2; }
+        .email-section-title.warm { color: var(--a-tier); border-color: #ffedd5; }
+        .email-section-title.stats { color: var(--info); border-color: #dbeafe; }
+
+        .email-lead {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: 10px;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+        }
+
+        .email-lead-tier {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+            color: var(--white);
+        }
+
+        .email-lead-tier.s { background: var(--s-tier); }
+        .email-lead-tier.a { background: var(--a-tier); }
+
+        .email-lead-info { flex: 1; }
+
+        .email-lead-address {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.95rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .email-lead-reason {
+            font-size: 0.83rem;
+            color: var(--gray-500);
+            margin-bottom: 0.4rem;
+        }
+
+        .email-lead-action {
+            font-size: 0.8rem;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .email-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem;
+            margin-top: 0.4rem;
+        }
+
+        .email-tag {
+            font-size: 0.68rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+        }
+
+        .tag-expired { background: #fee2e2; color: #991b1b; }
+        .tag-tax { background: #fef3c7; color: #92400e; }
+        .tag-agent { background: #e0e7ff; color: #3730a3; }
+        .tag-fsbo { background: #ffedd5; color: #9a3412; }
+        .tag-price { background: #fce7f3; color: #9d174d; }
+        .tag-foreclosure { background: #fecaca; color: #991b1b; }
+        .tag-equity { background: #d1fae5; color: #065f46; }
+        .tag-oos { background: #e0e7ff; color: #3730a3; }
+
+        .email-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            margin: 1rem 0;
+        }
+
+        .email-stat {
+            text-align: center;
+            padding: 0.75rem;
+            background: var(--gray-50);
+            border-radius: 10px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .email-stat-number {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--dark);
+        }
+
+        .email-stat-label {
+            font-size: 0.72rem;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        /* ===== SCORING VISUAL ===== */
+        .score-visual {
+            background: var(--gray-50);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            margin: 3rem 0;
+            border: 1px solid var(--gray-200);
+        }
+
+        .score-visual h3 {
+            text-align: center;
+            font-size: 1.3rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .score-visual > p {
+            text-align: center;
+            color: var(--gray-500);
+            font-size: 0.95rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .signal-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .signal-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: var(--white);
+            padding: 0.85rem 1.25rem;
+            border-radius: 12px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .signal-name {
+            flex: 1;
+            font-size: 0.92rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .signal-points {
+            font-weight: 700;
+            font-size: 0.92rem;
+            color: var(--primary);
+            white-space: nowrap;
+        }
+
+        .signal-bar-bg {
+            width: 120px;
+            height: 8px;
+            background: var(--gray-200);
+            border-radius: 4px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .signal-bar {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+        }
+
+        .score-arrow {
+            text-align: center;
+            font-size: 1.5rem;
+            color: var(--gray-300);
+            margin: 1rem 0;
+        }
+
+        .score-result {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            background: var(--white);
+            padding: 1.5rem 2rem;
+            border-radius: 16px;
+            border: 2px solid var(--primary-bg);
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .score-gauge {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: conic-gradient(var(--s-tier) 0% 88%, var(--gray-200) 88% 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .score-gauge-inner {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: var(--s-tier);
+        }
+
+        .score-meta h4 {
+            font-size: 1.1rem;
+            color: var(--dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .score-meta p {
+            font-size: 0.88rem;
+            color: var(--gray-500);
+        }
+
+        /* ===== TIER VISUAL ===== */
+        .tier-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1rem;
+            margin: 2.5rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .tier-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .tier-card {
+            text-align: center;
+            padding: 1.75rem 1rem;
+            border-radius: 16px;
+            border: 1px solid var(--gray-200);
+            background: var(--white);
+        }
+
+        .tier-letter {
+            font-size: 2rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+        }
+
+        .tier-card:nth-child(1) .tier-letter { color: var(--s-tier); }
+        .tier-card:nth-child(2) .tier-letter { color: var(--a-tier); }
+        .tier-card:nth-child(3) .tier-letter { color: var(--b-tier); }
+        .tier-card:nth-child(4) .tier-letter { color: var(--c-tier); }
+        .tier-card:nth-child(5) .tier-letter { color: var(--d-tier); }
+
+        .tier-range {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--gray-400);
+            margin-bottom: 0.5rem;
+        }
+
+        .tier-action {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 0.25rem;
+        }
+
+        .tier-desc {
+            font-size: 0.78rem;
+            color: var(--gray-400);
+        }
+
+        /* ===== LEAD TYPE CARDS ===== */
+        .lead-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin: 2.5rem 0;
+        }
+
+        .lead-type-card {
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid var(--gray-200);
+            background: var(--white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lead-type-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .lead-type-card:nth-child(1)::before { background: var(--s-tier); }
+        .lead-type-card:nth-child(2)::before { background: var(--a-tier); }
+        .lead-type-card:nth-child(3)::before { background: var(--s-tier); }
+        .lead-type-card:nth-child(4)::before { background: var(--info); }
+        .lead-type-card:nth-child(5)::before { background: var(--purple); }
+        .lead-type-card:nth-child(6)::before { background: var(--a-tier); }
+
+        .lead-type-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .lead-type-card h4 {
+            font-size: 1.05rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .lead-type-card .what {
+            font-size: 0.88rem;
+            color: var(--gray-600);
+            margin-bottom: 0.75rem;
+        }
+
+        .lead-type-card .why {
+            font-size: 0.82rem;
+            color: var(--gray-500);
+            padding: 0.65rem 0.85rem;
+            background: var(--gray-50);
+            border-radius: 8px;
+            border-left: 3px solid var(--primary-light);
+            margin-bottom: 0.75rem;
+        }
+
+        .lead-type-card .approach {
+            font-size: 0.82rem;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        /* ===== STACKING VISUAL ===== */
+        .stack-example {
+            background: linear-gradient(135deg, var(--dark) 0%, #1e1b4b 100%);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            margin: 3rem 0;
+            color: var(--white);
+        }
+
+        .stack-example h3 {
+            text-align: center;
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stack-example > p {
+            text-align: center;
+            color: var(--gray-400);
+            font-size: 0.95rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stack-demo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stack-signal {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 0.75rem 1.25rem;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .stack-signal-icon { font-size: 1.1rem; }
+
+        .stack-signal-name {
+            flex: 1;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .stack-signal-pts {
+            font-weight: 700;
+            color: var(--accent);
+            font-size: 0.9rem;
+        }
+
+        .stack-plus {
+            font-size: 1.2rem;
+            color: var(--gray-500);
+            font-weight: 700;
+        }
+
+        .stack-equals {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0.75rem 0;
+            color: var(--gray-400);
+            font-size: 0.85rem;
+        }
+
+        .stack-equals-line {
+            flex: 1;
+            height: 1px;
+            background: rgba(255,255,255,0.1);
+            max-width: 80px;
+        }
+
+        .stack-total {
+            text-align: center;
+            padding: 1.25rem 2rem;
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+            border-radius: 14px;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .stack-total-label {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .stack-total-score {
+            font-size: 2rem;
+            font-weight: 900;
+            color: var(--accent);
+        }
+
+        .stack-total-tier {
+            font-size: 0.88rem;
+            color: var(--gray-400);
+            margin-top: 0.25rem;
+        }
+
+        .stack-vs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 2rem;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .stack-vs-card {
+            text-align: center;
+            padding: 1.25rem;
+            border-radius: 12px;
+        }
+
+        .stack-vs-cold {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .stack-vs-stacked {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .stack-vs-number {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 0.25rem;
+        }
+
+        .stack-vs-cold .stack-vs-number { color: var(--gray-400); }
+        .stack-vs-stacked .stack-vs-number { color: var(--success); }
+
+        .stack-vs-label {
+            font-size: 0.78rem;
+            color: var(--gray-400);
+        }
+
+        /* ===== DASHBOARD MOCKUP ===== */
+        .dashboard-mockup {
+            background: var(--gray-100);
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            margin: 3rem 0;
+            border: 1px solid var(--gray-200);
+        }
+
+        .dashboard-mockup h3 {
+            text-align: center;
+            font-size: 1.3rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-mockup > p {
+            text-align: center;
+            font-size: 0.95rem;
+            color: var(--gray-500);
+            margin-bottom: 2rem;
+        }
+
+        .dash-frame {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
+        }
+
+        .dash-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1.5rem;
+            background: var(--dark);
+            color: var(--white);
+        }
+
+        .dash-topbar-logo {
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .dash-topbar-nav {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.82rem;
+            color: var(--gray-400);
+        }
+
+        .dash-topbar-nav span.active { color: var(--white); font-weight: 600; }
+
+        .dash-content { padding: 1.5rem; }
+
+        .dash-kpis {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (max-width: 640px) {
+            .dash-kpis { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        .dash-kpi {
+            padding: 1rem;
+            background: var(--gray-50);
+            border-radius: 10px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .dash-kpi-label {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--gray-400);
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .dash-kpi-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--dark);
+        }
+
+        .dash-kpi-delta {
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .dash-kpi-delta.up { color: var(--success); }
+        .dash-kpi-delta.down { color: var(--danger); }
+
+        .dash-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .dash-table th {
+            text-align: left;
+            padding: 0.65rem 0.75rem;
+            border-bottom: 2px solid var(--gray-200);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--gray-400);
+            font-weight: 600;
+        }
+
+        .dash-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--gray-100);
+            color: var(--gray-600);
+        }
+
+        .dash-table .dash-tier {
+            display: inline-block;
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 6px;
+            text-align: center;
+            line-height: 1.5rem;
+            font-weight: 800;
+            font-size: 0.7rem;
+            color: var(--white);
+        }
+
+        .dash-table .address { font-weight: 600; color: var(--dark); }
+        .dash-table .action-btn {
+            padding: 0.3rem 0.75rem;
+            border-radius: 6px;
+            border: 1px solid var(--gray-200);
+            background: var(--white);
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--primary);
+            cursor: pointer;
+        }
+
+        /* ===== WEEKLY RHYTHM ===== */
+        .week-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin: 2.5rem 0;
+        }
+
+        .week-day {
+            padding: 1.5rem;
+            border-radius: 14px;
+            border: 1px solid var(--gray-200);
+            background: var(--white);
+        }
+
+        .week-day-name {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .week-task {
+            font-size: 0.85rem;
+            color: var(--gray-600);
+            padding: 0.3rem 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.4rem;
+        }
+
+        .week-task::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            margin-top: 0.45rem;
+            flex-shrink: 0;
+        }
+
+        /* ===== FAQ ===== */
+        .faq-list {
+            margin: 2.5rem 0;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid var(--gray-200);
+            padding: 1.5rem 0;
+        }
+
+        .faq-q {
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 1.02rem;
+            margin-bottom: 0.6rem;
+            cursor: pointer;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .faq-q::before {
+            content: 'Q';
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.6rem;
+            height: 1.6rem;
+            border-radius: 6px;
+            background: var(--primary-bg);
+            color: var(--primary);
+            font-size: 0.75rem;
+            font-weight: 800;
+            flex-shrink: 0;
+            margin-top: 0.1rem;
+        }
+
+        .faq-a {
+            font-size: 0.95rem;
+            color: var(--gray-500);
+            padding-left: 2.35rem;
+            line-height: 1.7;
+        }
+
+        /* ===== CALLOUT BOX ===== */
+        .callout {
+            padding: 1.75rem 2rem;
+            border-radius: 14px;
+            margin: 2.5rem 0;
+        }
+
+        .callout-purple {
+            background: var(--purple-bg);
+            border: 1px solid #ddd6fe;
+        }
+
+        .callout-green {
+            background: var(--success-bg);
+            border: 1px solid #a7f3d0;
+        }
+
+        .callout-amber {
+            background: var(--accent-bg);
+            border: 1px solid #fde68a;
+        }
+
+        .callout h4 {
+            font-size: 1rem;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .callout p {
+            font-size: 0.92rem;
+            color: var(--gray-600);
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            padding: 5rem 2rem;
+            background: var(--dark);
+            color: var(--white);
+        }
+
+        .footer h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--white);
+        }
+
+        .footer p {
+            color: var(--gray-400);
+            font-size: 1.05rem;
+            max-width: 500px;
+            margin: 0 auto 2rem;
+        }
+
+        .footer-sig {
+            font-style: italic;
+            color: var(--gray-500);
+            font-size: 0.95rem;
+        }
+
+        /* ===== DIVIDER ===== */
+        .divider {
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 2px;
+            margin: 4rem auto;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 640px) {
+            .email-stats { grid-template-columns: 1fr; }
+            .stack-vs { grid-template-columns: 1fr; }
+            .lead-types { grid-template-columns: 1fr; }
+            .week-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media print {
+            .nav { display: none; }
+            .hero { padding-top: 3rem; }
+            body { font-size: 11pt; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== NAV ===== -->
+<nav class="nav">
+    <div class="nav-inner">
+        <a href="#" class="nav-logo">YaniVision</a>
+        <ul class="nav-links">
+            <li><a href="#big-picture">Big Picture</a></li>
+            <li><a href="#lead-types">Lead Types</a></li>
+            <li><a href="#scoring">Scoring</a></li>
+            <li><a href="#briefing">Briefing</a></li>
+            <li><a href="#dashboard">Dashboard</a></li>
+            <li><a href="#workflow">Workflow</a></li>
+            <li><a href="#faq">FAQ</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<div class="hero">
+    <div class="hero-inner">
+        <div class="hero-chip">
+            <span class="hero-chip-dot"></span>
+            How It Works — A Complete Guide
+        </div>
+        <h1>The Leads Come <em>to You</em></h1>
+        <p>A detailed look at how YaniVision finds, scores, and delivers the most motivated sellers and buyers in your market — every single morning.</p>
+    </div>
+</div>
+
+<!-- ===== CHAPTER 1: BIG PICTURE ===== -->
+<div class="content" id="big-picture">
+    <div class="chapter">
+        <div class="chapter-number">Chapter 1</div>
+        <h2>The Big Picture</h2>
+        <p>From raw data to your phone in five steps</p>
+    </div>
+
+    <p class="prose">
+        Right now, finding leads means scrolling through MLS, hoping for referrals, or buying expensive lists of strangers. YaniVision flips this completely. It <em>watches everything</em> — every listing change, every public record filing, every price reduction — and <em>connects the dots</em> to find the people who are most likely to need a Realtor right now.
+    </p>
+
+    <p class="prose">
+        Here's what happens behind the scenes, every single day:
+    </p>
+
+    <div class="flow">
+        <div class="flow-step flow-purple">
+            <div class="flow-line">
+                <div class="flow-icon">&#x1f4e5;</div>
+                <div class="flow-connector"></div>
+            </div>
+            <div class="flow-body">
+                <h4>Step 1: Gather Data</h4>
+                <p>YaniVision pulls fresh data from your MLS — new listings, status changes, price reductions, expirations. It also checks county records for foreclosure filings, probate cases, and tax delinquencies.</p>
+            </div>
+        </div>
+        <div class="flow-step flow-blue">
+            <div class="flow-line">
+                <div class="flow-icon">&#x1f50d;</div>
+                <div class="flow-connector"></div>
+            </div>
+            <div class="flow-body">
+                <h4>Step 2: Detect Signals</h4>
+                <p>Raw data becomes <strong>signals</strong>. A price reduction isn't just a number change — it's a signal that the seller is getting anxious. An expired listing after 180 days means an agent failed. A probate filing plus a vacant property means someone inherited a house they probably want to sell.</p>
+            </div>
+        </div>
+        <div class="flow-step flow-amber">
+            <div class="flow-line">
+                <div class="flow-icon">&#x1f3af;</div>
+                <div class="flow-connector"></div>
+            </div>
+            <div class="flow-body">
+                <h4>Step 3: Score & Rank</h4>
+                <p>Each signal has a point value. Signals on the same property <strong>stack together</strong> and multiply. The system calculates a 0-100 score and assigns a tier: S (act today), A (48 hours), B (this week), C (monthly), or D (monitor). The score also accounts for <strong>freshness</strong> — a signal from yesterday is worth more than one from 3 weeks ago.</p>
+            </div>
+        </div>
+        <div class="flow-step flow-green">
+            <div class="flow-line">
+                <div class="flow-icon">&#x2709;&#xfe0f;</div>
+                <div class="flow-connector"></div>
+            </div>
+            <div class="flow-body">
+                <h4>Step 4: Deliver Your Briefing</h4>
+                <p>At 6:30 AM, you get an email with your top leads — ranked, explained, and ready for action. Each lead includes <strong>why</strong> it scored high, <strong>what approach</strong> to take, and the key details you need.</p>
+            </div>
+        </div>
+        <div class="flow-step flow-red">
+            <div class="flow-line">
+                <div class="flow-icon">&#x1f4f1;</div>
+            </div>
+            <div class="flow-body">
+                <h4>Step 5: You Take Action</h4>
+                <p>Make your calls, send your CMAs, knock on doors — knowing you're spending your time on the people most likely to say yes. Log the outcome, and the system learns from it to get even smarter over time.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="callout callout-green">
+        <h4>The key insight</h4>
+        <p>You're not getting a list of strangers. You're getting a list of people who are <strong>already showing signs they need a Realtor</strong> — they just haven't called one yet. You're reaching them at the exact right moment.</p>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ===== CHAPTER 2: LEAD TYPES ===== -->
+<div class="wide-content" id="lead-types">
+    <div class="chapter">
+        <div class="chapter-number">Chapter 2</div>
+        <h2>The Leads YaniVision Finds</h2>
+        <p>Six categories of motivated sellers, each with a different approach</p>
+    </div>
+
+    <div class="lead-types">
+        <div class="lead-type-card">
+            <div class="lead-type-icon">&#x23f0;</div>
+            <h4>Expired Listings</h4>
+            <div class="what">Their listing expired without selling. They still want to sell — their agent just failed them.</div>
+            <div class="why"><strong>Why they're valuable:</strong> They've already committed to selling. They're frustrated with their last agent. They need someone who can explain what went wrong and do it better.</div>
+            <div class="approach">Approach: Market analysis + your track record + what you'll do differently</div>
+        </div>
+        <div class="lead-type-card">
+            <div class="lead-type-icon">&#x1f3e1;</div>
+            <h4>FSBOs (For Sale By Owner)</h4>
+            <div class="what">They're trying to sell without an agent. Most get frustrated within 3-6 weeks.</div>
+            <div class="why"><strong>Why they're valuable:</strong> They've already decided to sell. They just need to be shown the value an agent brings — especially when their price keeps dropping.</div>
+            <div class="approach">Approach: Recent comps + "what an agent could net you" + no pressure</div>
+        </div>
+        <div class="lead-type-card">
+            <div class="lead-type-icon">&#x26a0;&#xfe0f;</div>
+            <h4>Pre-Foreclosure</h4>
+            <div class="what">A foreclosure notice has been filed. The homeowner is in financial distress and often has a deadline to sell.</div>
+            <div class="why"><strong>Why they're valuable:</strong> Extremely motivated by timeline. Selling before foreclosure saves their credit and often lets them walk away with equity.</div>
+            <div class="approach">Approach: Empathy first, always. Options counseling. Never pushy. Be the person who helps.</div>
+        </div>
+        <div class="lead-type-card">
+            <div class="lead-type-icon">&#x1f4dc;</div>
+            <h4>Probate / Estate</h4>
+            <div class="what">Someone passed away and left a property. The heir usually lives far away and wants to sell.</div>
+            <div class="why"><strong>Why they're valuable:</strong> High motivation to sell (they don't want to manage a remote property). But requires patience and sensitivity — they're grieving.</div>
+            <div class="approach">Approach: Compassion + estate process guidance + patience. Follow up gently over months.</div>
+        </div>
+        <div class="lead-type-card">
+            <div class="lead-type-icon">&#x1f4c9;</div>
+            <h4>Price Reductions</h4>
+            <div class="what">Active listings that keep dropping their price. Each reduction signals growing anxiety.</div>
+            <div class="why"><strong>Why they're valuable:</strong> They're still listed with an agent, but the agent may be losing their confidence. Multiple drops = the seller is getting desperate.</div>
+            <div class="approach">Approach: "I noticed your listing — here's what the market is telling us" + your strategy</div>
+        </div>
+        <div class="lead-type-card">
+            <div class="lead-type-icon">&#x1f504;</div>
+            <h4>Withdrawn & Relisted</h4>
+            <div class="what">A listing was pulled off the market and put back on — often with a new agent or new price.</div>
+            <div class="why"><strong>Why they're valuable:</strong> The first attempt failed. They're still motivated to sell but now more cautious. They want an agent who gets it right.</div>
+            <div class="approach">Approach: Acknowledge the frustration + fresh market analysis + what went wrong before</div>
+        </div>
+    </div>
+
+    <div class="callout callout-purple">
+        <h4>You choose which types to pursue</h4>
+        <p>Not comfortable with pre-foreclosure? That's completely fine. YaniVision lets you turn any lead type on or off. You only see what you want to see.</p>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ===== CHAPTER 3: SCORING ===== -->
+<div class="content" id="scoring">
+    <div class="chapter">
+        <div class="chapter-number">Chapter 3</div>
+        <h2>How Scoring Works</h2>
+        <p>The system that tells you who to call first</p>
+    </div>
+
+    <p class="prose">
+        Not all leads are equal. An expired listing from yesterday is more urgent than one from 3 weeks ago. A FSBO with two price drops is hotter than one that just listed. YaniVision's scoring engine weighs all of this automatically.
+    </p>
+
+    <div class="score-visual">
+        <h3>Example: 123 Oak Street</h3>
+        <p>How a lead gets scored in real-time</p>
+
+        <div class="signal-list">
+            <div class="signal-row">
+                <span class="signal-name">Listing expired (yesterday)</span>
+                <span class="signal-points">+25 pts</span>
+                <div class="signal-bar-bg"><div class="signal-bar" style="width: 83%"></div></div>
+            </div>
+            <div class="signal-row">
+                <span class="signal-name">Tax delinquency on record</span>
+                <span class="signal-points">+18 pts</span>
+                <div class="signal-bar-bg"><div class="signal-bar" style="width: 60%"></div></div>
+            </div>
+            <div class="signal-row">
+                <span class="signal-name">Agent had 35% failure rate</span>
+                <span class="signal-points">+12 pts</span>
+                <div class="signal-bar-bg"><div class="signal-bar" style="width: 40%"></div></div>
+            </div>
+            <div class="signal-row">
+                <span class="signal-name">High equity (est. 60%+)</span>
+                <span class="signal-points">+10 pts</span>
+                <div class="signal-bar-bg"><div class="signal-bar" style="width: 33%"></div></div>
+            </div>
+            <div class="signal-row">
+                <span class="signal-name">Freshness bonus (signals &lt; 48 hrs)</span>
+                <span class="signal-points">+8 pts</span>
+                <div class="signal-bar-bg"><div class="signal-bar" style="width: 27%"></div></div>
+            </div>
+            <div class="signal-row">
+                <span class="signal-name">Stacking bonus: "Distressed Seller" (1.2x)</span>
+                <span class="signal-points">+15 pts</span>
+                <div class="signal-bar-bg"><div class="signal-bar" style="width: 50%"></div></div>
+            </div>
+        </div>
+
+        <div class="score-arrow">&#x2193;</div>
+
+        <div class="score-result">
+            <div class="score-gauge">
+                <div class="score-gauge-inner">88</div>
+            </div>
+            <div class="score-meta">
+                <h4>S-Tier — Act Today</h4>
+                <p>6 signals stacked. Distressed seller pattern detected. Contact before competitors.</p>
+            </div>
+        </div>
+    </div>
+
+    <p class="prose">
+        <strong>The scoring decays over time.</strong> That 88 will drop each day you don't act. Expired listings are hottest in the first 48 hours. Pre-foreclosure urgency escalates as the deadline approaches. The system keeps adjusting so your briefing always shows the most time-sensitive leads first.
+    </p>
+
+    <h3 style="font-size: 1.15rem; color: var(--dark); margin-bottom: 1rem;">The Five Tiers</h3>
+
+    <div class="tier-grid">
+        <div class="tier-card">
+            <div class="tier-letter">S</div>
+            <div class="tier-range">80 — 100</div>
+            <div class="tier-action">Act today</div>
+            <div class="tier-desc">Call within hours</div>
+        </div>
+        <div class="tier-card">
+            <div class="tier-letter">A</div>
+            <div class="tier-range">60 — 79</div>
+            <div class="tier-action">Within 48 hrs</div>
+            <div class="tier-desc">High priority</div>
+        </div>
+        <div class="tier-card">
+            <div class="tier-letter">B</div>
+            <div class="tier-range">40 — 59</div>
+            <div class="tier-action">This week</div>
+            <div class="tier-desc">Warm lead</div>
+        </div>
+        <div class="tier-card">
+            <div class="tier-letter">C</div>
+            <div class="tier-range">20 — 39</div>
+            <div class="tier-action">Monthly check-in</div>
+            <div class="tier-desc">Nurture / drip</div>
+        </div>
+        <div class="tier-card">
+            <div class="tier-letter">D</div>
+            <div class="tier-range">0 — 19</div>
+            <div class="tier-action">Monitor</div>
+            <div class="tier-desc">Watch for changes</div>
+        </div>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ===== CHAPTER 4: SIGNAL STACKING ===== -->
+<div class="content">
+    <div class="chapter">
+        <div class="chapter-number">Chapter 4</div>
+        <h2>Signal Stacking</h2>
+        <p>Why YaniVision finds leads no other tool catches</p>
+    </div>
+
+    <p class="prose">
+        Every lead tool on the market gives you <strong>one signal</strong> — expired listings OR foreclosures OR FSBOs. They hand you a list and say "good luck." The conversion rate on single-signal cold lists? About <em>2-3%</em>.
+    </p>
+
+    <p class="prose">
+        YaniVision does something different. It watches for <strong>multiple signals converging on the same property</strong>. When that happens, the probability of motivation goes through the roof.
+    </p>
+
+    <div class="stack-example">
+        <h3>Signal Stacking in Action</h3>
+        <p>Watch how individual signals combine into a high-confidence lead</p>
+
+        <div class="stack-demo">
+            <div class="stack-signal">
+                <span class="stack-signal-icon">&#x23f0;</span>
+                <span class="stack-signal-name">Listing expired after 180 days</span>
+                <span class="stack-signal-pts">+25 pts</span>
+            </div>
+            <div class="stack-plus">+</div>
+            <div class="stack-signal">
+                <span class="stack-signal-icon">&#x1f4b0;</span>
+                <span class="stack-signal-name">Tax delinquency filed</span>
+                <span class="stack-signal-pts">+18 pts</span>
+            </div>
+            <div class="stack-plus">+</div>
+            <div class="stack-signal">
+                <span class="stack-signal-icon">&#x1f3e0;</span>
+                <span class="stack-signal-name">High equity (60%+ estimated)</span>
+                <span class="stack-signal-pts">+10 pts</span>
+            </div>
+            <div class="stack-plus">+</div>
+            <div class="stack-signal">
+                <span class="stack-signal-icon">&#x26a1;</span>
+                <span class="stack-signal-name">"Distressed Seller" pattern match</span>
+                <span class="stack-signal-pts">2.0x boost</span>
+            </div>
+
+            <div class="stack-equals">
+                <div class="stack-equals-line"></div>
+                <span>RESULT</span>
+                <div class="stack-equals-line"></div>
+            </div>
+
+            <div class="stack-total">
+                <div class="stack-total-label">Combined Score</div>
+                <div class="stack-total-score">88 / 100</div>
+                <div class="stack-total-tier">S-Tier — Act Today</div>
+            </div>
+        </div>
+
+        <div class="stack-vs">
+            <div class="stack-vs-card stack-vs-cold">
+                <div class="stack-vs-number">2-3%</div>
+                <div class="stack-vs-label">Single-signal cold list<br>conversion rate</div>
+            </div>
+            <div class="stack-vs-card stack-vs-stacked">
+                <div class="stack-vs-number">15-25%</div>
+                <div class="stack-vs-label">Multi-signal stacked lead<br>conversion rate</div>
+            </div>
+        </div>
+    </div>
+
+    <p class="prose">
+        That's <em>5-10x better</em> lead quality. Instead of calling 100 people to get 2 appointments, you're calling 20 people to get 4-5. Less time on the phone, more listings signed.
+    </p>
+</div>
+
+<div class="divider"></div>
+
+<!-- ===== CHAPTER: RESEARCH BACKED ===== -->
+<div class="wide-content" id="research">
+    <div class="chapter">
+        <div class="chapter-number">Chapter 5</div>
+        <h2>The Research Behind It</h2>
+        <p>19,800+ lines of analysis across 16 deep-dive research studies</p>
+    </div>
+
+    <div class="content">
+        <p class="prose">
+            This isn't guesswork. Before writing a single line of code, we conducted <em>16 separate research studies</em> covering MLS data mining, public records, lead scoring, outreach psychology, legal compliance, competitive analysis, and more. Here are the key findings that shape everything YaniVision does:
+        </p>
+    </div>
+
+    <!-- TOP 10 STRATEGIES -->
+    <div class="content">
+        <h3 style="font-size: 1.2rem; color: var(--dark); margin-bottom: 0.5rem;">Top 10 Highest-ROI Strategies (Ranked by Research)</h3>
+        <p class="prose" style="margin-bottom: 1.5rem;">We ranked every lead-finding strategy by conversion probability, effort required, and commission potential. These are the winners — and all of them are built into YaniVision:</p>
+    </div>
+
+    <div style="max-width: 900px; margin: 0 auto 2rem; padding: 0 2rem; overflow-x: auto;">
+        <table style="width: 100%; border-collapse: separate; border-spacing: 0; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.05); font-size: 0.88rem;">
+            <thead>
+                <tr style="background: var(--dark); color: var(--white);">
+                    <th style="padding: 0.85rem 1rem; text-align: left; font-weight: 600; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase;">#</th>
+                    <th style="padding: 0.85rem 1rem; text-align: left; font-weight: 600; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase;">Strategy</th>
+                    <th style="padding: 0.85rem 1rem; text-align: left; font-weight: 600; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase;">Conversion</th>
+                    <th style="padding: 0.85rem 1rem; text-align: left; font-weight: 600; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase;">Effort</th>
+                    <th style="padding: 0.85rem 1rem; text-align: left; font-weight: 600; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase;">Why It Works</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="background: var(--white);">
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); font-weight: 800; color: var(--primary);">1</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); font-weight: 600; color: var(--dark);">Expired Listings (Same-Day)</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); color: var(--success); font-weight: 700;">8-12%</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100);">Low</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); color: var(--gray-500);">Proven motivation, frustrated seller, no agent</td>
+                </tr>
+                <tr style="background: var(--gray-50);">
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); font-weight: 800; color: var(--primary);">2</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); font-weight: 600; color: var(--dark);">Pre-Foreclosure / NOD</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); color: var(--success); font-weight: 700;">1-3%</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100);">Medium</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); color: var(--gray-500);">Legal clock creates urgency, equity preservation</td>
+                </tr>
+                <tr style="background: var(--white);">
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); font-weight: 800; color: var(--primary);">3</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); font-weight: 600; color: var(--dark);">Price Reduction Stacking (3+)</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); color: var(--success); font-weight: 700;">5-8%</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100);">Low</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); color: var(--gray-500);">Accelerating desperation, still active listing</td>
+                </tr>
+                <tr style="background: var(--gray-50);">
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); font-weight: 800; color: var(--primary);">4</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); font-weight: 600; color: var(--dark);">Probate / Inherited Properties</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); color: var(--success); font-weight: 700;">3-7%</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100);">Medium</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); color: var(--gray-500);">60-70% of inherited properties sell within 24 months</td>
+                </tr>
+                <tr style="background: var(--white);">
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); font-weight: 800; color: var(--primary);">5</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); font-weight: 600; color: var(--dark);">Absentee + High DOM</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); color: var(--success); font-weight: 700;">4-6%</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100);">Low</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); color: var(--gray-500);">Distant owners with stale listings = max motivation</td>
+                </tr>
+                <tr style="background: var(--gray-50);">
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); font-weight: 800; color: var(--primary);">6</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); font-weight: 600; color: var(--dark);">FSBO Failures (30+ days)</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); color: var(--success); font-weight: 700;">6-10%</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100);">Low</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); color: var(--gray-500);">Seller learned the hard way they need an agent</td>
+                </tr>
+                <tr style="background: var(--white);">
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); font-weight: 800; color: var(--primary);">7</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); font-weight: 600; color: var(--dark);">Withdrawn & Relisted</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); color: var(--success); font-weight: 700;">5-7%</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100);">Low</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); color: var(--gray-500);">Seller fired their agent, seeking new representation</td>
+                </tr>
+                <tr style="background: var(--gray-50);">
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); font-weight: 800; color: var(--primary);">8</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); font-weight: 600; color: var(--dark);">Comparable Sales Gaps</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); color: var(--success); font-weight: 700;">2-4%</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100);">Medium</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); color: var(--gray-500);">Properties that should list based on neighbor activity</td>
+                </tr>
+                <tr style="background: var(--white);">
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); font-weight: 800; color: var(--primary);">9</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); font-weight: 600; color: var(--dark);">Past Client Lifecycle (7-10 yr)</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); color: var(--success); font-weight: 700;">10-15%</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100);">Low</td>
+                    <td style="padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100); color: var(--gray-500);">Warm relationship, predictable move timing</td>
+                </tr>
+                <tr style="background: var(--gray-50);">
+                    <td style="padding: 0.75rem 1rem; font-weight: 800; color: var(--primary);">10</td>
+                    <td style="padding: 0.75rem 1rem; font-weight: 600; color: var(--dark);">Professional Referral Network</td>
+                    <td style="padding: 0.75rem 1rem; color: var(--success); font-weight: 700;">15-25%</td>
+                    <td style="padding: 0.75rem 1rem;">High (initially)</td>
+                    <td style="padding: 0.75rem 1rem; color: var(--gray-500);">Divorce attorneys, estate planners = pre-qualified</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- KEY RESEARCH FINDINGS -->
+    <div class="content">
+        <h3 style="font-size: 1.2rem; color: var(--dark); margin-bottom: 1.5rem;">Key Findings From Our Research</h3>
+    </div>
+
+    <div class="wide-content">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem; margin-bottom: 2.5rem;">
+            <div style="background: var(--info-bg); border: 1px solid #bfdbfe; border-radius: 14px; padding: 1.75rem;">
+                <div style="font-size: 2rem; font-weight: 900; color: var(--info); margin-bottom: 0.25rem;">10</div>
+                <div style="font-weight: 700; color: var(--dark); margin-bottom: 0.5rem;">MLS Mining Strategies</div>
+                <div style="font-size: 0.88rem; color: var(--gray-500);">From expired listing psychology timelines (Day 0 through Day 90+) to agent failure-rate databases that predict which active listings will expire next. We mapped the complete MLS behavioral landscape.</div>
+            </div>
+            <div style="background: var(--purple-bg); border: 1px solid #ddd6fe; border-radius: 14px; padding: 1.75rem;">
+                <div style="font-size: 2rem; font-weight: 900; color: var(--purple); margin-bottom: 0.25rem;">12</div>
+                <div style="font-weight: 700; color: var(--dark); margin-bottom: 0.5rem;">Public Record Sources</div>
+                <div style="font-size: 0.88rem; color: var(--gray-500);">Pre-foreclosure filings, probate cases, divorce records, tax delinquencies, code violations, building permits, and more. Each one is a signal of life change that often leads to a sale.</div>
+            </div>
+            <div style="background: var(--accent-bg); border: 1px solid #fde68a; border-radius: 14px; padding: 1.75rem;">
+                <div style="font-size: 2rem; font-weight: 900; color: var(--accent); margin-bottom: 0.25rem;">22</div>
+                <div style="font-weight: 700; color: var(--dark); margin-bottom: 0.5rem;">Creative Strategies</div>
+                <div style="font-size: 0.88rem; color: var(--gray-500);">Beyond the standard playbook. Zillow activity signals, "Make Me Move" monitoring, rental-to-sale conversions, comparable sales gap campaigns, tired landlord detection, and more.</div>
+            </div>
+            <div style="background: var(--success-bg); border: 1px solid #a7f3d0; border-radius: 14px; padding: 1.75rem;">
+                <div style="font-size: 2rem; font-weight: 900; color: var(--success); margin-bottom: 0.25rem;">20</div>
+                <div style="font-weight: 700; color: var(--dark); margin-bottom: 0.5rem;">Signal Types Scored</div>
+                <div style="font-size: 0.88rem; color: var(--gray-500);">Each signal has a researched weight, a temporal decay function (how fast urgency fades), and stacking rules for when multiple signals converge. The scoring engine uses all 20 simultaneously.</div>
+            </div>
+            <div style="background: var(--danger-bg); border: 1px solid #fecaca; border-radius: 14px; padding: 1.75rem;">
+                <div style="font-size: 2rem; font-weight: 900; color: var(--danger); margin-bottom: 0.25rem;">14</div>
+                <div style="font-weight: 700; color: var(--dark); margin-bottom: 0.5rem;">Competitor Tools Analyzed</div>
+                <div style="font-size: 0.88rem; color: var(--gray-500);">We studied every major lead tool (REDX, Vulcan7, PropStream, BatchLeads, and more). The gap they all share: none of them do multi-signal behavioral analysis on MLS data. That's YaniVision's edge.</div>
+            </div>
+            <div style="background: var(--primary-bg); border: 1px solid #c7d2fe; border-radius: 14px; padding: 1.75rem;">
+                <div style="font-size: 2rem; font-weight: 900; color: var(--primary); margin-bottom: 0.25rem;">100%</div>
+                <div style="font-weight: 700; color: var(--dark); margin-bottom: 0.5rem;">Compliance Verified</div>
+                <div style="font-size: 0.88rem; color: var(--gray-500);">Every strategy, every outreach method, every data source was checked against DNC, TCPA, CAN-SPAM, MLS ToS, Fair Housing, CCPA, and state-specific regulations. Nothing slips through.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SIGNAL STACKING CONVERSION DATA -->
+    <div class="content">
+        <div class="callout callout-green">
+            <h4>The data on signal stacking is compelling</h4>
+            <p>Our research found that <strong>single-signal leads convert at 2-3%</strong> (typical cold list). But when signals stack:</p>
+            <ul style="margin: 0.75rem 0 0 1.25rem; font-size: 0.92rem; color: var(--gray-600);">
+                <li style="margin-bottom: 0.3rem;"><strong>Expired + Pre-foreclosure + Vacant</strong> → 15-25% conversion</li>
+                <li style="margin-bottom: 0.3rem;"><strong>3x Price reduction + High DOM + Absentee</strong> → 10-15% conversion</li>
+                <li style="margin-bottom: 0.3rem;"><strong>Probate + Out-of-state heir + Vacant</strong> → 8-12% conversion</li>
+                <li style="margin-bottom: 0.3rem;"><strong>FSBO expired + Divorce filing</strong> → 10-15% conversion</li>
+                <li><strong>Long-term owner + Tax delinquent + Code violation</strong> → 8-12% conversion</li>
+            </ul>
+            <p style="margin-top: 0.75rem;">That's the difference between calling 100 people to get 2 appointments and calling 20 to get 4.</p>
+        </div>
+
+        <h3 style="font-size: 1.2rem; color: var(--dark); margin: 2rem 0 1rem;">What No Competitor Does</h3>
+        <p class="prose">
+            We analyzed 14 existing platforms and 5 data providers. Here's the gap in the market that YaniVision fills:
+        </p>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+            <div style="padding: 1.5rem; border-radius: 14px; border: 1px solid var(--gray-200); background: var(--white);">
+                <h4 style="font-size: 0.95rem; color: var(--gray-400); margin-bottom: 1rem; font-weight: 600;">What existing tools do</h4>
+                <div style="font-size: 0.88rem; color: var(--gray-500); line-height: 1.8;">
+                    <div style="display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 0.3rem;"><span style="color: var(--gray-300);">&#x2022;</span> Expired listing phone numbers</div>
+                    <div style="display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 0.3rem;"><span style="color: var(--gray-300);">&#x2022;</span> FSBO phone numbers</div>
+                    <div style="display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 0.3rem;"><span style="color: var(--gray-300);">&#x2022;</span> Pre-foreclosure lists</div>
+                    <div style="display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 0.3rem;"><span style="color: var(--gray-300);">&#x2022;</span> Generic lead lists</div>
+                    <div style="display: flex; gap: 0.5rem; align-items: flex-start;"><span style="color: var(--gray-300);">&#x2022;</span> One signal at a time</div>
+                </div>
+            </div>
+            <div style="padding: 1.5rem; border-radius: 14px; border: 2px solid var(--primary-light); background: var(--primary-bg);">
+                <h4 style="font-size: 0.95rem; color: var(--primary-dark); margin-bottom: 1rem; font-weight: 600;">What YaniVision does</h4>
+                <div style="font-size: 0.88rem; color: var(--gray-600); line-height: 1.8;">
+                    <div style="display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 0.3rem;"><span style="color: var(--primary);">&#x2713;</span> <strong>Behavioral analysis</strong> of MLS data</div>
+                    <div style="display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 0.3rem;"><span style="color: var(--primary);">&#x2713;</span> <strong>Multi-signal stacking</strong> across sources</div>
+                    <div style="display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 0.3rem;"><span style="color: var(--primary);">&#x2713;</span> <strong>Temporal decay scoring</strong> (urgency fades)</div>
+                    <div style="display: flex; gap: 0.5rem; align-items: flex-start; margin-bottom: 0.3rem;"><span style="color: var(--primary);">&#x2713;</span> <strong>Agent performance tracking</strong></div>
+                    <div style="display: flex; gap: 0.5rem; align-items: flex-start;"><span style="color: var(--primary);">&#x2713;</span> <strong>Pre-expiration prediction</strong></div>
+                </div>
+            </div>
+        </div>
+
+        <p class="prose">
+            The bottom line: <em>no existing tool treats MLS data as a behavioral signal engine</em>. They all treat it as a static phone book. YaniVision reads the patterns, stacks the signals, and tells you who to call — in order of who's most likely to say yes.
+        </p>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ===== CHAPTER 5: THE BRIEFING ===== -->
+<div class="content" id="briefing">
+    <div class="chapter">
+        <div class="chapter-number">Chapter 5</div>
+        <h2>The Morning Briefing</h2>
+        <p>What lands in your inbox at 6:30 AM</p>
+    </div>
+
+    <p class="prose">
+        Every morning, before you've had your coffee, an email arrives with everything you need. No logging into anything. No searching. Just open, read, and start calling.
+    </p>
+
+    <p class="prose">
+        Here's what it looks like:
+    </p>
+
+    <div class="email-mockup">
+        <div class="email-toolbar">
+            <span class="email-dot email-dot-red"></span>
+            <span class="email-dot email-dot-yellow"></span>
+            <span class="email-dot email-dot-green"></span>
+        </div>
+        <div class="email-header">
+            <div class="email-subject">YaniVision Daily Briefing — March 1, 2026</div>
+            <div class="email-meta">From: YaniVision &lt;briefing@yanivision.com&gt; &nbsp;|&nbsp; 6:30 AM</div>
+        </div>
+        <div class="email-body">
+            <div class="email-greeting">Good morning, Yani! Here's what's hot today.</div>
+
+            <div class="email-stats">
+                <div class="email-stat">
+                    <div class="email-stat-number">3</div>
+                    <div class="email-stat-label">S-Tier Leads</div>
+                </div>
+                <div class="email-stat">
+                    <div class="email-stat-number">7</div>
+                    <div class="email-stat-label">A-Tier Leads</div>
+                </div>
+                <div class="email-stat">
+                    <div class="email-stat-number">12</div>
+                    <div class="email-stat-label">New Signals</div>
+                </div>
+            </div>
+
+            <div class="email-section-title hot">&#x1f525; Act Today — S-Tier</div>
+
+            <div class="email-lead">
+                <div class="email-lead-tier s">S</div>
+                <div class="email-lead-info">
+                    <div class="email-lead-address">123 Oak Street — $425,000</div>
+                    <div class="email-lead-reason">Listing expired yesterday after 182 days. Agent (J. Smith, RE/MAX) has a 35% failure rate this year. County records show tax delinquency filed 4 months ago.</div>
+                    <div class="email-tags">
+                        <span class="email-tag tag-expired">Expired</span>
+                        <span class="email-tag tag-tax">Tax Delinquency</span>
+                        <span class="email-tag tag-agent">Weak Agent</span>
+                    </div>
+                    <div class="email-lead-action">Suggested: Market analysis showing what went wrong + your superior track record</div>
+                </div>
+            </div>
+
+            <div class="email-lead">
+                <div class="email-lead-tier s">S</div>
+                <div class="email-lead-info">
+                    <div class="email-lead-address">789 Pine Lane — $385,000</div>
+                    <div class="email-lead-reason">Pre-foreclosure (lis pendens) filed 8 days ago. Property appears vacant. Owner's mailing address is out of state (Ohio). Estimated equity: 55%.</div>
+                    <div class="email-tags">
+                        <span class="email-tag tag-foreclosure">Pre-Foreclosure</span>
+                        <span class="email-tag tag-equity">High Equity</span>
+                        <span class="email-tag tag-oos">Out-of-State Owner</span>
+                    </div>
+                    <div class="email-lead-action">Suggested: Empathy-first letter. Options counseling. Selling preserves their equity and credit.</div>
+                </div>
+            </div>
+
+            <div class="email-section-title warm">&#x1f31f; This Week — A-Tier</div>
+
+            <div class="email-lead">
+                <div class="email-lead-tier a">A</div>
+                <div class="email-lead-info">
+                    <div class="email-lead-address">456 Maple Drive — $349,900</div>
+                    <div class="email-lead-reason">FSBO listed 3 weeks ago. Price reduced twice: $375K → $360K → $349K. Days on Zillow: 24. No buyer interest.</div>
+                    <div class="email-tags">
+                        <span class="email-tag tag-fsbo">FSBO</span>
+                        <span class="email-tag tag-price">2x Price Drop</span>
+                    </div>
+                    <div class="email-lead-action">Suggested: Recent comps showing $365-370K with agent. "Here's what you're leaving on the table."</div>
+                </div>
+            </div>
+
+            <p style="color: var(--gray-400); font-size: 0.85rem; margin-top: 1.5rem; text-align: center; font-style: italic;">+ 6 more A-tier leads in your dashboard</p>
+        </div>
+    </div>
+
+    <div class="callout callout-amber">
+        <h4>S-Tier instant alerts</h4>
+        <p>For S-Tier leads, you can also get an <strong>instant notification</strong> the moment the signal is detected — not just in the morning briefing. Because sometimes 6 hours makes the difference between getting the listing and missing it.</p>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ===== CHAPTER 6: DASHBOARD ===== -->
+<div class="wide-content" id="dashboard">
+    <div class="chapter">
+        <div class="chapter-number">Chapter 6</div>
+        <h2>The Dashboard</h2>
+        <p>Your lead command center — on desktop and phone</p>
+    </div>
+
+    <div class="content">
+        <p class="prose">
+            The email briefing gets you started. The dashboard lets you <strong>manage everything</strong>. Filter leads, view the map, click to call, log outcomes, track your pipeline — all in one place.
+        </p>
+    </div>
+
+    <div class="dashboard-mockup">
+        <h3>What You'll See</h3>
+        <p>A preview of your lead command center</p>
+
+        <div class="dash-frame">
+            <div class="dash-topbar">
+                <span class="dash-topbar-logo">YaniVision</span>
+                <div class="dash-topbar-nav">
+                    <span class="active">Dashboard</span>
+                    <span>Leads</span>
+                    <span>Map</span>
+                    <span>Analytics</span>
+                </div>
+            </div>
+            <div class="dash-content">
+                <div class="dash-kpis">
+                    <div class="dash-kpi">
+                        <div class="dash-kpi-label">S-Tier Leads</div>
+                        <div class="dash-kpi-value">3</div>
+                        <div class="dash-kpi-delta up">+2 from yesterday</div>
+                    </div>
+                    <div class="dash-kpi">
+                        <div class="dash-kpi-label">Pipeline Total</div>
+                        <div class="dash-kpi-value">42</div>
+                        <div class="dash-kpi-delta up">+12 new signals</div>
+                    </div>
+                    <div class="dash-kpi">
+                        <div class="dash-kpi-label">Contacted Today</div>
+                        <div class="dash-kpi-value">0</div>
+                        <div class="dash-kpi-delta" style="color: var(--gray-400);">3 to go</div>
+                    </div>
+                    <div class="dash-kpi">
+                        <div class="dash-kpi-label">Appointments Set</div>
+                        <div class="dash-kpi-value">2</div>
+                        <div class="dash-kpi-delta up">This week</div>
+                    </div>
+                </div>
+
+                <table class="dash-table">
+                    <thead>
+                        <tr>
+                            <th>Tier</th>
+                            <th>Address</th>
+                            <th>Score</th>
+                            <th>Signals</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="dash-tier" style="background:var(--s-tier)">S</span></td>
+                            <td class="address">123 Oak Street</td>
+                            <td>88</td>
+                            <td>Expired, Tax, Agent</td>
+                            <td>New</td>
+                            <td><span class="action-btn">Call</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="dash-tier" style="background:var(--s-tier)">S</span></td>
+                            <td class="address">789 Pine Lane</td>
+                            <td>85</td>
+                            <td>Foreclosure, Equity, OOS</td>
+                            <td>New</td>
+                            <td><span class="action-btn">Letter</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="dash-tier" style="background:var(--a-tier)">A</span></td>
+                            <td class="address">456 Maple Drive</td>
+                            <td>72</td>
+                            <td>FSBO, 2x Price Drop</td>
+                            <td>New</td>
+                            <td><span class="action-btn">Call</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="dash-tier" style="background:var(--a-tier)">A</span></td>
+                            <td class="address">234 Elm Court</td>
+                            <td>68</td>
+                            <td>Expired, High DOM</td>
+                            <td>Contacted</td>
+                            <td><span class="action-btn">Follow Up</span></td>
+                        </tr>
+                        <tr>
+                            <td><span class="dash-tier" style="background:var(--b-tier)">B</span></td>
+                            <td class="address">567 Cedar Ave</td>
+                            <td>54</td>
+                            <td>Price Drop, 90 DOM</td>
+                            <td>New</td>
+                            <td><span class="action-btn">Call</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <p class="prose">
+            The dashboard also has a <strong>map view</strong> — every lead plotted on a map with color-coded pins. Red for S-tier, orange for A-tier, blue for B-tier. You can plan your driving route visually and see which neighborhoods have the highest concentration of motivated sellers.
+        </p>
+
+        <p class="prose">
+            And it works on your phone. Between appointments, waiting in a parking lot, or over lunch — check your leads, log a call outcome, see what's new. Everything syncs in real-time.
+        </p>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ===== CHAPTER 7: YOUR WORKFLOW ===== -->
+<div class="content" id="workflow">
+    <div class="chapter">
+        <div class="chapter-number">Chapter 7</div>
+        <h2>Your Weekly Workflow</h2>
+        <p>How YaniVision fits into your actual day</p>
+    </div>
+
+    <p class="prose">
+        YaniVision isn't one more thing on your plate. It <strong>replaces</strong> the time you currently spend searching for leads with time spent <em>acting on them</em>. Here's what a typical week looks like:
+    </p>
+
+    <div class="week-grid">
+        <div class="week-day">
+            <div class="week-day-name">Monday</div>
+            <div class="week-task">Review morning briefing (5 min)</div>
+            <div class="week-task">Call S-tier leads first (20 min)</div>
+            <div class="week-task">Work through A-tier list</div>
+            <div class="week-task">Check new pipeline entries</div>
+        </div>
+        <div class="week-day">
+            <div class="week-day-name">Tuesday</div>
+            <div class="week-task">Review briefing for new leads</div>
+            <div class="week-task">Follow up on Monday's calls</div>
+            <div class="week-task">Send CMAs to interested leads</div>
+            <div class="week-task">Log outcomes in dashboard</div>
+        </div>
+        <div class="week-day">
+            <div class="week-day-name">Wednesday</div>
+            <div class="week-task">Review briefing</div>
+            <div class="week-task">Door-knock high-value S-tiers</div>
+            <div class="week-task">Work B-tier list (quick calls)</div>
+            <div class="week-task">Review map for route planning</div>
+        </div>
+        <div class="week-day">
+            <div class="week-day-name">Thursday</div>
+            <div class="week-task">Review briefing</div>
+            <div class="week-task">Listing appointments (from earlier calls!)</div>
+            <div class="week-task">Follow up on CMAs sent</div>
+            <div class="week-task">Nurture C-tier with drip email</div>
+        </div>
+        <div class="week-day">
+            <div class="week-day-name">Friday</div>
+            <div class="week-task">Review briefing</div>
+            <div class="week-task">Wrap up week's follow-ups</div>
+            <div class="week-task">Check analytics (what's working?)</div>
+            <div class="week-task">Plan next week's door knocks</div>
+        </div>
+    </div>
+
+    <div class="callout callout-green">
+        <h4>Time saved</h4>
+        <p>Without YaniVision: 30-60 minutes/day searching for leads + figuring out who to call.<br>
+        <strong>With YaniVision: 5 minutes reading the briefing.</strong> The rest is spent on calls, appointments, and closings.</p>
+    </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- ===== CHAPTER 8: FAQ ===== -->
+<div class="content" id="faq">
+    <div class="chapter">
+        <div class="chapter-number">Chapter 8</div>
+        <h2>Common Questions</h2>
+        <p>Everything you might be wondering</p>
+    </div>
+
+    <div class="faq-list">
+        <div class="faq-item">
+            <div class="faq-q">Do I have to learn new software?</div>
+            <div class="faq-a">Barely. Phase 1 is just email — you read a briefing, same as any other email. The dashboard (Phase 3) is a simple website you open in your browser. If you can use Zillow, you can use YaniVision.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">What if I don't like the suggested scripts?</div>
+            <div class="faq-a">They're suggestions, not requirements. The scripts are frameworks that match each lead's specific situation. You personalize them with your own voice. Over time, we'll tune them to match how YOU actually talk to people.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">Is this legal? What about Do Not Call lists?</div>
+            <div class="faq-a">Yes, 100% legal. YaniVision has compliance built into every layer. DNC lists are checked automatically. CAN-SPAM rules are followed for emails. State-specific waiting periods (like for foreclosure outreach) are enforced in code. You can't accidentally break the rules.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">What if the system gives me too many leads?</div>
+            <div class="faq-a">The scoring thresholds are adjustable. If you're getting 20 S-tier leads a day (you won't — that would be amazing), we raise the bar. The goal is a manageable daily number that matches your capacity. You tell us what feels right.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">What about my MLS terms of service?</div>
+            <div class="faq-a">YaniVision uses your authorized MLS access — the same data you already have permission to see. We never scrape, redistribute, or share MLS data. The system just helps you analyze what you're already looking at, faster and smarter.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">What happens to the leads I don't contact?</div>
+            <div class="faq-a">They stay in your pipeline. Their scores decay over time (because urgency fades), but if new signals appear — another price drop, a new public record — the score goes back up and they reappear in your briefing. Nothing falls through the cracks.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">Can I use this on my phone?</div>
+            <div class="faq-a">Yes. The email briefing works on any phone. The dashboard (Phase 3) is built as a mobile-friendly web app — works in Safari or Chrome, no app store download needed.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">What if I stop using it for a while?</div>
+            <div class="faq-a">No penalty, no contracts, no wasted data. The system just keeps watching. When you come back, your pipeline is still there, and the most current leads are waiting for you. And if you stop using it entirely, we redesign it around what you actually need.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">How is this different from buying leads on Zillow?</div>
+            <div class="faq-a">Zillow leads are people who clicked a button — they're being sent to 3-5 agents simultaneously, and you're competing on speed. YaniVision leads are people showing <strong>behavioral signals of motivation</strong> that only you can see. You're the only agent who knows about them. No competition, higher conversion.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">Does this replace my CRM?</div>
+            <div class="faq-a">No — it feeds your CRM. YaniVision finds and scores the leads. When you decide to pursue one, it pushes the lead to your CRM (Follow Up Boss, etc.) with all the context and a suggested action plan. Your CRM handles the ongoing relationship.</div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<div class="footer">
+    <h2>Built Around You</h2>
+    <p>Every feature, every screen, every script suggestion is designed around how you actually work. This is your system.</p>
+    <div class="footer-sig">Built with love by your favorite nerd. &#x2764;&#xfe0f;</div>
+</div>
+
+</body>
+</html>
