@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YaniVision — Quick Questions For You</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --accent: #f59e0b;
+            --dark: #0f172a;
+            --gray: #64748b;
+            --gray-light: #94a3b8;
+            --light: #f8fafc;
+            --white: #ffffff;
+            --border: #e2e8f0;
+            --success: #10b981;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--dark);
+            line-height: 1.6;
+            background: var(--light);
+            min-height: 100vh;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: linear-gradient(135deg, var(--dark) 0%, #1a1a4e 100%);
+            color: var(--white);
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+
+        .header p {
+            font-size: 1.05rem;
+            color: var(--gray-light);
+            max-width: 600px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        /* ===== FORM CONTAINER ===== */
+        .form-container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        /* ===== SECTIONS ===== */
+        .form-section {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            border: 1px solid var(--border);
+        }
+
+        .form-section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.75rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .form-section-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .form-section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .form-section-subtitle {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        /* ===== FORM FIELDS ===== */
+        .field {
+            margin-bottom: 1.75rem;
+        }
+
+        .field:last-child { margin-bottom: 0; }
+
+        .field label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+            color: var(--dark);
+        }
+
+        .field .hint {
+            font-size: 0.82rem;
+            color: var(--gray);
+            margin-bottom: 0.6rem;
+            font-style: italic;
+        }
+
+        .field input[type="text"],
+        .field textarea,
+        .field select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            color: var(--dark);
+            background: var(--white);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            -webkit-appearance: none;
+        }
+
+        .field input[type="text"]:focus,
+        .field textarea:focus,
+        .field select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .field textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .field select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            padding-right: 2.5rem;
+        }
+
+        /* ===== CHECKBOXES ===== */
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.6rem 0.85rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .checkbox-item:hover { background: var(--light); }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 1.2rem;
+            height: 1.2rem;
+            accent-color: var(--primary);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .checkbox-item span {
+            font-size: 0.92rem;
+            color: var(--dark);
+        }
+
+        /* ===== RANKING ===== */
+        .rank-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .rank-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: var(--light);
+            border-radius: 10px;
+            border: 1.5px solid var(--border);
+        }
+
+        .rank-item select {
+            width: 3.5rem;
+            padding: 0.3rem;
+            border: 1.5px solid var(--border);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--primary);
+            text-align: center;
+            background: var(--white);
+        }
+
+        .rank-item .rank-label {
+            font-size: 0.92rem;
+            font-weight: 500;
+        }
+
+        .rank-item .rank-desc {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        /* ===== RADIO PILLS ===== */
+        .pill-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .pill-item {
+            position: relative;
+        }
+
+        .pill-item input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .pill-item label {
+            display: inline-block;
+            padding: 0.5rem 1.25rem;
+            border: 1.5px solid var(--border);
+            border-radius: 50px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--gray);
+        }
+
+        .pill-item input[type="radio"]:checked + label {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        .pill-item label:hover {
+            border-color: var(--primary-light);
+            color: var(--dark);
+        }
+
+        /* ===== BUTTONS ===== */
+        .actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.85rem 2rem;
+            border-radius: 50px;
+            border: none;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--dark);
+            border: 1.5px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--light);
+        }
+
+        /* ===== SAVE NOTIFICATION ===== */
+        .save-toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--dark);
+            color: var(--white);
+            padding: 0.85rem 1.75rem;
+            border-radius: 50px;
+            font-size: 0.92rem;
+            font-weight: 500;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 100;
+        }
+
+        .save-toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ===== PROGRESS BAR ===== */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 0.3s;
+            z-index: 200;
+        }
+
+        /* ===== PRINT ===== */
+        @media print {
+            .header { padding: 1.5rem; }
+            .form-container { padding: 0.5rem; }
+            .form-section { box-shadow: none; border: 1px solid #ddd; page-break-inside: avoid; }
+            .actions, .progress-bar, .save-toast { display: none; }
+            body { background: white; }
+        }
+
+        @media (max-width: 640px) {
+            .header { padding: 2rem 1.5rem; }
+            .header h1 { font-size: 1.6rem; }
+            .form-section { padding: 1.5rem; }
+            .pill-group { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="header">
+    <h1>YaniVision — Quick Questions</h1>
+    <p>Just fill in your answers below. Don't overthink it — short answers are perfect. This helps us build the system around exactly how you work.</p>
+</div>
+
+<div class="form-container">
+    <form id="questionnaire">
+
+        <!-- ===== MLS SETUP ===== -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <div class="form-section-icon">&#x1f3e0;</div>
+                <div>
+                    <div class="form-section-title">Your MLS Setup</div>
+                    <div class="form-section-subtitle">About the tools you use to search listings</div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>1. Which MLS platform do you log into?</label>
+                <div class="hint">If you're not sure, what's the website URL you go to?</div>
+                <select>
+                    <option value="">Select your platform...</option>
+                    <option>FlexMLS</option>
+                    <option>Matrix / Homelinc</option>
+                    <option>Bright MLS</option>
+                    <option>Paragon</option>
+                    <option>HAR</option>
+                    <option>Stellar MLS</option>
+                    <option>ARMLS</option>
+                    <option>Other (type below)</option>
+                </select>
+                <input type="text" placeholder="If Other, type your MLS platform here..." style="margin-top: 0.5rem;">
+            </div>
+
+            <div class="field">
+                <label>2. Can you export search results as a CSV/spreadsheet?</label>
+                <div class="hint">Most platforms have an "Export" or "Download" button</div>
+                <div class="pill-group">
+                    <div class="pill-item"><input type="radio" name="csv" id="csv-yes"><label for="csv-yes">Yes</label></div>
+                    <div class="pill-item"><input type="radio" name="csv" id="csv-no"><label for="csv-no">No</label></div>
+                    <div class="pill-item"><input type="radio" name="csv" id="csv-unsure"><label for="csv-unsure">Not sure</label></div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>3. Do you already have saved searches set up?</label>
+                <div class="hint">If yes, what are they filtering for?</div>
+                <textarea placeholder="e.g., Expired listings in my ZIP codes, homes under $500K, price reductions this week..."></textarea>
+            </div>
+        </div>
+
+        <!-- ===== YOUR MARKET ===== -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <div class="form-section-icon">&#x1f4cd;</div>
+                <div>
+                    <div class="form-section-title">Your Market</div>
+                    <div class="form-section-subtitle">Where you focus your business</div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>4. What areas do you focus on?</label>
+                <div class="hint">ZIP codes, neighborhoods, city, or county name</div>
+                <textarea placeholder="e.g., 77024, 77027, Memorial area, Spring Branch, Houston Heights..."></textarea>
+            </div>
+
+            <div class="field">
+                <label>5. What's your average sale price?</label>
+                <div class="hint">Ballpark is fine</div>
+                <div class="pill-group">
+                    <div class="pill-item"><input type="radio" name="price" id="p1"><label for="p1">Under $250K</label></div>
+                    <div class="pill-item"><input type="radio" name="price" id="p2"><label for="p2">$250K - $400K</label></div>
+                    <div class="pill-item"><input type="radio" name="price" id="p3"><label for="p3">$400K - $600K</label></div>
+                    <div class="pill-item"><input type="radio" name="price" id="p4"><label for="p4">$600K+</label></div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>6. What's your commission split?</label>
+                <div class="hint">What % do you take home after brokerage split?</div>
+                <input type="text" placeholder="e.g., 70/30, 80/20, 100% with cap...">
+            </div>
+        </div>
+
+        <!-- ===== CURRENT WORKFLOW ===== -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <div class="form-section-icon">&#x1f4cb;</div>
+                <div>
+                    <div class="form-section-title">Your Current Workflow</div>
+                    <div class="form-section-subtitle">How you find and manage leads today</div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>7. How do you currently find new leads?</label>
+                <div class="hint">Check all that apply</div>
+                <div class="checkbox-group">
+                    <label class="checkbox-item"><input type="checkbox"><span>Referrals from past clients</span></label>
+                    <label class="checkbox-item"><input type="checkbox"><span>Open houses</span></label>
+                    <label class="checkbox-item"><input type="checkbox"><span>Zillow / Realtor.com leads (paid)</span></label>
+                    <label class="checkbox-item"><input type="checkbox"><span>Cold calling</span></label>
+                    <label class="checkbox-item"><input type="checkbox"><span>Door knocking</span></label>
+                    <label class="checkbox-item"><input type="checkbox"><span>Social media</span></label>
+                    <label class="checkbox-item"><input type="checkbox"><span>Farming (mailers to a neighborhood)</span></label>
+                </div>
+                <input type="text" placeholder="Other methods..." style="margin-top: 0.5rem;">
+            </div>
+
+            <div class="field">
+                <label>8. How much time per day do you spend looking for leads?</label>
+                <div class="pill-group">
+                    <div class="pill-item"><input type="radio" name="time" id="t0"><label for="t0">Almost none</label></div>
+                    <div class="pill-item"><input type="radio" name="time" id="t1"><label for="t1">15 min</label></div>
+                    <div class="pill-item"><input type="radio" name="time" id="t2"><label for="t2">30 min</label></div>
+                    <div class="pill-item"><input type="radio" name="time" id="t3"><label for="t3">1 hour+</label></div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>9. What's the most annoying part of finding leads?</label>
+                <div class="hint">What would you change if you could wave a magic wand?</div>
+                <textarea placeholder="e.g., I waste too much time searching and not enough time calling..."></textarea>
+            </div>
+        </div>
+
+        <!-- ===== YOUR TOOLS ===== -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <div class="form-section-icon">&#x1f4f1;</div>
+                <div>
+                    <div class="form-section-title">Your Tools</div>
+                    <div class="form-section-subtitle">What you use to manage your business</div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>10. Do you use a CRM?</label>
+                <select>
+                    <option value="">Select your CRM...</option>
+                    <option>Follow Up Boss</option>
+                    <option>kvCORE</option>
+                    <option>LionDesk</option>
+                    <option>Chime</option>
+                    <option>BoomTown</option>
+                    <option>Spreadsheet / Google Sheets</option>
+                    <option>Nothing yet</option>
+                    <option>Other (type below)</option>
+                </select>
+                <input type="text" placeholder="If Other, type your CRM here..." style="margin-top: 0.5rem;">
+            </div>
+
+            <div class="field">
+                <label>11. Phone or computer — which do you use more for work?</label>
+                <div class="pill-group">
+                    <div class="pill-item"><input type="radio" name="device" id="d1"><label for="d1">Phone mostly</label></div>
+                    <div class="pill-item"><input type="radio" name="device" id="d2"><label for="d2">Computer mostly</label></div>
+                    <div class="pill-item"><input type="radio" name="device" id="d3"><label for="d3">Both equally</label></div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>12. How do you prefer to get notifications?</label>
+                <div class="hint">Check all that work for you</div>
+                <div class="checkbox-group">
+                    <label class="checkbox-item"><input type="checkbox"><span>Email</span></label>
+                    <label class="checkbox-item"><input type="checkbox"><span>Text message</span></label>
+                    <label class="checkbox-item"><input type="checkbox"><span>Phone app notification</span></label>
+                    <label class="checkbox-item"><input type="checkbox"><span>I'll just check when I'm ready</span></label>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== LEAD TYPES ===== -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <div class="form-section-icon">&#x1f3af;</div>
+                <div>
+                    <div class="form-section-title">Lead Types</div>
+                    <div class="form-section-subtitle">What kinds of leads interest you most</div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>13. Rank these lead types (1 = most interested):</label>
+                <div class="hint">Use the dropdown to assign a rank</div>
+                <div class="rank-group">
+                    <div class="rank-item">
+                        <select><option>-</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+                        <div>
+                            <div class="rank-label">Expired Listings</div>
+                            <div class="rank-desc">Listings that didn't sell — homeowner still wants to sell</div>
+                        </div>
+                    </div>
+                    <div class="rank-item">
+                        <select><option>-</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+                        <div>
+                            <div class="rank-label">FSBOs (For Sale By Owner)</div>
+                            <div class="rank-desc">People trying to sell without an agent</div>
+                        </div>
+                    </div>
+                    <div class="rank-item">
+                        <select><option>-</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+                        <div>
+                            <div class="rank-label">Pre-Foreclosure</div>
+                            <div class="rank-desc">Homeowners facing foreclosure — sensitive outreach</div>
+                        </div>
+                    </div>
+                    <div class="rank-item">
+                        <select><option>-</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+                        <div>
+                            <div class="rank-label">Probate / Estate</div>
+                            <div class="rank-desc">Inherited property they likely want to sell</div>
+                        </div>
+                    </div>
+                    <div class="rank-item">
+                        <select><option>-</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+                        <div>
+                            <div class="rank-label">Price Reductions</div>
+                            <div class="rank-desc">Active listings where the seller keeps dropping the price</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>14. Any lead types you're NOT comfortable pursuing?</label>
+                <div class="hint">Totally fine if some feel too sensitive — no judgment</div>
+                <textarea placeholder="e.g., I'd rather not do pre-foreclosure, or probate feels too sensitive..."></textarea>
+            </div>
+
+            <div class="field">
+                <label>15. Are you comfortable door-knocking for high-value leads?</label>
+                <div class="pill-group">
+                    <div class="pill-item"><input type="radio" name="doorknock" id="dk1"><label for="dk1">Yes, love it</label></div>
+                    <div class="pill-item"><input type="radio" name="doorknock" id="dk2"><label for="dk2">Sometimes</label></div>
+                    <div class="pill-item"><input type="radio" name="doorknock" id="dk3"><label for="dk3">Prefer not to</label></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== OUTREACH STYLE ===== -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <div class="form-section-icon">&#x1f4ac;</div>
+                <div>
+                    <div class="form-section-title">Your Outreach Style</div>
+                    <div class="form-section-subtitle">How you connect with potential clients</div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>16. How do you prefer to make first contact?</label>
+                <div class="hint">Rank in order of preference (1 = favorite)</div>
+                <div class="rank-group">
+                    <div class="rank-item">
+                        <select><option>-</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+                        <div><div class="rank-label">Phone call</div></div>
+                    </div>
+                    <div class="rank-item">
+                        <select><option>-</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+                        <div><div class="rank-label">Email</div></div>
+                    </div>
+                    <div class="rank-item">
+                        <select><option>-</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+                        <div><div class="rank-label">Text message</div></div>
+                    </div>
+                    <div class="rank-item">
+                        <select><option>-</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+                        <div><div class="rank-label">Direct mail / letter</div></div>
+                    </div>
+                    <div class="rank-item">
+                        <select><option>-</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+                        <div><div class="rank-label">Door knock</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>17. How would you describe your communication style?</label>
+                <div class="hint">Check the one that fits best</div>
+                <div class="checkbox-group">
+                    <label class="checkbox-item"><input type="radio" name="style" value="warm"><span>Warm and friendly — relationship first</span></label>
+                    <label class="checkbox-item"><input type="radio" name="style" value="pro"><span>Professional and data-driven — market expert</span></label>
+                    <label class="checkbox-item"><input type="radio" name="style" value="direct"><span>Direct and efficient — let's get to business</span></label>
+                    <label class="checkbox-item"><input type="radio" name="style" value="empathetic"><span>Empathetic and patient — especially with tough situations</span></label>
+                </div>
+                <input type="text" placeholder="Or describe your own style..." style="margin-top: 0.5rem;">
+            </div>
+
+            <div class="field">
+                <label>18. Do you have scripts or templates you already love?</label>
+                <div class="hint">If yes, we'll build the system around your voice</div>
+                <textarea placeholder="Paste or describe them here, or just say 'no' and we'll create some for you..."></textarea>
+            </div>
+        </div>
+
+        <!-- ===== MORNING BRIEFING ===== -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <div class="form-section-icon">&#x2615;</div>
+                <div>
+                    <div class="form-section-title">The Morning Briefing</div>
+                    <div class="form-section-subtitle">Customizing your daily lead email</div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>19. What time do you usually start working?</label>
+                <div class="hint">We'll schedule the briefing to arrive before you start</div>
+                <div class="pill-group">
+                    <div class="pill-item"><input type="radio" name="starttime" id="st1"><label for="st1">6:00 AM</label></div>
+                    <div class="pill-item"><input type="radio" name="starttime" id="st2"><label for="st2">7:00 AM</label></div>
+                    <div class="pill-item"><input type="radio" name="starttime" id="st3"><label for="st3">8:00 AM</label></div>
+                    <div class="pill-item"><input type="radio" name="starttime" id="st4"><label for="st4">9:00 AM</label></div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>20. In the daily briefing, what matters most?</label>
+                <div class="hint">Rank 1-5 (1 = most important)</div>
+                <div class="rank-group">
+                    <div class="rank-item">
+                        <select><option>-</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+                        <div><div class="rank-label">Who to call first (prioritized list)</div></div>
+                    </div>
+                    <div class="rank-item">
+                        <select><option>-</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+                        <div><div class="rank-label">Why they're a lead (the signals/reasons)</div></div>
+                    </div>
+                    <div class="rank-item">
+                        <select><option>-</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+                        <div><div class="rank-label">What to say (suggested script/approach)</div></div>
+                    </div>
+                    <div class="rank-item">
+                        <select><option>-</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+                        <div><div class="rank-label">Property details (address, price, beds/baths)</div></div>
+                    </div>
+                    <div class="rank-item">
+                        <select><option>-</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option></select>
+                        <div><div class="rank-label">Pipeline overview (how many leads total)</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>21. How many leads per day feels manageable?</label>
+                <div class="hint">This helps us set the right scoring thresholds</div>
+                <div class="pill-group">
+                    <div class="pill-item"><input type="radio" name="leads" id="l1"><label for="l1">3-5</label></div>
+                    <div class="pill-item"><input type="radio" name="leads" id="l2"><label for="l2">5-10</label></div>
+                    <div class="pill-item"><input type="radio" name="leads" id="l3"><label for="l3">10-20</label></div>
+                    <div class="pill-item"><input type="radio" name="leads" id="l4"><label for="l4">20+</label></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== BIG PICTURE ===== -->
+        <div class="form-section">
+            <div class="form-section-header">
+                <div class="form-section-icon">&#x1f31f;</div>
+                <div>
+                    <div class="form-section-title">Big Picture</div>
+                    <div class="form-section-subtitle">What success looks like for you</div>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>22. What does success look like in 6 months?</label>
+                <textarea placeholder="e.g., 2 extra closings per month, a steady pipeline so I'm not stressed about the next deal..."></textarea>
+            </div>
+
+            <div class="field">
+                <label>23. Have you seen another agent do something smart to find leads?</label>
+                <textarea placeholder="Anything you thought was clever or wished you could do..."></textarea>
+            </div>
+
+            <div class="field">
+                <label>24. Anything else you want us to know?</label>
+                <textarea placeholder="No wrong answers — anything helps!"></textarea>
+            </div>
+        </div>
+
+        <!-- ===== ACTIONS ===== -->
+        <div class="actions">
+            <button type="button" class="btn btn-primary" onclick="saveAnswers()">&#x1f4be; Save My Answers</button>
+            <button type="button" class="btn btn-secondary" onclick="window.print()">&#x1f5a8; Print</button>
+        </div>
+
+    </form>
+</div>
+
+<div class="save-toast" id="saveToast">Answers saved! You can come back and edit anytime.</div>
+
+<script>
+    // Auto-save to localStorage
+    const form = document.getElementById('questionnaire');
+    const STORAGE_KEY = 'yanivision_questionnaire';
+
+    // Load saved answers
+    function loadAnswers() {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return;
+        const data = JSON.parse(saved);
+
+        const inputs = form.querySelectorAll('input, textarea, select');
+        inputs.forEach((el, i) => {
+            if (data[i] !== undefined) {
+                if (el.type === 'checkbox' || el.type === 'radio') {
+                    el.checked = data[i];
+                } else {
+                    el.value = data[i];
+                }
+            }
+        });
+        updateProgress();
+    }
+
+    // Save answers
+    function saveAnswers() {
+        const inputs = form.querySelectorAll('input, textarea, select');
+        const data = {};
+        inputs.forEach((el, i) => {
+            if (el.type === 'checkbox' || el.type === 'radio') {
+                data[i] = el.checked;
+            } else {
+                data[i] = el.value;
+            }
+        });
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+
+        const toast = document.getElementById('saveToast');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // Auto-save on change
+    form.addEventListener('input', () => {
+        saveAnswers();
+        updateProgress();
+    });
+
+    // Progress bar
+    function updateProgress() {
+        const inputs = form.querySelectorAll('input[type="text"], textarea, select');
+        const radios = form.querySelectorAll('input[type="radio"]');
+        const checkboxes = form.querySelectorAll('input[type="checkbox"]');
+
+        let filled = 0;
+        let total = 0;
+
+        inputs.forEach(el => {
+            if (el.value && el.value !== '') filled++;
+            total++;
+        });
+
+        // Count radio groups
+        const radioGroups = {};
+        radios.forEach(r => { radioGroups[r.name] = radioGroups[r.name] || false; if (r.checked) radioGroups[r.name] = true; });
+        Object.values(radioGroups).forEach(v => { total++; if (v) filled++; });
+
+        const pct = total > 0 ? (filled / total) * 100 : 0;
+        document.getElementById('progressBar').style.width = pct + '%';
+    }
+
+    loadAnswers();
+    updateProgress();
+</script>
+
+</body>
+</html>
