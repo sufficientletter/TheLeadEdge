@@ -1,4 +1,4 @@
-# LeadFinder: Master Build Plan
+# YaniVision: Master Build Plan
 
 > **Project**: Data-driven real estate lead generation system
 > **Builder**: Husband (developer) for wife (licensed Realtor with MLS access)
@@ -10,7 +10,7 @@
 
 ## Executive Summary
 
-LeadFinder is a Python-based intelligence system that mines MLS data, public records, and digital signals to find motivated real estate sellers and buyers before competitors. The wife's MLS access is the competitive moat -- no existing tool does deep MLS behavioral analysis.
+YaniVision is a Python-based intelligence system that mines MLS data, public records, and digital signals to find motivated real estate sellers and buyers before competitors. The wife's MLS access is the competitive moat -- no existing tool does deep MLS behavioral analysis.
 
 **The plan has 7 phases, starting with $0 cost on Day 1 and scaling to ~$650/month by Month 4.** The system is usable and delivering value by Week 2.
 
@@ -69,7 +69,7 @@ Goes from zero systematic prospecting to a structured daily pipeline. Ahead of 8
 ```
 Wife exports CSV from MLS portal (5 min)
     → drops in folder
-        → LeadFinder ingests, deduplicates, detects signals
+        → YaniVision ingests, deduplicates, detects signals
             → scores and tiers all leads
                 → sends daily briefing email at 6:30 AM
 ```
@@ -84,24 +84,24 @@ Wife exports CSV from MLS portal (5 min)
 | 2 | `pyproject.toml` | Dependencies: pydantic, sqlalchemy, aiosqlite, httpx, apscheduler, jinja2, pyyaml, structlog | Simple |
 | 3 | Virtual env + `pip install -e ".[dev]"` | Dev environment | Simple |
 | 4 | `.env.example` + `.gitignore` | Config template, ignore secrets + data | Simple |
-| 5 | `leadfinder/models/enums.py` | Tier, LeadStatus, SignalCategory, DecayType, MLSStatus, OutreachType, OutreachOutcome | Simple |
+| 5 | `yanivision/models/enums.py` | Tier, LeadStatus, SignalCategory, DecayType, MLSStatus, OutreachType, OutreachOutcome | Simple |
 | 6 | `config/settings.py` | Pydantic Settings (~45 fields across 10 categories) | Medium |
-| 7 | `leadfinder/utils/logging.py` | structlog setup (JSON prod, colored dev) | Medium |
-| 8 | `leadfinder/utils/address.py` | USPS address normalization for dedup | Medium |
-| 9 | `leadfinder/utils/phone.py` | Phone normalization to E.164 | Simple |
-| 10 | `leadfinder/utils/retry.py` | tenacity retry decorators (api_retry, gentle_retry) | Simple |
-| 11 | `leadfinder/utils/rate_limit.py` | CircuitBreaker class | Medium |
+| 7 | `yanivision/utils/logging.py` | structlog setup (JSON prod, colored dev) | Medium |
+| 8 | `yanivision/utils/address.py` | USPS address normalization for dedup | Medium |
+| 9 | `yanivision/utils/phone.py` | Phone normalization to E.164 | Simple |
+| 10 | `yanivision/utils/retry.py` | tenacity retry decorators (api_retry, gentle_retry) | Simple |
+| 11 | `yanivision/utils/rate_limit.py` | CircuitBreaker class | Medium |
 
 #### Data Models (Steps 12-17)
 
 | Step | File | What | Complexity |
 |------|------|------|------------|
-| 12 | `leadfinder/models/property.py` | PropertyBase/Valuation/MLS/Owner composite model | Medium |
-| 13 | `leadfinder/models/signal.py` | Signal, SignalCreate, SignalConfig | Medium |
-| 14 | `leadfinder/models/score.py` | ScoreResult, ScoreHistory | Simple |
-| 15 | `leadfinder/models/outreach.py` | OutreachEvent, OutreachEventCreate | Simple |
-| 16 | `leadfinder/models/lead.py` | Lead with computed fields (score_change, days_since_detection) | Medium |
-| 17 | `leadfinder/models/__init__.py` | Re-export all models | Simple |
+| 12 | `yanivision/models/property.py` | PropertyBase/Valuation/MLS/Owner composite model | Medium |
+| 13 | `yanivision/models/signal.py` | Signal, SignalCreate, SignalConfig | Medium |
+| 14 | `yanivision/models/score.py` | ScoreResult, ScoreHistory | Simple |
+| 15 | `yanivision/models/outreach.py` | OutreachEvent, OutreachEventCreate | Simple |
+| 16 | `yanivision/models/lead.py` | Lead with computed fields (score_change, days_since_detection) | Medium |
+| 17 | `yanivision/models/__init__.py` | Re-export all models | Simple |
 
 #### Scoring Engine (Steps 18-20)
 
@@ -109,15 +109,15 @@ Wife exports CSV from MLS portal (5 min)
 |------|------|------|------------|
 | 18 | `config/scoring_weights.yaml` | 20 signal types + 6 stacking rules + tier thresholds | Simple |
 | 19 | `config/feature_flags.yaml` | Data sources, integrations, notifications toggles | Simple |
-| 20 | `leadfinder/scoring/config_loader.py` | Load YAML → SignalConfig + StackingRule + TierConfig | Simple |
+| 20 | `yanivision/scoring/config_loader.py` | Load YAML → SignalConfig + StackingRule + TierConfig | Simple |
 
 #### Database (Steps 21-24)
 
 | Step | File | What | Complexity |
 |------|------|------|------------|
-| 21 | `leadfinder/storage/database.py` | 7 SQLAlchemy tables + async engine + session factory | Complex |
-| 22 | `leadfinder/storage/repositories.py` | PropertyRepo, LeadRepo, SignalRepo, ScoreHistoryRepo, SyncLogRepo | Complex |
-| 23 | `leadfinder/storage/queries.py` | Named queries for briefing, lead list, map | Medium |
+| 21 | `yanivision/storage/database.py` | 7 SQLAlchemy tables + async engine + session factory | Complex |
+| 22 | `yanivision/storage/repositories.py` | PropertyRepo, LeadRepo, SignalRepo, ScoreHistoryRepo, SyncLogRepo | Complex |
+| 23 | `yanivision/storage/queries.py` | Named queries for briefing, lead list, map | Medium |
 | 24 | `alembic.ini` + `alembic/env.py` | Migration setup (generate initial schema) | Medium |
 
 #### Tests + Factories (Steps 25-27)
@@ -132,18 +132,18 @@ Wife exports CSV from MLS portal (5 min)
 
 | Step | File | What | Complexity |
 |------|------|------|------------|
-| 28 | `leadfinder/scoring/decay.py` | 4 decay functions (linear, exponential, step, escalating) + freshness premium | Low |
-| 29 | `leadfinder/scoring/stacking.py` | 6 stacking rules, best-single-rule algorithm | Low-Med |
-| 30 | `leadfinder/scoring/engine.py` | ScoringEngine.calculate() — the core intelligence | Medium |
-| 31 | `leadfinder/sources/base.py` | Abstract DataSourceConnector + SyncResult | Medium |
-| 32 | `leadfinder/sources/mls_csv.py` | CSV import from MLS exports (FlexMLS/Matrix column mapping) | Low |
-| 33 | `leadfinder/pipelines/detect.py` | SignalDetector — 12 detection rules for MLS signals | Medium |
-| 34 | `leadfinder/pipelines/score.py` | ScorePipeline — fetch signals, calculate, persist, detect tier changes | Medium |
-| 35 | `leadfinder/pipelines/ingest.py` | IngestPipeline — CSV read, normalize, deduplicate, upsert | Medium |
-| 36 | `leadfinder/notifications/email.py` | SMTP email sender (Gmail free) | Low |
-| 37 | `leadfinder/notifications/templates/daily_briefing.html` | Jinja2 HTML email template | Medium |
-| 38 | `leadfinder/pipelines/briefing.py` | BriefingGenerator — hot leads, tier movers, pipeline summary | Medium |
-| 39 | `leadfinder/main.py` | CLI runner: import → detect → score → email | Low |
+| 28 | `yanivision/scoring/decay.py` | 4 decay functions (linear, exponential, step, escalating) + freshness premium | Low |
+| 29 | `yanivision/scoring/stacking.py` | 6 stacking rules, best-single-rule algorithm | Low-Med |
+| 30 | `yanivision/scoring/engine.py` | ScoringEngine.calculate() — the core intelligence | Medium |
+| 31 | `yanivision/sources/base.py` | Abstract DataSourceConnector + SyncResult | Medium |
+| 32 | `yanivision/sources/mls_csv.py` | CSV import from MLS exports (FlexMLS/Matrix column mapping) | Low |
+| 33 | `yanivision/pipelines/detect.py` | SignalDetector — 12 detection rules for MLS signals | Medium |
+| 34 | `yanivision/pipelines/score.py` | ScorePipeline — fetch signals, calculate, persist, detect tier changes | Medium |
+| 35 | `yanivision/pipelines/ingest.py` | IngestPipeline — CSV read, normalize, deduplicate, upsert | Medium |
+| 36 | `yanivision/notifications/email.py` | SMTP email sender (Gmail free) | Low |
+| 37 | `yanivision/notifications/templates/daily_briefing.html` | Jinja2 HTML email template | Medium |
+| 38 | `yanivision/pipelines/briefing.py` | BriefingGenerator — hot leads, tier movers, pipeline summary | Medium |
+| 39 | `yanivision/main.py` | CLI runner: import → detect → score → email | Low |
 
 #### Unit Tests
 
@@ -159,7 +159,7 @@ Wife exports CSV from MLS portal (5 min)
 - `ruff check .` passes
 - `pytest tests/` — all ~45 tests green
 - `alembic upgrade head` creates SQLite DB with 7 tables
-- Drop a CSV in `data/mls_imports/`, run `python -m leadfinder`, receive briefing email
+- Drop a CSV in `data/mls_imports/`, run `python -m yanivision`, receive briefing email
 
 ### Success Criteria
 - Wife exports CSV, drops in folder, runs one command → scored briefing email in 60 seconds
@@ -234,7 +234,7 @@ Chosen over Streamlit (no WebSocket push), Dash (callback hell), and React (over
 ### File Structure (28 new files)
 
 ```
-leadfinder/dashboard/
+yanivision/dashboard/
 ├── app.py                    # NiceGUI setup, routing, auth
 ├── theme.py                  # Colors, tier/signal palette, Tailwind
 ├── components/               # 11 reusable components
@@ -378,11 +378,11 @@ The system NEVER auto-adjusts weights. It suggests changes; the human approves.
 ### Project Structure
 
 ```
-LeadFinder/
+YaniVision/
 ├── CLAUDE.md
 ├── MASTER_BUILD_PLAN.md          # This file
 ├── Research/                      # 16 research files (19,800+ lines)
-├── leadfinder/                    # Python package root
+├── yanivision/                    # Python package root
 │   ├── pyproject.toml
 │   ├── .env.example
 │   ├── alembic.ini
@@ -391,7 +391,7 @@ LeadFinder/
 │   │   ├── settings.py           # Pydantic Settings (45 fields)
 │   │   ├── scoring_weights.yaml  # Signal weights, stacking rules, tiers
 │   │   └── feature_flags.yaml    # Data source + integration toggles
-│   ├── leadfinder/
+│   ├── yanivision/
 │   │   ├── main.py               # Entrypoint: scheduler + NiceGUI
 │   │   ├── models/               # 6 Pydantic model files
 │   │   ├── sources/              # 7 data connectors

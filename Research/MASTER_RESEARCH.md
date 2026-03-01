@@ -1,4 +1,4 @@
-# LeadFinder: Master Research Document
+# YaniVision: Master Research Document
 
 > **Project**: Data-driven real estate lead generation for a licensed Realtor with MLS access
 > **Created**: 2026-02-28
