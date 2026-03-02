@@ -9,4 +9,4 @@
 - Create journal entry every session in `TeamLeadJournal/`.
 - Stay within project folder — never browse or modify other projects.
 - If subagents hit file write permission issues, Team Lead writes files directly based on their output.
-- The Realtor (wife) handles all client contact — we build the intelligence layer only.
+- The Realtor operator handles all client contact — we build the intelligence layer only.

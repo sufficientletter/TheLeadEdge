@@ -1,6 +1,6 @@
 # Local Market Data Sources & County-Level Public Records Access
 
-> **Project**: LeadFinder — Real Estate Lead Generation System
+> **Project**: TheLeadEdge — Real Estate Lead Generation System
 > **Created**: 2026-02-28
 > **Purpose**: Practical "how to actually access" guide for every public records data source identified in prior research
 > **Prerequisite Reading**: [public_records_strategies.md](public_records_strategies.md) (identifies the 12 lead sources), [automation_integrations.md](automation_integrations.md) (automation layer)
@@ -625,7 +625,7 @@ Third-party aggregators compile public records from thousands of counties and co
 - Typically five-figure annual contracts minimum
 - You are more likely to access CoreLogic data *through* another product (like your MLS, which probably runs on CoreLogic/Trestle, or through a title company that licenses CoreLogic)
 
-**Relevance to LeadFinder**: You probably will not license CoreLogic directly. Instead, recognize that CoreLogic data already flows through your MLS system. Your RESO Web API access (through Trestle) is CoreLogic infrastructure.
+**Relevance to TheLeadEdge**: You probably will not license CoreLogic directly. Instead, recognize that CoreLogic data already flows through your MLS system. Your RESO Web API access (through Trestle) is CoreLogic infrastructure.
 
 ### 5.4 Reonomy
 
@@ -644,7 +644,7 @@ Third-party aggregators compile public records from thousands of counties and co
 - Professional plans $99-249/mo with more search volume
 - Enterprise/API access requires sales discussion
 
-**Relevance to LeadFinder**: Useful primarily if you want to identify commercial property owners or pierce the LLC veil (identify the actual person behind an LLC-owned property). For pure residential lead gen, ATTOM or PropertyRadar offer better value.
+**Relevance to TheLeadEdge**: Useful primarily if you want to identify commercial property owners or pierce the LLC veil (identify the actual person behind an LLC-owned property). For pure residential lead gen, ATTOM or PropertyRadar offer better value.
 
 ### 5.5 DataTree (First American)
 
@@ -711,7 +711,7 @@ Third-party aggregators compile public records from thousands of counties and co
 | **Monthly Cost** | $100-500+ | $59-199 | Enterprise (five figures) | $49-249 | $50-150 | $50-100 |
 | **Data Freshness** | 30-60 day lag on recordings | Near-real-time foreclosure in core markets | Variable | Weekly updates | Near-real-time for recordings | Variable |
 
-### 5.8 Recommended Stack for LeadFinder
+### 5.8 Recommended Stack for TheLeadEdge
 
 Based on cost, coverage, and API quality:
 
@@ -1022,7 +1022,7 @@ Step 6: Outreach to the owner at their NEW address
 
 **Technical integration:**
 - Melissa Data and Smarty both offer APIs for programmatic NCOA processing
-- Can be integrated directly into the LeadFinder Python pipeline
+- Can be integrated directly into the TheLeadEdge Python pipeline
 - Run as a scheduled batch job (quarterly or monthly)
 - Results feed into the lead scoring engine as a signal
 
@@ -1581,4 +1581,4 @@ For each of the 12 lead sources from prior research, here is the fastest path to
 
 ---
 
-*This document provides the practical access guide for every public records data source identified in prior LeadFinder research. It is designed to be a working reference — not a one-time read. Bookmark specific sections and return to them as you set up access to each data source in your target market.*
+*This document provides the practical access guide for every public records data source identified in prior TheLeadEdge research. It is designed to be a working reference — not a one-time read. Bookmark specific sections and return to them as you set up access to each data source in your target market.*

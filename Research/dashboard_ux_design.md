@@ -1,6 +1,6 @@
 # Dashboard UI/UX Design Research
 
-> **Project**: LeadFinder — Real Estate Lead Generation Dashboard
+> **Project**: TheLeadEdge — Real Estate Lead Generation Dashboard
 > **Created**: 2026-02-28
 > **Purpose**: Design patterns, color systems, and UX principles for a Realtor-facing dashboard
 
@@ -47,7 +47,7 @@
 
 ### 1.2 Critical Gaps in Existing Tools
 
-| Gap | What's Missing | LeadFinder Opportunity |
+| Gap | What's Missing | TheLeadEdge Opportunity |
 |-----|---------------|----------------------|
 | Signal Stacking Visualization | No tool shows WHY a lead is hot | Visual signal badges with point values |
 | Morning Briefing | No tool generates a daily action summary | Auto-generated morning view |
@@ -156,11 +156,11 @@ Phone:         (602) 555-1234 (standard US format)
 
 ### 3.1 Morning Briefing View (Default Landing Page)
 
-This is what the Realtor sees when they open LeadFinder at 7am:
+This is what the Realtor sees when they open TheLeadEdge at 7am:
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│  LeadFinder          Good morning, Sarah!     Feb 28, 2026  🌓  │
+│  TheLeadEdge          Good morning, Sarah!     Feb 28, 2026  🌓  │
 │  [Briefing] [Leads] [Map] [Pipeline] [Analytics]                │
 ├──────────────────────────────────────────────────────────────────┤
 │                                                                  │
@@ -423,7 +423,7 @@ For showing impact of signal stacking:
 
 ```
 ┌─────────────────────┐    ┌─────────────────────┐
-│  WITHOUT LeadFinder  │    │  WITH LeadFinder     │
+│  WITHOUT TheLeadEdge  │    │  WITH TheLeadEdge     │
 │                      │    │                      │
 │  Leads/month:   ~20  │ →  │  Leads/month:   ~80  │
 │  S-Tier:         0   │    │  S-Tier:        12   │
@@ -471,7 +471,7 @@ For showing impact of signal stacking:
 ### 5.3 Daily Digest Email Layout
 
 ```
-Subject: LeadFinder Morning Briefing — Feb 28, 2026
+Subject: TheLeadEdge Morning Briefing — Feb 28, 2026
 
 ╔══════════════════════════════════════════════════╗
 ║  LEADFINDER MORNING BRIEFING                     ║
@@ -556,7 +556,7 @@ ui.add_head_html('''
 ''')
 ```
 
-### 6.3 NiceGUI Component Mapping to LeadFinder Features
+### 6.3 NiceGUI Component Mapping to TheLeadEdge Features
 
 | Feature | NiceGUI Component | Notes |
 |---------|------------------|-------|
@@ -576,7 +576,7 @@ ui.add_head_html('''
 | Download | `ui.download()` | Export lead lists |
 | Auth | `app.storage.user` | Session-based authentication |
 
-### 6.4 ECharts Chart Components for LeadFinder
+### 6.4 ECharts Chart Components for TheLeadEdge
 
 | Chart Type | Use Case | ECharts Type |
 |-----------|----------|-------------|
@@ -596,7 +596,7 @@ ui.add_head_html('''
 ### 7.1 The "Sarah Test" — User Persona
 
 ```
-Name:        Sarah (the Realtor wife)
+Name:        the Realtor operator
 Age:         35-45
 Tech Level:  Comfortable with phone/tablet, uses Zillow, Instagram
 Daily Tools: iPhone, MLS portal, Follow Up Boss, email, text
@@ -794,4 +794,4 @@ DARK MODE
 
 ---
 
-*This design system provides a comprehensive visual language for LeadFinder, optimized for a non-technical Realtor user who needs to quickly identify high-priority leads and take action.*
+*This design system provides a comprehensive visual language for TheLeadEdge, optimized for a non-technical Realtor user who needs to quickly identify high-priority leads and take action.*

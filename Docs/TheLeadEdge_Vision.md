@@ -1,14 +1,14 @@
-# YaniVision — Your Unfair Advantage
+# TheLeadEdge — Your Unfair Advantage
 
 > **What if the best leads came to you every morning before your first cup of coffee?**
 
 ---
 
-## What Is YaniVision?
+## What Is TheLeadEdge?
 
-YaniVision is a system your husband is building specifically for you. It watches the MLS, tracks public records, and monitors dozens of signals to find the most motivated sellers and buyers in your market — then tells you exactly who to call first, and why.
+TheLeadEdge is a data-driven lead intelligence system built for Realtors. It watches the MLS, tracks public records, and monitors dozens of signals to find the most motivated sellers and buyers in your market — then tells you exactly who to call first, and why.
 
-No cold calling random lists. No hoping for referrals. No scrolling through MLS for 30 minutes every morning. YaniVision does the detective work so you can focus on what you're best at: building relationships and closing deals.
+No cold calling random lists. No hoping for referrals. No scrolling through MLS for 30 minutes every morning. TheLeadEdge does the detective work so you can focus on what you're best at: building relationships and closing deals.
 
 ---
 
@@ -52,7 +52,7 @@ On your phone or laptop, you have a visual dashboard showing:
 
 Every tool out there gives you one type of lead — expired listings OR pre-foreclosures OR FSBOs. They hand you a list and say "good luck."
 
-YaniVision watches for **combinations**. When multiple signals converge on the same property, the probability of motivation skyrockets:
+TheLeadEdge watches for **combinations**. When multiple signals converge on the same property, the probability of motivation skyrockets:
 
 - Expired listing + tax delinquency + high equity = **distressed seller** (very high priority)
 - Price dropped twice + agent has high failure rate + 3x market average days on market = **listing about to fail**
@@ -62,7 +62,7 @@ These multi-signal leads convert at 5-10x the rate of a cold list. That's the ed
 
 ### It Predicts (The Feature No One Else Has)
 
-Eventually, YaniVision will identify active listings that are *likely to fail* — based on pricing patterns, agent track record, and market data. You'll be able to contact these sellers **weeks before their listing expires**, before anyone else even knows they're a lead.
+Eventually, TheLeadEdge will identify active listings that are *likely to fail* — based on pricing patterns, agent track record, and market data. You'll be able to contact these sellers **weeks before their listing expires**, before anyone else even knows they're a lead.
 
 ---
 
@@ -108,16 +108,16 @@ One closed deal covers 15 months of the system.
 - You don't learn any software beyond checking email and clicking a website
 - You don't change how you talk to clients — the scripts are suggestions, your voice is what sells
 - You don't worry about compliance — DNC checking, waiting periods, and CAN-SPAM rules are all built in
-- You don't manage the technology — your husband handles all of that
+- You don't manage the technology — the developer handles all of that
 
-**You just do what you do best: connect with people, build trust, and close deals.** YaniVision finds the people who actually want to hear from you.
+**You just do what you do best: connect with people, build trust, and close deals.** TheLeadEdge finds the people who actually want to hear from you.
 
 ---
 
 ## One Last Thing
 
-The most important feature of YaniVision is the kill switch: **if you're not using it, we redesign it around what you actually need.** This system serves your workflow — you never serve the system. Your feedback shapes everything.
+The most important feature of TheLeadEdge is the kill switch: **if you're not using it, we redesign it around what you actually need.** This system serves your workflow — you never serve the system. Your feedback shapes everything.
 
 ---
 
-*Built with love by your favorite nerd.*
+*Built for Realtors who work smarter.*

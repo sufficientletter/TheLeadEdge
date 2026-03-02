@@ -1,4 +1,4 @@
-# YaniVision — Quick Questions For You
+# TheLeadEdge — Quick Questions For You
 
 > **Just fill in your answers below each question. Don't overthink it — short answers are perfect. If you're not sure about something, just write "not sure" and we'll figure it out together.**
 
@@ -174,4 +174,4 @@ Answer:
 
 ---
 
-> **That's it! Just save this file when you're done. No wrong answers — everything helps us build this around how YOU actually work. The goal is that YaniVision feels like it was made just for you... because it is.**
+> **That's it! Just save this file when you're done. No wrong answers — everything helps us build this around how YOU actually work. The goal is that TheLeadEdge feels like it was made just for you... because it is.**

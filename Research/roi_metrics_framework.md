@@ -1,6 +1,6 @@
 # ROI Metrics, KPI Framework & Success Measurement
 
-> **Project**: LeadFinder — Real Estate Lead Generation System
+> **Project**: TheLeadEdge — Real Estate Lead Generation System
 > **Created**: 2026-02-28
 > **Purpose**: Comprehensive measurement framework to evaluate every lead source, optimize spend, and scale what works
 > **Prerequisite Reading**: lead_scoring_models.md, competitive_analysis.md, MASTER_RESEARCH.md
@@ -254,7 +254,7 @@ Response Rate = COUNT(responses) / COUNT(outreach_attempts) * 100
 
 ### 2.1 Full Funnel Definition
 
-Every lead in the LeadFinder system moves through a defined funnel. Each stage has clear entry criteria, exit criteria, and actions.
+Every lead in the TheLeadEdge system moves through a defined funnel. Each stage has clear entry criteria, exit criteria, and actions.
 
 ```
 Stage 1: RAW LEAD
@@ -345,9 +345,9 @@ Pipeline Velocity = (Number of Leads * Win Rate * Avg Deal Value) / Avg Days in 
 
 ### 2.4 Industry Benchmark Conversion Rates
 
-How the LeadFinder system should compare against published industry averages.
+How the TheLeadEdge system should compare against published industry averages.
 
-| Metric | Industry Average | Good | Excellent | LeadFinder Target |
+| Metric | Industry Average | Good | Excellent | TheLeadEdge Target |
 |--------|-----------------|------|-----------|-------------------|
 | Lead-to-Contact (all sources) | 20-30% | 35-45% | 50%+ | 40%+ |
 | Contact-to-Appointment | 15-25% | 25-35% | 40%+ | 30%+ |
@@ -708,7 +708,7 @@ These metrics measure the health of the system itself -- not the leads, but the 
 
 Track how long each daily task takes to identify efficiency gains.
 
-| Task | Manual Time (no system) | With LeadFinder (Phase 1) | With Automation (Phase 4) | Time Saved |
+| Task | Manual Time (no system) | With TheLeadEdge (Phase 1) | With Automation (Phase 4) | Time Saved |
 |------|-------------------------|---------------------------|---------------------------|------------|
 | Check MLS expireds | 15-20 min | 5 min | 0 min (auto) | 15-20 min |
 | Check price reductions | 10-15 min | 3 min | 0 min (auto) | 10-15 min |
@@ -1035,7 +1035,7 @@ Winner: TBD
 
 ### 8.1 Weekly Performance Report
 
-Generate every Monday morning. Time to complete: 10-15 minutes with LeadFinder system.
+Generate every Monday morning. Time to complete: 10-15 minutes with TheLeadEdge system.
 
 ```
 ===================================================================
@@ -1545,7 +1545,7 @@ Real estate is cyclical. Goals must flex with market reality.
 
 **Market Condition Adjustments**:
 
-| Market Condition | Impact on LeadFinder | Goal Adjustment |
+| Market Condition | Impact on TheLeadEdge | Goal Adjustment |
 |-----------------|---------------------|-----------------|
 | **Rising inventory / buyer's market** | More expireds, more motivated sellers, longer DOM | Increase lead targets 20-30%, shift to expired/DOM strategies |
 | **Low inventory / seller's market** | Fewer expireds, faster sales, less motivation | Decrease expired targets, increase buyer-side focus, focus on off-market/creative strategies |
@@ -1805,4 +1805,4 @@ Adjusted Target = Base Target * Market Multiplier * Seasonal Multiplier
 
 ---
 
-*This document provides the measurement infrastructure for the entire LeadFinder system. Every strategy, every lead source, and every dollar spent should be trackable using the frameworks defined here. Start with the Weekly Report (Section 8.1) on day one, add the Monthly Review (Section 8.2) after 30 days, and implement the Quarterly Analysis (Section 8.3) at the 90-day mark. The scoring feedback loop (Section 9) should begin collecting data immediately but should not drive weight adjustments until minimum data thresholds (Section 9.5) are met.*
+*This document provides the measurement infrastructure for the entire TheLeadEdge system. Every strategy, every lead source, and every dollar spent should be trackable using the frameworks defined here. Start with the Weekly Report (Section 8.1) on day one, add the Monthly Review (Section 8.2) after 30 days, and implement the Quarterly Analysis (Section 8.3) at the 90-day mark. The scoring feedback loop (Section 9) should begin collecting data immediately but should not drive weight adjustments until minimum data thresholds (Section 9.5) are met.*

@@ -1,6 +1,6 @@
 # Automation & Integrations Research
 
-> **Project**: LeadFinder — Real Estate Lead Generation Dashboard
+> **Project**: TheLeadEdge — Real Estate Lead Generation Dashboard
 > **Created**: 2026-02-28
 > **Purpose**: Third-party integrations, automation opportunities, and AI/LLM integration
 
@@ -13,7 +13,7 @@
 The **RESO Web API** is the modern standard replacing legacy RETS feeds. Based on OData v4, it provides RESTful access to MLS data.
 
 **How to Get Access**:
-1. Wife's MLS board membership includes data access rights
+1. The Realtor's MLS board membership includes data access rights
 2. Contact the MLS board's IT/tech department and request API credentials
 3. Some boards use third-party platforms (Trestle, Bridge, Spark) to serve the API
 4. You'll receive: base URL, client ID, client secret, and scope
@@ -65,13 +65,13 @@ GET /Media              — Property photos
 | **MLS Grid** | 100+ MLSs | RESO Web API | OAuth 2.0 | Via MLS membership | Growing, focused on data standardization |
 | **RETS (Legacy)** | Most MLSs | XML-based | Digest auth | Via MLS membership | Being phased out — avoid if possible |
 
-**Recommendation**: Check which platform your wife's MLS board uses first. Most Arizona boards use Trestle or Spark.
+**Recommendation**: Check which platform the Realtor's MLS board uses first. Most Arizona boards use Trestle or Spark.
 
 ### 1.3 Access Strategy (Prioritized)
 
 | Priority | Method | Effort | Data Quality | Real-Time |
 |----------|--------|--------|-------------|-----------|
-| 1 | **RESO Web API** via wife's board | Medium | Best | Yes |
+| 1 | **RESO Web API** via Realtor's board | Medium | Best | Yes |
 | 2 | **Trestle/Bridge** aggregator | Medium | Best | Yes |
 | 3 | **MLS saved search exports** (CSV) | Low | Good | Daily |
 | 4 | **Manual MLS portal checks** | None | Good | Manual |
@@ -225,8 +225,8 @@ class FollowUpBossClient:
             "lastName": lead.get("last_name"),
             "emails": [{"value": lead.get("email")}] if lead.get("email") else [],
             "phones": [{"value": lead.get("phone")}] if lead.get("phone") else [],
-            "tags": lead.get("tags", []),  # e.g., ["S-Tier", "Expired", "LeadFinder"]
-            "source": "LeadFinder",
+            "tags": lead.get("tags", []),  # e.g., ["S-Tier", "Expired", "TheLeadEdge"]
+            "source": "TheLeadEdge",
             "customFields": {
                 "leadfinder_score": str(lead.get("score", 0)),
                 "leadfinder_tier": lead.get("tier", "D"),
@@ -281,10 +281,10 @@ class FollowUpBossClient:
 
 ```python
 class CRMSyncService:
-    """Bidirectional sync between LeadFinder and Follow Up Boss"""
+    """Bidirectional sync between TheLeadEdge and Follow Up Boss"""
 
     async def push_lead_to_crm(self, lead: Lead, property: Property):
-        """LeadFinder → FUB: Push new leads or updates"""
+        """TheLeadEdge → FUB: Push new leads or updates"""
         # Check if already in CRM
         existing = await self.fub.get_person_by_phone(property.owner_phone)
 
@@ -293,11 +293,11 @@ class CRMSyncService:
             await self.fub.update_tags(existing["id"], [
                 f"LF-{lead.tier}-Tier",
                 f"LF-Score-{lead.current_score:.0f}",
-                "LeadFinder"
+                "TheLeadEdge"
             ])
             await self.fub.add_note(
                 existing["id"],
-                f"LeadFinder Update: Score {lead.current_score:.0f} ({lead.tier}-Tier)\n"
+                f"TheLeadEdge Update: Score {lead.current_score:.0f} ({lead.tier}-Tier)\n"
                 f"Signals: {lead.signal_summary}\n"
                 f"Property: {property.address}"
             )
@@ -313,17 +313,17 @@ class CRMSyncService:
                 "tier": lead.tier,
                 "signal_summary": lead.signal_summary,
                 "address": property.address,
-                "tags": [f"LF-{lead.tier}-Tier", "LeadFinder"]
+                "tags": [f"LF-{lead.tier}-Tier", "TheLeadEdge"]
             })
             lead.crm_id = str(result.get("id"))
 
         lead.crm_synced_at = datetime.utcnow()
 
     async def pull_status_from_crm(self):
-        """FUB → LeadFinder: Pull lead status updates back"""
+        """FUB → TheLeadEdge: Pull lead status updates back"""
         # Use FUB webhooks for real-time, or poll periodically
-        # When Sarah marks a contact as "Listing Signed" in FUB,
-        # update the lead status in LeadFinder
+        # When the Realtor marks a contact as "Listing Signed" in FUB,
+        # update the lead status in TheLeadEdge
         pass
 ```
 
@@ -504,7 +504,7 @@ Situation: {lead.signal_summary}
 
 Keep it under 150 words. Be genuine, not salesy. Don't use exclamation marks.
 Include a soft call to action (offer a free market analysis or coffee meeting).
-Sign off as 'Sarah' with her contact info placeholder."""
+Sign off with the Realtor's name and contact info placeholder."""
 
     message = self.client.messages.create(
         model="claude-haiku-4-5-20251001",
@@ -591,7 +591,7 @@ class ROITracker:
 
 ### 6.2 Dashboard Usage Analytics
 
-Track what Sarah actually uses to optimize the dashboard:
+Track what the Realtor actually uses to optimize the dashboard:
 
 ```sql
 CREATE TABLE usage_analytics (
@@ -633,7 +633,7 @@ WHERE action = 'view' AND page = 'briefing';
 | **Real Estate Integrations** | Via HTTP nodes | Pre-built connectors | Most pre-built |
 | **Best For** | Custom workflows, cost-conscious | Visual automation | Quick setup |
 
-**Recommendation**: Self-hosted **n8n** for maximum flexibility at zero cost. Deploy alongside LeadFinder in Docker.
+**Recommendation**: Self-hosted **n8n** for maximum flexibility at zero cost. Deploy alongside TheLeadEdge in Docker.
 
 ### 7.2 When Workflow Tools vs Custom Code
 
@@ -662,13 +662,13 @@ async def fub_webhook(request: Request):
     event = payload.get("event")
 
     if event == "person.updated":
-        # CRM contact was updated — sync status back to LeadFinder
+        # CRM contact was updated — sync status back to TheLeadEdge
         person_id = payload["data"]["id"]
         new_stage = payload["data"].get("stage")
         await sync_crm_status_to_lead(person_id, new_stage)
 
     elif event == "note.created":
-        # New note added in CRM — log activity in LeadFinder
+        # New note added in CRM — log activity in TheLeadEdge
         lead_id = await find_lead_by_crm_id(payload["data"]["personId"])
         if lead_id:
             await log_activity(lead_id, "crm_note", payload["data"]["body"])
@@ -746,4 +746,4 @@ NEVER commit .env to git — add to .gitignore
 
 ---
 
-*This research covers the full integration landscape for LeadFinder, from MLS data access to CRM sync to AI-powered lead analysis, with a phased implementation plan that scales from $0 to a full production system.*
+*This research covers the full integration landscape for TheLeadEdge, from MLS data access to CRM sync to AI-powered lead analysis, with a phased implementation plan that scales from $0 to a full production system.*

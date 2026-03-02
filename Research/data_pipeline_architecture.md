@@ -1,6 +1,6 @@
 # Data Pipeline Architecture Research
 
-> **Project**: LeadFinder — Real Estate Lead Generation Dashboard
+> **Project**: TheLeadEdge — Real Estate Lead Generation Dashboard
 > **Created**: 2026-02-28
 > **Purpose**: Backend architecture for data ingestion, scoring, storage, and serving
 
@@ -1060,7 +1060,7 @@ def login_page():
             ui.notify("Invalid credentials", type="negative")
 
     with ui.card().classes('mx-auto mt-20 p-8'):
-        ui.label('LeadFinder').classes('text-2xl font-bold mb-4')
+        ui.label('TheLeadEdge').classes('text-2xl font-bold mb-4')
         username_input = ui.input('Username')
         password_input = ui.input('Password', password=True)
         ui.button('Login', on_click=try_login).classes('w-full mt-4')
@@ -1131,4 +1131,4 @@ CREATE TABLE audit_log (
 
 ---
 
-*This architecture provides a solid foundation for LeadFinder's data pipeline, designed to scale from a simple SQLite-backed local tool to a full production system with PostgreSQL, multiple data sources, and real-time notifications.*
+*This architecture provides a solid foundation for TheLeadEdge's data pipeline, designed to scale from a simple SQLite-backed local tool to a full production system with PostgreSQL, multiple data sources, and real-time notifications.*

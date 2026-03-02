@@ -459,7 +459,7 @@ Properties owned by the same person for 10, 15, 20+ years represent enormous unt
 | **County Recorder** | Deed transfer history | Free |
 | **ListSource / CoreLogic** | Filter by length of ownership | ~$0.05--0.15/record |
 | **PropStream / BatchLeads** | Length of residency filter | Subscription |
-| **MLS (via wife's access)** | Properties NOT in MLS that match long-term ownership criteria | Free with access |
+| **MLS (via the Realtor's access)** | Properties NOT in MLS that match long-term ownership criteria | Free with access |
 
 **Specific access steps:**
 1. County tax assessor websites show when the current owner was recorded (deed date or "sale date").
@@ -1005,4 +1005,4 @@ Consistency is the key to making public records work as a lead source. Here is a
 
 ---
 
-*This document is part of the LeadFinder research library. All strategies must be implemented in compliance with applicable federal, state, and local laws. The Realtor is responsible for verifying compliance with their broker and local real estate board before implementing any outreach campaign.*
+*This document is part of the TheLeadEdge research library. All strategies must be implemented in compliance with applicable federal, state, and local laws. The Realtor is responsible for verifying compliance with their broker and local real estate board before implementing any outreach campaign.*

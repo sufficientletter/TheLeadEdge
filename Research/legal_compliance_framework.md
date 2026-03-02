@@ -1,6 +1,6 @@
 # Legal & Compliance Framework for Real Estate Lead Generation
 
-> **Purpose**: Comprehensive legal reference for the LeadFinder system. This document covers every federal, state, and local regulation that applies to real estate lead generation and outreach. It is organized so you can quickly find compliance requirements by regulation, by outreach method, or by lead source.
+> **Purpose**: Comprehensive legal reference for the TheLeadEdge system. This document covers every federal, state, and local regulation that applies to real estate lead generation and outreach. It is organized so you can quickly find compliance requirements by regulation, by outreach method, or by lead source.
 >
 > **Disclaimer**: This document is a research summary and does not constitute legal advice. Laws change frequently. Before launching any campaign, consult a real estate attorney licensed in your state and have all marketing materials reviewed by your managing broker.
 >
@@ -90,7 +90,7 @@ There are narrow exemptions, but they are frequently misunderstood:
 | **Private right of action** | Consumers can sue for $500 per violation, trebled to $1,500 for willful violations |
 | **Pattern of violations** | Can result in FTC injunctive orders and business restrictions |
 
-> **LeadFinder Impact**: Any phone outreach component of the system MUST integrate DNC scrubbing as a mandatory pre-call step. The system should block calls to DNC-listed numbers programmatically and log the scrub date for each record.
+> **TheLeadEdge Impact**: Any phone outreach component of the system MUST integrate DNC scrubbing as a mandatory pre-call step. The system should block calls to DNC-listed numbers programmatically and log the scrub date for each record.
 
 ---
 
@@ -134,7 +134,7 @@ This distinction matters because **transactional emails are largely exempt** fro
 - Criminal penalties possible for aggravated violations (spoofed headers, harvested addresses, dictionary attacks)
 - State attorneys general can also enforce
 
-> **LeadFinder Impact**: All automated email campaigns must include: physical address, unsubscribe link, advertisement identification. The system must process unsubscribes within 10 business days and maintain a suppression list.
+> **TheLeadEdge Impact**: All automated email campaigns must include: physical address, unsubscribe link, advertisement identification. The system must process unsubscribes within 10 business days and maintain a suppression list.
 
 ---
 
@@ -205,7 +205,7 @@ The FCC finalized a rule effective January 27, 2025, that tightens consent requi
 
 **Scale of risk**: A single campaign of 1,000 non-compliant texts could result in $500,000 to $1,500,000 in damages in a class action.
 
-> **LeadFinder Impact**: Cold text messaging is effectively prohibited. Any text or autodialed phone campaigns require documented prior express written consent. The system must store consent records with timestamps, the specific language the consumer agreed to, and the phone number authorized. The system should NEVER text or auto-dial numbers without verified consent records.
+> **TheLeadEdge Impact**: Cold text messaging is effectively prohibited. Any text or autodialed phone campaigns require documented prior express written consent. The system must store consent records with timestamps, the specific language the consumer agreed to, and the phone number authorized. The system should NEVER text or auto-dial numbers without verified consent records.
 
 ---
 
@@ -272,7 +272,7 @@ After the *NFHA v. Facebook* settlement and subsequent changes:
 | **License implications** | State real estate commissions can suspend or revoke license for Fair Housing violations |
 | **Reputation damage** | Fair Housing complaints are public and can be devastating to a real estate business |
 
-> **LeadFinder Impact**: Lead scoring and targeting algorithms must never use protected class characteristics as inputs. Geographic targeting must be based on legitimate market criteria (price range, property type, school district quality) not demographic composition. All marketing templates must be reviewed for Fair Housing compliance before use.
+> **TheLeadEdge Impact**: Lead scoring and targeting algorithms must never use protected class characteristics as inputs. Geographic targeting must be based on legitimate market criteria (price range, property type, school district quality) not demographic composition. All marketing templates must be reviewed for Fair Housing compliance before use.
 
 ---
 
@@ -298,7 +298,7 @@ The FCRA regulates the use of consumer credit information and "consumer reports"
 - **Prescreened offers**: You CAN use prescreened lists from credit bureaus to make "firm offers of credit or insurance" --- but this applies to lenders, not real estate agents
 - **Adverse action notices**: If you take adverse action (deny service) based on information in a consumer report, you must provide an adverse action notice
 
-#### Safe Practice for LeadFinder
+#### Safe Practice for TheLeadEdge
 
 - **DO** use public records (tax records, court filings, property records) for lead generation --- these are not consumer reports
 - **DO NOT** purchase lists that are compiled based on credit bureau data for marketing purposes
@@ -306,7 +306,7 @@ The FCRA regulates the use of consumer credit information and "consumer reports"
 - **ASK list providers** whether their data includes any credit bureau-sourced information
 - If using a data aggregator like ATTOM, PropStream, or ListSource, their terms of service should specify whether any credit data is included and restrict its use accordingly
 
-> **LeadFinder Impact**: The system should never integrate credit bureau data. All lead sources should be verified as non-FCRA-regulated (public records, MLS data, self-reported information). Document the data source for every lead record.
+> **TheLeadEdge Impact**: The system should never integrate credit bureau data. All lead sources should be verified as non-FCRA-regulated (public records, MLS data, self-reported information). Document the data source for every lead record.
 
 ---
 
@@ -330,7 +330,7 @@ While RESPA primarily governs settlement services, it has implications for lead 
 - You **cannot** receive kickbacks from settlement service providers (title companies, lenders, home inspectors) for referring business to them
 - **Affiliated business arrangements** (AfBAs) are permitted with proper disclosure using the Affiliated Business Arrangement Disclosure Statement
 
-> **LeadFinder Impact**: If the system ever evolves to include referral tracking or partnerships with service providers, RESPA compliance must be built in. Referral fee structures must be reviewed by legal counsel.
+> **TheLeadEdge Impact**: If the system ever evolves to include referral tracking or partnerships with service providers, RESPA compliance must be built in. Referral fee structures must be reviewed by legal counsel.
 
 ---
 
@@ -501,7 +501,7 @@ Many states add protected classes beyond the federal seven. Examples:
 | **Minnesota** | Marital status, public assistance status, sexual orientation, gender identity |
 | **Maryland** | Marital status, sexual orientation, gender identity, source of income |
 
-> **LeadFinder Impact**: Lead scoring and targeting must also avoid using any state-level protected class as a factor. The system should be reviewed for compliance with the specific state(s) where it will be deployed.
+> **TheLeadEdge Impact**: Lead scoring and targeting must also avoid using any state-level protected class as a factor. The system should be reviewed for compliance with the specific state(s) where it will be deployed.
 
 ---
 
@@ -667,7 +667,7 @@ Text messaging carries the **highest legal risk** of any outreach method for rea
 
 #### Best Practice: Avoid Cold Texting Entirely
 
-Given the legal landscape, the recommendation for LeadFinder is clear:
+Given the legal landscape, the recommendation for TheLeadEdge is clear:
 
 - **Do not cold text** any lead under any circumstances
 - **Do text** only people who have provided documented prior express written consent
@@ -939,9 +939,9 @@ MLS data is licensed data, not public data. It is subject to the terms of servic
 | **NAR ethics complaint** | If the agent is a REALTOR, an ethics complaint can be filed with the local association |
 | **Reporting to state commission** | Severe violations may be reported to the state real estate commission, which can affect your license |
 
-### 5.5 LeadFinder-Specific MLS Compliance
+### 5.5 TheLeadEdge-Specific MLS Compliance
 
-For the LeadFinder system specifically:
+For the TheLeadEdge system specifically:
 
 | Activity | Compliance Status | Notes |
 |---|---|---|
@@ -1341,6 +1341,6 @@ Use this checklist before launching any outreach campaign.
 
 ---
 
-*This document is part of the LeadFinder research library. It is a reference document, not legal advice. All strategies must be verified with a licensed attorney and approved by your managing broker before implementation. Laws and regulations change frequently --- review this document at least annually and whenever entering a new market or launching a new outreach channel.*
+*This document is part of the TheLeadEdge research library. It is a reference document, not legal advice. All strategies must be verified with a licensed attorney and approved by your managing broker before implementation. Laws and regulations change frequently --- review this document at least annually and whenever entering a new market or launching a new outreach channel.*
 
 *Cross-references: See [Public Records Strategies](public_records_strategies.md) Section 14 for lead-source-specific legal notes. See [Automation Integrations](automation_integrations.md) Section 9 for technical compliance implementation.*

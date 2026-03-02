@@ -2,7 +2,7 @@
 
 > **Purpose**: Go beyond the standard playbook (expired listings, pre-foreclosure, FSBO) and identify high-probability leads through innovative data mining, cross-referencing, and pattern recognition.
 >
-> **Context**: These strategies are designed for a licensed Realtor with MLS access, built by a data-driven husband-and-wife team that wants to find motivated sellers and buyers before the competition does.
+> **Context**: These strategies are designed for a licensed Realtor with MLS access, built by a data-driven developer-and-Realtor team that wants to find motivated sellers and buyers before the competition does.
 >
 > **Last Updated**: 2026-02-28
 
@@ -1335,7 +1335,7 @@ Ranked by the combination of practicality, reward potential, and automation pote
 
 ---
 
-> **Next Steps**: This research document feeds into the broader LeadFinder project. Priority items for development:
+> **Next Steps**: This research document feeds into the broader TheLeadEdge project. Priority items for development:
 > 1. Build the Lead Scoring Engine combining multiple signal sources
 > 2. Set up the automated monitoring pipeline (Google Alerts, permits, NCOA)
 > 3. Create CRM templates for each lead type (lifecycle stage, referral partner, inherited property, etc.)

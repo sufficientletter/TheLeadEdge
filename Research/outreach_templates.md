@@ -1,6 +1,6 @@
 # Outreach Messaging Templates & Contact Scripts
 
-> **Project**: LeadFinder -- Real Estate Lead Generation System
+> **Project**: TheLeadEdge -- Real Estate Lead Generation System
 > **Created**: 2026-02-28
 > **Purpose**: Comprehensive outreach messaging for every major lead type, designed for a female Realtor who is helpful, knowledgeable, and empathetic -- never pushy or salesy.
 > **Tone**: Professional but warm. Confident but not aggressive. Solution-oriented, never fear-based.
@@ -1620,4 +1620,4 @@ Use these placeholders consistently across all templates for CRM integration and
 
 ---
 
-*This document is part of the LeadFinder research library. All templates should be customized to reflect the Realtor's genuine voice, local market conditions, and individual property details. Templates are starting points -- authenticity beats polish every time.*
+*This document is part of the TheLeadEdge research library. All templates should be customized to reflect the Realtor's genuine voice, local market conditions, and individual property details. Templates are starting points -- authenticity beats polish every time.*

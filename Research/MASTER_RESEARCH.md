@@ -1,4 +1,4 @@
-# YaniVision: Master Research Document
+# TheLeadEdge: Master Research Document
 
 > **Project**: Data-driven real estate lead generation for a licensed Realtor with MLS access
 > **Created**: 2026-02-28
@@ -12,7 +12,7 @@ This document synthesizes research from **17 deep-dive analyses** across two res
 
 ### The Core Insight
 
-**Your wife's MLS access is the competitive moat.** No existing tool in the market does deep MLS behavioral analysis — they all treat MLS as a static data source rather than a behavioral signal engine. The opportunity is to build an intelligence layer that:
+**The Realtor's MLS access is the competitive moat.** No existing tool in the market does deep MLS behavioral analysis — they all treat MLS as a static data source rather than a behavioral signal engine. The opportunity is to build an intelligence layer that:
 
 1. Mines MLS status changes, price patterns, and agent behavior as *leading indicators*
 2. Cross-references MLS signals with public records for *signal stacking*
@@ -274,7 +274,7 @@ Each quadrant gets a different outreach strategy, messaging framework, and conta
 | Language | Python | Free | Data processing, APIs, automation |
 | Database | SQLite → PostgreSQL | Free | Lead storage, scoring history |
 | Data APIs | ATTOM (~$250/mo), BatchData (~$50/mo) | ~$300/mo | Property data, public records |
-| MLS Access | RESO Web API (via wife's board) | Included w/ MLS dues | MLS data extraction |
+| MLS Access | RESO Web API (via Realtor's board) | Included w/ MLS dues | MLS data extraction |
 | CRM | Follow Up Boss | $69/mo | Lead management, outreach |
 | Skip Trace | BatchLeads | $99/mo | Owner contact info |
 | Expired Feeds | REDX | $60/mo | Real-time expired/FSBO lists |

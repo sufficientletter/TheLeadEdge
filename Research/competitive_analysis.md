@@ -1,7 +1,7 @@
 # Competitive Analysis: Real Estate Lead Generation Tools & Platforms
 
 > **Created**: February 2026
-> **Purpose**: Evaluate existing tools to identify gaps and opportunities for a custom LeadFinder system
+> **Purpose**: Evaluate existing tools to identify gaps and opportunities for a custom TheLeadEdge system
 > **Context**: Building a data-driven lead gen system for a licensed Realtor with full MLS access
 > **Note**: Pricing and features are based on the most recent publicly available information. Verify current pricing directly with vendors before making purchasing decisions, as these markets shift frequently.
 
@@ -640,7 +640,7 @@
 - Coverage may be inconsistent in smaller markets
 - AI models are black-box -- no transparency into why a prediction is made
 
-**Gap It Leaves**: Likely.AI is the closest thing to what a custom LeadFinder could be, but it still operates without MLS behavioral data. It predicts from property attributes and external signals but cannot see listing dynamics, price reduction patterns, or agent behavior patterns within the MLS. The API access, however, makes it a potential data source for a custom system.
+**Gap It Leaves**: Likely.AI is the closest thing to what a custom TheLeadEdge could be, but it still operates without MLS behavioral data. It predicts from property attributes and external signals but cannot see listing dynamics, price reduction patterns, or agent behavior patterns within the MLS. The API access, however, makes it a potential data source for a custom system.
 
 ---
 
@@ -690,7 +690,7 @@
 - No custom scoring or analysis tools (you get what they give you)
 - Limited automation capabilities
 
-**Gap It Leaves**: Remine is the CLOSEST existing tool to what LeadFinder aims to be, and its existence validates the approach. However, Remine scratches the surface of what MLS data analysis could reveal. It does not track price reduction velocity, DOM deviation from neighborhood norms, listing-to-expiration patterns, agent performance patterns, seasonal listing behavior, or the dozens of other MLS micro-signals that indicate motivation. It is a good start that proves the concept but leaves enormous room for a custom tool that goes deeper.
+**Gap It Leaves**: Remine is the CLOSEST existing tool to what TheLeadEdge aims to be, and its existence validates the approach. However, Remine scratches the surface of what MLS data analysis could reveal. It does not track price reduction velocity, DOM deviation from neighborhood norms, listing-to-expiration patterns, agent performance patterns, seasonal listing behavior, or the dozens of other MLS micro-signals that indicate motivation. It is a good start that proves the concept but leaves enormous room for a custom tool that goes deeper.
 
 ---
 
@@ -711,7 +711,7 @@
 
 **Key Data Available**: Property characteristics, tax assessments, deed transfers, mortgage recordings, foreclosure filings, owner contact info, home equity estimates, neighborhood statistics, hazard risk data, school district data, crime data, rental rates, market trends, building permits.
 
-**Relevance to LeadFinder**: ATTOM's API could provide the public records backbone for a custom tool. Property characteristics, equity estimates, mortgage ages, and distress indicators (pre-foreclosure, tax delinquency) are all available programmatically. This is likely what PropStream and many competitors use as their data foundation. A custom tool could access the same raw data and apply superior analysis.
+**Relevance to TheLeadEdge**: ATTOM's API could provide the public records backbone for a custom tool. Property characteristics, equity estimates, mortgage ages, and distress indicators (pre-foreclosure, tax delinquency) are all available programmatically. This is likely what PropStream and many competitors use as their data foundation. A custom tool could access the same raw data and apply superior analysis.
 
 ---
 
@@ -730,7 +730,7 @@
 
 **Key Data Available**: Most comprehensive property database in the US (99.9% coverage claimed), MLS data (through their MLS platforms), mortgage performance data, property valuations (AVM), building permits, natural hazard data, insurance claims, rental data, neighborhood analytics, consumer behavior data.
 
-**Relevance to LeadFinder**: CoreLogic is significant because they actually OPERATE the MLS platform (Matrix/Realist) in many markets. If the wife's MLS runs on CoreLogic's Matrix system, then CoreLogic's data structure and API layer (Trestle) may be the pathway to programmatic MLS data access. Understanding CoreLogic's architecture is crucial for any custom tool that wants to leverage MLS data.
+**Relevance to TheLeadEdge**: CoreLogic is significant because they actually OPERATE the MLS platform (Matrix/Realist) in many markets. If the Realtor's MLS runs on CoreLogic's Matrix system, then CoreLogic's data structure and API layer (Trestle) may be the pathway to programmatic MLS data access. Understanding CoreLogic's architecture is crucial for any custom tool that wants to leverage MLS data.
 
 ---
 
@@ -749,7 +749,7 @@
 
 **Key Data Available**: Property records, mortgage origination and performance data (industry-leading), lien data, foreclosure/default data, property valuations, transaction history, MLS data (via Paragon platform), homeowner insurance data, title records.
 
-**Relevance to LeadFinder**: If the MLS runs on Black Knight's Paragon platform (rather than CoreLogic Matrix), this is the MLS tech layer to understand. Black Knight's mortgage data is the best in the industry -- knowing mortgage origination dates, rates, and balances reveals which homeowners have refinance motivation, equity positions, and payment stress. This data, combined with MLS behavioral analysis, would be extremely powerful.
+**Relevance to TheLeadEdge**: If the MLS runs on Black Knight's Paragon platform (rather than CoreLogic Matrix), this is the MLS tech layer to understand. Black Knight's mortgage data is the best in the industry -- knowing mortgage origination dates, rates, and balances reveals which homeowners have refinance motivation, equity positions, and payment stress. This data, combined with MLS behavioral analysis, would be extremely powerful.
 
 ---
 
@@ -766,7 +766,7 @@
 
 **Key Data Available**: Commercial property ownership, corporate ownership trees, tenant information, building permits, sales history, mortgage/lien data, zoning data, environmental data, building specifications.
 
-**Relevance to LeadFinder**: Limited direct relevance for residential lead generation. However, Reonomy's approach to ownership entity resolution (tracing properties through LLCs and corporate structures to find the actual human owner) is a technique that could be applied to residential properties, especially for identifying investor-owned homes, absentee owners, and portfolio landlords who might be motivated to sell.
+**Relevance to TheLeadEdge**: Limited direct relevance for residential lead generation. However, Reonomy's approach to ownership entity resolution (tracing properties through LLCs and corporate structures to find the actual human owner) is a technique that could be applied to residential properties, especially for identifying investor-owned homes, absentee owners, and portfolio landlords who might be motivated to sell.
 
 ---
 
@@ -784,7 +784,7 @@
 
 **Key Data Available**: Property ownership (current and historical chain of title), deed recordings, mortgage/lien recordings, tax data, property characteristics, plat maps, flood zone data, natural hazard disclosures, assessed values, transaction history with full deed detail.
 
-**Relevance to LeadFinder**: DataTree's chain-of-title data is unmatched. For identifying ownership changes, inherited properties (probate leads), properties with title complexity (multiple liens, partial transfers), and long-term ownership (high equity), DataTree provides deeper insight than any competitor. The title data can identify inherited properties before they hit probate court records, creating an early-signal advantage.
+**Relevance to TheLeadEdge**: DataTree's chain-of-title data is unmatched. For identifying ownership changes, inherited properties (probate leads), properties with title complexity (multiple liens, partial transfers), and long-term ownership (high equity), DataTree provides deeper insight than any competitor. The title data can identify inherited properties before they hit probate court records, creating an early-signal advantage.
 
 ---
 
@@ -814,7 +814,7 @@
 - Speed-to-lead tracking
 - Team accountability dashboards
 
-**Relevance to LeadFinder**: Follow Up Boss would be the ideal CRM layer for a custom LeadFinder system. Its open API and 250+ integrations mean a custom lead identification tool could push leads directly into Follow Up Boss for the Realtor wife to manage. The Smart Lists feature could be used to segment leads by score, source, or signal type. This is not a competitor -- it is a potential integration partner.
+**Relevance to TheLeadEdge**: Follow Up Boss would be the ideal CRM layer for a custom TheLeadEdge system. Its open API and 250+ integrations mean a custom lead identification tool could push leads directly into Follow Up Boss for the Realtor operator to manage. The Smart Lists feature could be used to segment leads by score, source, or signal type. This is not a competitor -- it is a potential integration partner.
 
 ---
 
@@ -843,7 +843,7 @@
 - Squeeze pages and landing pages
 - Behavioral alerts when past clients search
 
-**Relevance to LeadFinder**: kvCORE's behavioral tracking of website visitors is interesting -- it identifies when past clients or leads return to search for homes, which can signal intent. If the wife's brokerage provides kvCORE, its behavioral data could feed into a custom LeadFinder system. Its API capabilities, however, are more limited than Follow Up Boss.
+**Relevance to TheLeadEdge**: kvCORE's behavioral tracking of website visitors is interesting -- it identifies when past clients or leads return to search for homes, which can signal intent. If the Realtor's brokerage provides kvCORE, its behavioral data could feed into a custom TheLeadEdge system. Its API capabilities, however, are more limited than Follow Up Boss.
 
 ---
 
@@ -871,7 +871,7 @@
 - Transaction management
 - Social media marketing tools
 
-**Relevance to LeadFinder**: Chime's AI lead scoring is relevant as a concept but works on a different data set (website visitor behavior and CRM interactions). The idea of scoring leads based on behavioral signals is exactly what LeadFinder should do -- but with MLS data signals rather than website click data. Chime proves the market accepts AI-driven lead scoring.
+**Relevance to TheLeadEdge**: Chime's AI lead scoring is relevant as a concept but works on a different data set (website visitor behavior and CRM interactions). The idea of scoring leads based on behavioral signals is exactly what TheLeadEdge should do -- but with MLS data signals rather than website click data. Chime proves the market accepts AI-driven lead scoring.
 
 ---
 
@@ -897,7 +897,7 @@
 - Facebook and Zillow integration
 - Bulk texting and emailing
 
-**Relevance to LeadFinder**: LionDesk's AI text assistant concept is worth noting -- automated initial engagement with leads frees the agent from repetitive follow-up. If LeadFinder identifies a lead, an AI-assisted first contact through a CRM like LionDesk could handle the initial outreach. However, LionDesk itself has no lead generation or data analysis capability.
+**Relevance to TheLeadEdge**: LionDesk's AI text assistant concept is worth noting -- automated initial engagement with leads frees the agent from repetitive follow-up. If TheLeadEdge identifies a lead, an AI-assisted first contact through a CRM like LionDesk could handle the initial outreach. However, LionDesk itself has no lead generation or data analysis capability.
 
 ---
 
@@ -923,7 +923,7 @@
 - 24/7 customer support (standout feature)
 - Integration with major lead sources
 
-**Relevance to LeadFinder**: Wise Agent is a straightforward CRM with no intelligence layer. Its main relevance is as a potential downstream recipient of leads generated by a custom system. Its simplicity might be appealing if the Realtor wife does not need the complexity of Follow Up Boss or kvCORE.
+**Relevance to TheLeadEdge**: Wise Agent is a straightforward CRM with no intelligence layer. Its main relevance is as a potential downstream recipient of leads generated by a custom system. Its simplicity might be appealing if the Realtor operator does not need the complexity of Follow Up Boss or kvCORE.
 
 ---
 
@@ -1011,7 +1011,7 @@ The competitive moat is the MLS data. Every investor tool (PropStream, BatchLead
 
 ### What Would a "Dream Tool" Look Like?
 
-The ideal LeadFinder system would combine:
+The ideal TheLeadEdge system would combine:
 
 **Data Layer**:
 - Real-time MLS data feed (listings, status changes, price changes, DOM, photos, descriptions, agent info)
@@ -1185,7 +1185,7 @@ Adds predictive seller identification but at significant cost with uncertain ROI
 6. Alert system that pushes high-score leads to the CRM
 
 **Estimated cost to operate the custom intelligence layer**:
-- MLS data access: Free (through wife's MLS membership, within terms of service)
+- MLS data access: Free (through the Realtor's MLS membership, within terms of service)
 - Public records API (ATTOM or similar): $250-500/mo for development tier
 - Server/compute: $20-50/mo (modern cloud services)
 - Follow Up Boss CRM: $58/mo
@@ -1200,8 +1200,8 @@ Compare this to $1,000-1,400/mo for Offrs or SmartZip, which provide weaker inte
 
 The real estate lead generation market is crowded with tools that approach the problem from different angles -- property data, cold calling, paid advertising, and probabilistic prediction. But no single tool, and no combination of existing tools, performs deep MLS behavioral analysis to identify motivated sellers before they become obvious to everyone.
 
-The opportunity for LeadFinder is clear: **build the intelligence layer that connects MLS behavioral signals with public records and life event data to produce high-confidence, time-sensitive lead scores.** This layer does not exist in any product on the market. Remine comes closest conceptually but barely scratches the surface analytically. Offrs and SmartZip attempt prediction but do so without real-time MLS insight.
+The opportunity for TheLeadEdge is clear: **build the intelligence layer that connects MLS behavioral signals with public records and life event data to produce high-confidence, time-sensitive lead scores.** This layer does not exist in any product on the market. Remine comes closest conceptually but barely scratches the surface analytically. Offrs and SmartZip attempt prediction but do so without real-time MLS insight.
 
-The wife's MLS access is the competitive moat. Every investor tool is locked out of this data. Every consumer portal uses it for advertising rather than intelligence. The custom tool can operate in a space where no competitor currently plays, at a lower cost than the generic predictive platforms, with higher accuracy because it is trained on local MLS patterns rather than national averages.
+The Realtor's MLS access is the competitive moat. Every investor tool is locked out of this data. Every consumer portal uses it for advertising rather than intelligence. The custom tool can operate in a space where no competitor currently plays, at a lower cost than the generic predictive platforms, with higher accuracy because it is trained on local MLS patterns rather than national averages.
 
 **The bottom line**: Do not try to rebuild PropStream, REDX, or Follow Up Boss. Buy those where needed. Build the thing that does not exist: the MLS intelligence engine.

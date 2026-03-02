@@ -1,6 +1,6 @@
 # RESO Web API & MLS Technical Integration
 
-> **Project**: LeadFinder -- Real Estate Lead Generation System
+> **Project**: TheLeadEdge -- Real Estate Lead Generation System
 > **Created**: 2026-02-28
 > **Purpose**: Comprehensive technical reference for integrating with MLS data via the RESO Web API standard
 > **Audience**: Developer building automated lead generation tools for a licensed Realtor
@@ -81,7 +81,7 @@ Client processes response, paginates if needed via @odata.nextLink
 
 ### 1.4 Authentication: OAuth 2.0
 
-The RESO Web API uses OAuth 2.0. The most common flow for server-to-server applications (like LeadFinder) is the **Client Credentials Grant**:
+The RESO Web API uses OAuth 2.0. The most common flow for server-to-server applications (like TheLeadEdge) is the **Client Credentials Grant**:
 
 ```http
 POST /oauth2/token HTTP/1.1
@@ -202,7 +202,7 @@ The Data Dictionary defines:
 
 ### 2.2 Core Resources
 
-| Resource | Description | Key Use for LeadFinder |
+| Resource | Description | Key Use for TheLeadEdge |
 |----------|-------------|----------------------|
 | **Property** | Listing data -- the primary resource | All lead generation queries |
 | **Member** | Agent/broker information | Identifying listing agents, tracking agent behavior |
@@ -346,7 +346,7 @@ Getting RESO Web API access follows this general process:
 
 **Step 1: Identify Your MLS Board's Data Platform**
 
-Your wife's MLS membership includes data access rights. First, determine which technology platform her MLS board uses to serve data:
+The Realtor's MLS membership includes data access rights. First, determine which technology platform the MLS board uses to serve data:
 
 ```
 MLS Board
@@ -373,9 +373,9 @@ Contact the MLS board's IT department or the data platform directly:
 | Written application | Board compliance | Fill out the data license application |
 
 **What they will ask for:**
-- MLS member ID (your wife's license/member number)
+- MLS member ID (the Realtor's license/member number)
 - Business purpose (describe as "custom market analysis tool for my real estate practice")
-- Application name ("LeadFinder" or similar)
+- Application name ("TheLeadEdge" or similar)
 - Intended data usage (display, analysis, internal business use)
 - Acknowledgment of data usage policies
 - Sometimes: proof of active license, E&O insurance info
@@ -418,7 +418,7 @@ There are two types of API access, and they differ significantly:
 | **Approval Time** | Days to weeks | Weeks to months |
 | **Best For** | Our use case (personal business tool) | SaaS products serving multiple agents |
 
-**For LeadFinder**: We want **Member Access** because the Realtor (wife) is using API access for her own licensed business. This is the simplest path with the lowest cost.
+**For TheLeadEdge**: We want **Member Access** because the Realtor is using API access for her own licensed business. This is the simplest path with the lowest cost.
 
 ### 3.3 RETS vs. RESO Web API (Migration Status)
 
@@ -816,7 +816,7 @@ $filter=Latitude ge 33.38 and Latitude le 33.45
 
 ```python
 """
-reso_client.py - RESO Web API client for LeadFinder
+reso_client.py - RESO Web API client for TheLeadEdge
 
 A production-grade client for interacting with MLS data via the RESO Web API.
 Handles authentication, pagination, rate limiting, and error recovery.
@@ -1387,7 +1387,7 @@ class LeadQueryService:
 
 ```python
 """
-example_usage.py - Demonstration of LeadFinder RESO integration.
+example_usage.py - Demonstration of TheLeadEdge RESO integration.
 """
 
 import asyncio
@@ -2095,7 +2095,7 @@ MLS data comes with strict usage restrictions enforced by the local MLS board, N
 - MLS data is licensed, not owned -- you are granted access, not ownership
 - Data can only be used in connection with the licensed Realtor's business
 - Data cannot be resold, sublicensed, or shared with unauthorized parties
-- All access must be under the member's credentials (wife's MLS membership)
+- All access must be under the member's credentials (the Realtor's MLS membership)
 
 ### 9.2 IDX vs. VOW vs. Internal Use
 
@@ -2103,15 +2103,15 @@ There are three main categories of MLS data usage, each with different rules:
 
 | Category | Full Name | Use Case | Display Rules | Our Category |
 |----------|-----------|----------|---------------|-------------|
-| **IDX** | Internet Data Exchange | Public-facing property search websites | Extensive rules on display, attribution, updates | Not applicable for LeadFinder |
+| **IDX** | Internet Data Exchange | Public-facing property search websites | Extensive rules on display, attribution, updates | Not applicable for TheLeadEdge |
 | **VOW** | Virtual Office Website | Client-only portal (behind login) | More flexible, requires registration/login | Possible future feature |
-| **Internal Use** | Back-office / Private | Agent's own business analysis tools | Most flexible -- minimal display rules | **This is LeadFinder** |
+| **Internal Use** | Back-office / Private | Agent's own business analysis tools | Most flexible -- minimal display rules | **This is TheLeadEdge** |
 
-**LeadFinder falls under "Internal Use"** -- it is a private business intelligence tool for a licensed Realtor. This is the most permissive category because the data is not being displayed publicly.
+**TheLeadEdge falls under "Internal Use"** -- it is a private business intelligence tool for a licensed Realtor. This is the most permissive category because the data is not being displayed publicly.
 
 ### 9.3 Internal Use Compliance Checklist
 
-For internal/private business tools like LeadFinder:
+For internal/private business tools like TheLeadEdge:
 
 | Requirement | Status | Notes |
 |-------------|--------|-------|
@@ -2234,7 +2234,7 @@ This is the simplest fallback and requires zero API access:
 1. Wife logs into the MLS portal (e.g., FlexMLS, Matrix, Paragon)
 2. Creates saved searches for each lead category (expired, price reductions, etc.)
 3. Exports results as CSV on a regular schedule (daily)
-4. LeadFinder imports and processes the CSV files
+4. TheLeadEdge imports and processes the CSV files
 
 **Advantages:**
 - Zero setup cost or API credentials needed
@@ -2466,7 +2466,7 @@ If direct MLS API access is delayed or limited, third-party services provide pre
 | **ATTOM Data** | Public records, AVM, foreclosure | $250-$500 | Yes (REST API) | Deep public records data |
 | **PropertyRadar** | Public records, pre-foreclosure | $100 | Yes (REST API) | Western US markets |
 
-**Integration with LeadFinder**: These services can supplement MLS data. For example, use MLS data (via API or CSV) for listing intelligence, and use ATTOM or BatchLeads for owner contact information and public records enrichment.
+**Integration with TheLeadEdge**: These services can supplement MLS data. For example, use MLS data (via API or CSV) for listing intelligence, and use ATTOM or BatchLeads for owner contact information and public records enrichment.
 
 ### 10.5 Fallback 4: Manual MLS Portal Workflow
 
@@ -2478,7 +2478,7 @@ If neither API access nor CSV exports are practical initially, a structured manu
 2. **Check expired listings** -- run saved search for "Expired in last 24 hours"
 3. **Check price reductions** -- run saved search for "Price changed in last 24 hours, reduced"
 4. **Check DOM threshold** -- run saved search for "Active, DOM > 90 days"
-5. **Manually enter high-priority leads** into LeadFinder dashboard
+5. **Manually enter high-priority leads** into TheLeadEdge dashboard
 6. **Weekly**: Check withdrawn/cancelled, approaching expirations
 
 This manual workflow is the Phase 0 approach described in the existing automation_integrations.md. It requires zero technical setup and can start immediately.
@@ -2490,7 +2490,7 @@ Phase 0 (Week 1)         Phase 1 (Weeks 2-4)        Phase 2 (Month 2-3)
 ┌─────────────────┐      ┌──────────────────┐       ┌───────────────────┐
 │ Manual MLS      │      │ CSV Export +     │       │ RESO Web API      │
 │ portal searches │ ---> │ CSV Importer     │ ----> │ Full automated    │
-│ + manual entry  │      │ + LeadFinder     │       │ sync + scoring    │
+│ + manual entry  │      │ + TheLeadEdge     │       │ sync + scoring    │
 │                 │      │ dashboard        │       │ + alerts          │
 └─────────────────┘      └──────────────────┘       └───────────────────┘
 
@@ -2644,4 +2644,4 @@ async def explore_metadata(client: RESOClient):
 
 ---
 
-*This document provides the complete technical foundation for integrating LeadFinder with MLS data via the RESO Web API. Start with Section 3 (getting access), use the Python client in Section 6 for implementation, and follow the sync strategies in Section 7 for ongoing operation. If API access is delayed, Section 10 provides immediate alternatives to begin generating leads.*
+*This document provides the complete technical foundation for integrating TheLeadEdge with MLS data via the RESO Web API. Start with Section 3 (getting access), use the Python client in Section 6 for implementation, and follow the sync strategies in Section 7 for ongoing operation. If API access is delayed, Section 10 provides immediate alternatives to begin generating leads.*

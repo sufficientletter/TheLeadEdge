@@ -1,6 +1,6 @@
 # Python Implementation Patterns & Technical Architecture
 
-> **Project**: LeadFinder -- Real Estate Lead Generation System
+> **Project**: TheLeadEdge -- Real Estate Lead Generation System
 > **Created**: 2026-02-28
 > **Purpose**: Technical blueprint for the build phase. Covers project structure, data models, connectors, scoring engine, pipelines, database schema, configuration, error handling, and testing.
 
@@ -1325,7 +1325,7 @@ class ConnectorRegistry:
 
 ## 5. Lead Scoring Engine
 
-The scoring engine is the core intelligence of LeadFinder. It takes a collection of signals for a lead, applies configurable weights, time-decay functions, and stacking bonuses, then outputs a normalized 0-100 score with a tier assignment.
+The scoring engine is the core intelligence of TheLeadEdge. It takes a collection of signals for a lead, applies configurable weights, time-decay functions, and stacking bonuses, then outputs a normalized 0-100 score with a tier assignment.
 
 ### 5.1 Decay Functions
 
@@ -2776,7 +2776,7 @@ class Settings(BaseSettings):
     )
 
     # ---- Application ----
-    app_name: str = "LeadFinder"
+    app_name: str = "TheLeadEdge"
     app_env: str = "development"  # development | staging | production
     debug: bool = True
     log_level: str = "INFO"
@@ -3880,7 +3880,7 @@ async def main():
         ui.run(
             host=settings.dashboard_host,
             port=settings.dashboard_port,
-            title="LeadFinder",
+            title="TheLeadEdge",
             reload=settings.debug,
         )
 
@@ -4015,4 +4015,4 @@ Start with items 1-13 for a fully functional local system that ingests CSV expor
 
 ---
 
-*This document serves as the technical blueprint for the LeadFinder build phase. All code patterns are designed to be copied, adapted, and extended. The architecture prioritizes testability, configurability, and incremental enhancement -- start simple with CSV imports and SQLite, then progressively enable API connectors and advanced features as subscriptions are added.*
+*This document serves as the technical blueprint for the TheLeadEdge build phase. All code patterns are designed to be copied, adapted, and extended. The architecture prioritizes testability, configurability, and incremental enhancement -- start simple with CSV imports and SQLite, then progressively enable API connectors and advanced features as subscriptions are added.*

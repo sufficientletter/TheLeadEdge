@@ -1,7 +1,7 @@
-# YaniVision: Master Build Plan
+# TheLeadEdge: Master Build Plan
 
 > **Project**: Data-driven real estate lead generation system
-> **Builder**: Husband (developer) for wife (licensed Realtor with MLS access)
+> **Builder**: Developer for licensed Realtors with MLS access
 > **Status**: Research complete (19,800+ lines across 16 files). Ready to build.
 > **Created**: 2026-02-28
 > **Compiled from**: 6 parallel planning agents analyzing all research files
@@ -10,7 +10,7 @@
 
 ## Executive Summary
 
-YaniVision is a Python-based intelligence system that mines MLS data, public records, and digital signals to find motivated real estate sellers and buyers before competitors. The wife's MLS access is the competitive moat -- no existing tool does deep MLS behavioral analysis.
+TheLeadEdge is a Python-based intelligence system that mines MLS data, public records, and digital signals to find motivated real estate sellers and buyers before competitors. The Realtor's MLS access is the competitive moat -- no existing tool does deep MLS behavioral analysis.
 
 **The plan has 7 phases, starting with $0 cost on Day 1 and scaling to ~$650/month by Month 4.** The system is usable and delivering value by Week 2.
 
@@ -36,7 +36,7 @@ YaniVision is a Python-based intelligence system that mines MLS data, public rec
 
 ## Phase 0: Immediate Value (Day 1) — $0
 
-**Goal**: She finds better leads TODAY using research insights + MLS access + free tools. Zero code.
+**Goal**: The Realtor finds better leads TODAY using research insights + MLS access + free tools. Zero code.
 
 ### Deliverables
 
@@ -45,7 +45,7 @@ YaniVision is a Python-based intelligence system that mines MLS data, public rec
 | 1 | Configure 10 MLS saved searches (expireds, price reductions, high DOM, withdrawn, FSBO, back-on-market, agent churn) | 45 min | `mls_data_analysis.md` |
 | 2 | Set up Google Alerts (company relocations, layoffs, new employers in market) | 15 min | `creative_strategies.md` |
 | 3 | Create spreadsheet lead tracker with scoring reference card (S/A/B/C/D tiers) | 30 min | `lead_scoring_models.md` |
-| 4 | Customize outreach templates with her name/brokerage (expired, FSBO, pre-foreclosure, probate scripts) | 1 hr | `outreach_templates.md` |
+| 4 | Customize outreach templates with Realtor name/brokerage (expired, FSBO, pre-foreclosure, probate scripts) | 1 hr | `outreach_templates.md` |
 | 5 | Establish 30-minute daily workflow (check searches, score leads, plan outreach) | 15 min | `MASTER_RESEARCH.md` Sec 2 |
 | 6 | Register for DNC list access, review MLS ToS, check state foreclosure rules | 30 min | `legal_compliance_framework.md` |
 
@@ -67,9 +67,9 @@ Goes from zero systematic prospecting to a structured daily pipeline. Ahead of 8
 ### What Gets Built
 
 ```
-Wife exports CSV from MLS portal (5 min)
+Realtor exports CSV from MLS portal (5 min)
     → drops in folder
-        → YaniVision ingests, deduplicates, detects signals
+        → TheLeadEdge ingests, deduplicates, detects signals
             → scores and tiers all leads
                 → sends daily briefing email at 6:30 AM
 ```
@@ -84,24 +84,24 @@ Wife exports CSV from MLS portal (5 min)
 | 2 | `pyproject.toml` | Dependencies: pydantic, sqlalchemy, aiosqlite, httpx, apscheduler, jinja2, pyyaml, structlog | Simple |
 | 3 | Virtual env + `pip install -e ".[dev]"` | Dev environment | Simple |
 | 4 | `.env.example` + `.gitignore` | Config template, ignore secrets + data | Simple |
-| 5 | `yanivision/models/enums.py` | Tier, LeadStatus, SignalCategory, DecayType, MLSStatus, OutreachType, OutreachOutcome | Simple |
+| 5 | `theleadedge/models/enums.py` | Tier, LeadStatus, SignalCategory, DecayType, MLSStatus, OutreachType, OutreachOutcome | Simple |
 | 6 | `config/settings.py` | Pydantic Settings (~45 fields across 10 categories) | Medium |
-| 7 | `yanivision/utils/logging.py` | structlog setup (JSON prod, colored dev) | Medium |
-| 8 | `yanivision/utils/address.py` | USPS address normalization for dedup | Medium |
-| 9 | `yanivision/utils/phone.py` | Phone normalization to E.164 | Simple |
-| 10 | `yanivision/utils/retry.py` | tenacity retry decorators (api_retry, gentle_retry) | Simple |
-| 11 | `yanivision/utils/rate_limit.py` | CircuitBreaker class | Medium |
+| 7 | `theleadedge/utils/logging.py` | structlog setup (JSON prod, colored dev) | Medium |
+| 8 | `theleadedge/utils/address.py` | USPS address normalization for dedup | Medium |
+| 9 | `theleadedge/utils/phone.py` | Phone normalization to E.164 | Simple |
+| 10 | `theleadedge/utils/retry.py` | tenacity retry decorators (api_retry, gentle_retry) | Simple |
+| 11 | `theleadedge/utils/rate_limit.py` | CircuitBreaker class | Medium |
 
 #### Data Models (Steps 12-17)
 
 | Step | File | What | Complexity |
 |------|------|------|------------|
-| 12 | `yanivision/models/property.py` | PropertyBase/Valuation/MLS/Owner composite model | Medium |
-| 13 | `yanivision/models/signal.py` | Signal, SignalCreate, SignalConfig | Medium |
-| 14 | `yanivision/models/score.py` | ScoreResult, ScoreHistory | Simple |
-| 15 | `yanivision/models/outreach.py` | OutreachEvent, OutreachEventCreate | Simple |
-| 16 | `yanivision/models/lead.py` | Lead with computed fields (score_change, days_since_detection) | Medium |
-| 17 | `yanivision/models/__init__.py` | Re-export all models | Simple |
+| 12 | `theleadedge/models/property.py` | PropertyBase/Valuation/MLS/Owner composite model | Medium |
+| 13 | `theleadedge/models/signal.py` | Signal, SignalCreate, SignalConfig | Medium |
+| 14 | `theleadedge/models/score.py` | ScoreResult, ScoreHistory | Simple |
+| 15 | `theleadedge/models/outreach.py` | OutreachEvent, OutreachEventCreate | Simple |
+| 16 | `theleadedge/models/lead.py` | Lead with computed fields (score_change, days_since_detection) | Medium |
+| 17 | `theleadedge/models/__init__.py` | Re-export all models | Simple |
 
 #### Scoring Engine (Steps 18-20)
 
@@ -109,15 +109,15 @@ Wife exports CSV from MLS portal (5 min)
 |------|------|------|------------|
 | 18 | `config/scoring_weights.yaml` | 20 signal types + 6 stacking rules + tier thresholds | Simple |
 | 19 | `config/feature_flags.yaml` | Data sources, integrations, notifications toggles | Simple |
-| 20 | `yanivision/scoring/config_loader.py` | Load YAML → SignalConfig + StackingRule + TierConfig | Simple |
+| 20 | `theleadedge/scoring/config_loader.py` | Load YAML → SignalConfig + StackingRule + TierConfig | Simple |
 
 #### Database (Steps 21-24)
 
 | Step | File | What | Complexity |
 |------|------|------|------------|
-| 21 | `yanivision/storage/database.py` | 7 SQLAlchemy tables + async engine + session factory | Complex |
-| 22 | `yanivision/storage/repositories.py` | PropertyRepo, LeadRepo, SignalRepo, ScoreHistoryRepo, SyncLogRepo | Complex |
-| 23 | `yanivision/storage/queries.py` | Named queries for briefing, lead list, map | Medium |
+| 21 | `theleadedge/storage/database.py` | 7 SQLAlchemy tables + async engine + session factory | Complex |
+| 22 | `theleadedge/storage/repositories.py` | PropertyRepo, LeadRepo, SignalRepo, ScoreHistoryRepo, SyncLogRepo | Complex |
+| 23 | `theleadedge/storage/queries.py` | Named queries for briefing, lead list, map | Medium |
 | 24 | `alembic.ini` + `alembic/env.py` | Migration setup (generate initial schema) | Medium |
 
 #### Tests + Factories (Steps 25-27)
@@ -132,18 +132,18 @@ Wife exports CSV from MLS portal (5 min)
 
 | Step | File | What | Complexity |
 |------|------|------|------------|
-| 28 | `yanivision/scoring/decay.py` | 4 decay functions (linear, exponential, step, escalating) + freshness premium | Low |
-| 29 | `yanivision/scoring/stacking.py` | 6 stacking rules, best-single-rule algorithm | Low-Med |
-| 30 | `yanivision/scoring/engine.py` | ScoringEngine.calculate() — the core intelligence | Medium |
-| 31 | `yanivision/sources/base.py` | Abstract DataSourceConnector + SyncResult | Medium |
-| 32 | `yanivision/sources/mls_csv.py` | CSV import from MLS exports (FlexMLS/Matrix column mapping) | Low |
-| 33 | `yanivision/pipelines/detect.py` | SignalDetector — 12 detection rules for MLS signals | Medium |
-| 34 | `yanivision/pipelines/score.py` | ScorePipeline — fetch signals, calculate, persist, detect tier changes | Medium |
-| 35 | `yanivision/pipelines/ingest.py` | IngestPipeline — CSV read, normalize, deduplicate, upsert | Medium |
-| 36 | `yanivision/notifications/email.py` | SMTP email sender (Gmail free) | Low |
-| 37 | `yanivision/notifications/templates/daily_briefing.html` | Jinja2 HTML email template | Medium |
-| 38 | `yanivision/pipelines/briefing.py` | BriefingGenerator — hot leads, tier movers, pipeline summary | Medium |
-| 39 | `yanivision/main.py` | CLI runner: import → detect → score → email | Low |
+| 28 | `theleadedge/scoring/decay.py` | 4 decay functions (linear, exponential, step, escalating) + freshness premium | Low |
+| 29 | `theleadedge/scoring/stacking.py` | 6 stacking rules, best-single-rule algorithm | Low-Med |
+| 30 | `theleadedge/scoring/engine.py` | ScoringEngine.calculate() — the core intelligence | Medium |
+| 31 | `theleadedge/sources/base.py` | Abstract DataSourceConnector + SyncResult | Medium |
+| 32 | `theleadedge/sources/mls_csv.py` | CSV import from MLS exports (FlexMLS/Matrix column mapping) | Low |
+| 33 | `theleadedge/pipelines/detect.py` | SignalDetector — 12 detection rules for MLS signals | Medium |
+| 34 | `theleadedge/pipelines/score.py` | ScorePipeline — fetch signals, calculate, persist, detect tier changes | Medium |
+| 35 | `theleadedge/pipelines/ingest.py` | IngestPipeline — CSV read, normalize, deduplicate, upsert | Medium |
+| 36 | `theleadedge/notifications/email.py` | SMTP email sender (Gmail free) | Low |
+| 37 | `theleadedge/notifications/templates/daily_briefing.html` | Jinja2 HTML email template | Medium |
+| 38 | `theleadedge/pipelines/briefing.py` | BriefingGenerator — hot leads, tier movers, pipeline summary | Medium |
+| 39 | `theleadedge/main.py` | CLI runner: import → detect → score → email | Low |
 
 #### Unit Tests
 
@@ -159,12 +159,12 @@ Wife exports CSV from MLS portal (5 min)
 - `ruff check .` passes
 - `pytest tests/` — all ~45 tests green
 - `alembic upgrade head` creates SQLite DB with 7 tables
-- Drop a CSV in `data/mls_imports/`, run `python -m yanivision`, receive briefing email
+- Drop a CSV in `data/mls_imports/`, run `python -m theleadedge`, receive briefing email
 
 ### Success Criteria
-- Wife exports CSV, drops in folder, runs one command → scored briefing email in 60 seconds
-- Scoring matches her manual intuition from Phase 0 spreadsheet
-- Briefing tells her exactly who to call first
+- Realtor exports CSV, drops in folder, runs one command → scored briefing email in 60 seconds
+- Scoring matches the operator's manual intuition from Phase 0 spreadsheet
+- Briefing tells the operator exactly who to call first
 
 ### Value to Realtor
 Eliminates 20-30 min/day of manual spreadsheet work. Signal stacking catches combinations manual review would miss.
@@ -203,7 +203,7 @@ Eliminates 20-30 min/day of manual spreadsheet work. Signal stacking catches com
 ### Success Criteria
 - System runs fully unattended every morning
 - S-tier leads appear in CRM within minutes
-- Wife's workflow: check email, review briefing, make calls — 10 min total
+- Operator's workflow: check email, review briefing, make calls — 10 min total
 
 ### Value to Realtor
 Fully automated morning pipeline. S-tier leads go straight into CRM with action plan. REDX provides phone numbers. Daily workflow drops from 30 → 10 minutes.
@@ -212,7 +212,7 @@ Fully automated morning pipeline. S-tier leads go straight into CRM with action 
 
 ## Phase 3: Dashboard (Month 2) — $160/month
 
-**Goal**: Web UI so she can see leads visually, not just via email.
+**Goal**: Web UI so the operator can see leads visually, not just via email.
 
 ### Framework: NiceGUI 2.x
 
@@ -234,7 +234,7 @@ Chosen over Streamlit (no WebSocket push), Dash (callback hell), and React (over
 ### File Structure (28 new files)
 
 ```
-yanivision/dashboard/
+theleadedge/dashboard/
 ├── app.py                    # NiceGUI setup, routing, auth
 ├── theme.py                  # Colors, tier/signal palette, Tailwind
 ├── components/               # 11 reusable components
@@ -270,8 +270,8 @@ yanivision/dashboard/
 | Push to CRM | "Add to CRM" | Creates Follow Up Boss contact with full context |
 
 ### Success Criteria
-- Dashboard loads in <2 seconds, works on her phone
-- She can manage leads without touching a spreadsheet
+- Dashboard loads in <2 seconds, works on mobile
+- Operator can manage leads without touching a spreadsheet
 - Map view helps plan driving routes
 
 ---
@@ -292,7 +292,7 @@ yanivision/dashboard/
 | 6 | **DNC + compliance automation** | `pipelines/compliance.py` | $0 |
 
 ### Compliance Requirements (Critical)
-- DNC scrubbing mandatory before phone numbers reach the Realtor
+- DNC scrubbing mandatory before phone numbers reach the operator
 - Pre-foreclosure: state-specific waiting periods enforced in code (e.g., CA: 5 business days after NOD)
 - Probate: 30-day minimum wait after filing
 - TCPA: system MUST NOT send automated texts without documented consent
@@ -323,7 +323,7 @@ Complete actionable intelligence: phone numbers, email addresses, AI summaries, 
 Contact likely-to-fail listings BEFORE they expire — weeks ahead of every REDX subscriber. No existing tool does this.
 
 ### Value to Realtor
-Unfair advantage. She contacts failing listings before expiration, knows which agents underperform, and surfaces multi-signal convergence leads (15-25% conversion probability) that no single tool catches.
+Unfair advantage. The operator contacts failing listings before expiration, knows which agents underperform, and surfaces multi-signal convergence leads (15-25% conversion probability) that no single tool catches.
 
 ---
 
@@ -378,11 +378,11 @@ The system NEVER auto-adjusts weights. It suggests changes; the human approves.
 ### Project Structure
 
 ```
-YaniVision/
+TheLeadEdge/
 ├── CLAUDE.md
 ├── MASTER_BUILD_PLAN.md          # This file
 ├── Research/                      # 16 research files (19,800+ lines)
-├── yanivision/                    # Python package root
+├── theleadedge/                   # Python package root
 │   ├── pyproject.toml
 │   ├── .env.example
 │   ├── alembic.ini
@@ -391,7 +391,7 @@ YaniVision/
 │   │   ├── settings.py           # Pydantic Settings (45 fields)
 │   │   ├── scoring_weights.yaml  # Signal weights, stacking rules, tiers
 │   │   └── feature_flags.yaml    # Data source + integration toggles
-│   ├── yanivision/
+│   ├── theleadedge/
 │   │   ├── main.py               # Entrypoint: scheduler + NiceGUI
 │   │   ├── models/               # 6 Pydantic model files
 │   │   ├── sources/              # 7 data connectors
@@ -512,7 +512,7 @@ All configurable via `scoring_weights.yaml` — no code changes needed to tune.
 | ATTOM API | No score calibration improvement after 60 days | Downgrade to manual enrichment |
 | Predictive model | <30% precision on expiration predictions | Fall back to rules-based flags |
 | A/B test | No signal after 60 days | Pick cheaper option, move on |
-| **The entire system** | **Wife hasn't used it for 2 consecutive weeks** | **Conversation. Redesign around what she actually uses.** |
+| **The entire system** | **Operator hasn't used it for 2 consecutive weeks** | **Conversation. Redesign around what the operator actually uses.** |
 
 ---
 
@@ -522,25 +522,25 @@ Questions to ask the Realtor before/during build:
 
 ### Before Starting
 - [ ] Which 5-10 ZIP codes / neighborhoods to focus on?
-- [ ] What is her MLS platform? (FlexMLS, Matrix, Paragon → determines RESO API availability)
-- [ ] Does her brokerage already provide a CRM?
-- [ ] Is she comfortable door-knocking for expired/pre-foreclosure leads?
+- [ ] What is the MLS platform? (FlexMLS, Matrix, Paragon → determines RESO API availability)
+- [ ] Does the brokerage already provide a CRM?
+- [ ] Is the operator comfortable door-knocking for expired/pre-foreclosure leads?
 
 ### After Phase 1 (Week 2)
-- [ ] After 3 days of briefing emails — what's missing? What info does she wish she had?
-- [ ] Does she want S-tier alerts as separate instant emails?
+- [ ] After 3 days of briefing emails — what's missing? What info does the operator wish they had?
+- [ ] Does the operator want S-tier alerts as separate instant emails?
 
 ### After Phase 2 (Week 4)
-- [ ] Does she like Follow Up Boss, or prefer a different CRM?
+- [ ] Does the operator like Follow Up Boss, or prefer a different CRM?
 - [ ] REDX vs Vulcan7? Start with REDX, switch if contact rates are poor.
 
 ### After Phase 3 (Month 2)
-- [ ] Does she use the dashboard or just the emails? (Invest accordingly)
+- [ ] Does the operator use the dashboard or just the emails? (Invest accordingly)
 - [ ] Phone or desktop primarily? (Drives mobile investment)
-- [ ] What metrics does she actually look at? (Don't build dashboards she ignores)
+- [ ] What metrics does the operator actually look at? (Don't build dashboards that get ignored)
 
 ### After Phase 5 (Month 4)
-- [ ] Is she comfortable with pre-expiration outreach to active listings?
+- [ ] Is the operator comfortable with pre-expiration outreach to active listings?
 - [ ] At $650/month, is the ROI there? How many deals from the system?
 - [ ] How many direct mail pieces per month feels right?
 
@@ -572,4 +572,4 @@ All research files in `Research/` directory:
 
 ---
 
-*This build plan was compiled from 6 parallel planning agents analyzing 19,800+ lines of research. Each phase is designed to deliver value incrementally — the Realtor benefits from Day 1, and the system gets smarter every month.*
+*This build plan was compiled from 6 parallel planning agents analyzing 19,800+ lines of research. Each phase is designed to deliver value incrementally -- the operator benefits from Day 1, and the system gets smarter every month.*

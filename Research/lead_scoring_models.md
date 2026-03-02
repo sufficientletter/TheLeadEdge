@@ -1,6 +1,6 @@
 # Lead Scoring Models & Automation Opportunities for Real Estate Lead Generation
 
-**Research Document | LeadFinder Project**
+**Research Document | TheLeadEdge Project**
 **Last Updated: 2026-02-28**
 
 ---
@@ -1359,7 +1359,7 @@ def create_lead_in_fub(lead_data, score_data):
     tags.append(f"Quadrant: {score_data['quadrant']}")
 
     payload = {
-        "source": "LeadFinder",
+        "source": "TheLeadEdge",
         "type": "Seller",
         "person": {
             "firstName": lead_data.get('owner_first_name', ''),
@@ -2289,7 +2289,7 @@ class LeadReportGenerator:
             h2 {{ color: #333; border-bottom: 2px solid #0066cc; padding-bottom: 5px; }}
         </style></head>
         <body>
-        <h1>LeadFinder Daily Report - {report['date']}</h1>
+        <h1>TheLeadEdge Daily Report - {report['date']}</h1>
         """
 
         # Hot leads section

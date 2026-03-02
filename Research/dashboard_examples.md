@@ -1,8 +1,8 @@
 # Dashboard Examples & Inspiration Research
 
-> **Project**: LeadFinder — Real Estate Lead Generation Dashboard
+> **Project**: TheLeadEdge — Real Estate Lead Generation Dashboard
 > **Created**: 2026-02-28
-> **Purpose**: Real-world examples, UI patterns, and inspiration for building the LeadFinder dashboard
+> **Purpose**: Real-world examples, UI patterns, and inspiration for building the TheLeadEdge dashboard
 
 ---
 
@@ -34,7 +34,7 @@
 - No MLS behavioral analysis (expired patterns, agent scoring)
 - UI is functional but dated — data-dense but not beautiful
 
-**LeadFinder Opportunity**: Borrow the filter system concept but add scoring, signal stacking, and a priority-first workflow.
+**TheLeadEdge Opportunity**: Borrow the filter system concept but add scoring, signal stacking, and a priority-first workflow.
 
 ---
 
@@ -61,7 +61,7 @@
 - No visualization — pure list view
 - Outdated-looking interface
 
-**LeadFinder Opportunity**: REDX provides raw expired data. LeadFinder adds intelligence on top — scoring, signal stacking, agent history analysis.
+**TheLeadEdge Opportunity**: REDX provides raw expired data. TheLeadEdge adds intelligence on top — scoring, signal stacking, agent history analysis.
 
 ---
 
@@ -88,7 +88,7 @@
 - No MLS integration — purely property/demographic data
 - Hit rate is debated — many agents report low ROI
 
-**LeadFinder Opportunity**: Transparent scoring (show the signals), real-time MLS data (not just predictions), and dramatically lower cost.
+**TheLeadEdge Opportunity**: Transparent scoring (show the signals), real-time MLS data (not just predictions), and dramatically lower cost.
 
 ---
 
@@ -115,7 +115,7 @@
 - No morning briefing or action-oriented workflow
 - Limited notification/alert system
 
-**LeadFinder Opportunity**: Borrow the property timeline concept, add scoring and action-oriented workflow on top.
+**TheLeadEdge Opportunity**: Borrow the property timeline concept, add scoring and action-oriented workflow on top.
 
 ---
 
@@ -139,7 +139,7 @@
 - No lead generation — purely a presentation tool
 - No scoring, no signals, no automation
 
-**LeadFinder Opportunity**: Integrate CMA generation into the one-click action system. When Sarah clicks "Send CMA" on a lead card, auto-generate and deliver.
+**TheLeadEdge Opportunity**: Integrate CMA generation into the one-click action system. When Sarah clicks "Send CMA" on a lead card, auto-generate and deliver.
 
 ---
 
@@ -158,7 +158,7 @@
 | Price History Viz | Basic | No | No | Basic | Yes (in CMA) |
 | Agent Analytics | No | No | No | Basic | No |
 | Mobile App | Yes | Yes | No | Yes | Yes |
-| **LeadFinder Fills Gap** | **Scoring + Stacking** | **Intelligence layer** | **Transparency** | **Action workflow** | **Auto-generation** |
+| **TheLeadEdge Fills Gap** | **Scoring + Stacking** | **Intelligence layer** | **Transparency** | **Action workflow** | **Auto-generation** |
 
 ---
 
@@ -191,7 +191,7 @@ with col2:
 ```
 
 **What to borrow**: Sidebar filter pattern, metric cards, map+data split.
-**Why not Streamlit for LeadFinder**: Re-renders on every interaction, limited real-time push, can't match NiceGUI's visual quality.
+**Why not Streamlit for TheLeadEdge**: Re-renders on every interaction, limited real-time push, can't match NiceGUI's visual quality.
 
 ### 2.2 Open-Source BI Tools
 
@@ -235,7 +235,7 @@ with col2:
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
-│  🏠 LeadFinder        Good morning, Sarah!    Fri Feb 28, 2026  🌓  │
+│  🏠 TheLeadEdge        Good morning, Sarah!    Fri Feb 28, 2026  🌓  │
 │  ══════════════════════════════════════════════════════════════════  │
 │  [📊 Briefing]  [📋 Leads]  [🗺️ Map]  [📈 Pipeline]  [⚙️ Settings]│
 ├──────────────────────────────────────────────────────────────────────┤
@@ -416,7 +416,7 @@ Hover cluster → show summary: "12 leads (3 S-tier, 4 A-tier, 5 B-tier)"
 
 ### 5.1 Progressive Web App (PWA)
 
-NiceGUI can serve as a PWA, allowing Sarah to add LeadFinder to her phone's home screen:
+NiceGUI can serve as a PWA, allowing Sarah to add TheLeadEdge to her phone's home screen:
 
 ```python
 # NiceGUI PWA configuration
@@ -435,8 +435,8 @@ ui.add_head_html('''
 ```json
 // static/manifest.json
 {
-  "name": "LeadFinder",
-  "short_name": "LeadFinder",
+  "name": "TheLeadEdge",
+  "short_name": "TheLeadEdge",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#1E3A5F",
@@ -453,7 +453,7 @@ ui.add_head_html('''
 **Phone (< 768px)**:
 ```
 ┌─────────────────────┐
-│ LeadFinder    🔔  ⚙️│
+│ TheLeadEdge    🔔  ⚙️│
 ├─────────────────────┤
 │ ┌────┐ ┌────┐      │
 │ │🔥 5│ │📥12│      │  ← 2x2 KPI grid
@@ -530,7 +530,7 @@ For when Sarah is in the car between showings:
 
 ### 6.1 HubSpot CRM
 
-**Borrow for LeadFinder**:
+**Borrow for TheLeadEdge**:
 - **Deal pipeline**: Kanban board with customizable stages, drag-and-drop
 - **Contact timeline**: Chronological activity feed showing all touchpoints
 - **Dashboard widgets**: Configurable metric cards with charts
@@ -539,14 +539,14 @@ For when Sarah is in the car between showings:
 
 ### 6.2 Salesforce
 
-**Borrow for LeadFinder**:
+**Borrow for TheLeadEdge**:
 - **List views**: Saved, filterable, shareable views of data
 - **Record pages**: Configurable layout with related records
 - **Reports/Dashboards**: Powerful aggregation and grouping
 
 ### 6.3 Metabase
 
-**Borrow for LeadFinder**:
+**Borrow for TheLeadEdge**:
 - **"Ask a question"**: Natural language → chart (perfect for Claude NL query)
 - **Auto-visualize**: Automatically picks the best chart type for the data
 - **Clean aesthetics**: Minimal, tasteful chart design with lots of white space
@@ -554,7 +554,7 @@ For when Sarah is in the car between showings:
 
 ### 6.4 Linear (Project Management)
 
-**Borrow for LeadFinder**:
+**Borrow for TheLeadEdge**:
 - **Keyboard shortcuts**: Power-user shortcuts for fast navigation
 - **Minimal design**: Clean, focused, no visual noise
 - **Views**: Switch between list, board, and timeline for same data
@@ -563,7 +563,7 @@ For when Sarah is in the car between showings:
 
 ### 6.5 Notion
 
-**Borrow for LeadFinder**:
+**Borrow for TheLeadEdge**:
 - **Multiple views of same data**: Table, Board (Kanban), Calendar, Gallery
 - **Properties/columns**: Customizable fields with types (select, multi-select, date, number)
 - **Templates**: Pre-built layouts for common workflows
@@ -571,11 +571,11 @@ For when Sarah is in the car between showings:
 
 ### 6.6 Applicability Matrix
 
-| Pattern | Source | LeadFinder Feature | Priority |
+| Pattern | Source | TheLeadEdge Feature | Priority |
 |---------|--------|-------------------|----------|
 | Kanban pipeline | HubSpot, Linear, Notion | Lead pipeline view | High |
 | Activity timeline | HubSpot, Salesforce | Lead detail panel | High |
-| NL query | Metabase | "Ask LeadFinder" via Claude | Medium |
+| NL query | Metabase | "Ask TheLeadEdge" via Claude | Medium |
 | Keyboard shortcuts | Linear | Power-user navigation | Low |
 | Multiple views | Notion | List/Map/Board toggle | High |
 | Smart filters | HubSpot, Salesforce | Lead list filters | High |
@@ -622,7 +622,7 @@ For when Sarah is in the car between showings:
 
 ### 7.4 Competitive Feature Matrix
 
-| Feature | PropStream | REDX | SmartZip | Remine | **LeadFinder** |
+| Feature | PropStream | REDX | SmartZip | Remine | **TheLeadEdge** |
 |---------|-----------|------|----------|--------|---------------|
 | Lead Scoring | ❌ | ❌ | ⚠️ (opaque) | ❌ | ✅ Transparent |
 | Signal Stacking | ❌ | ❌ | ❌ | ❌ | ✅ Multi-source |
@@ -637,8 +637,8 @@ For when Sarah is in the car between showings:
 | Urgency Decay | ❌ | ❌ | ❌ | ❌ | ✅ Time-based |
 | Cross-Source Intel | ❌ | ❌ | ❌ | ❌ | ✅ MLS+Public+Digital |
 
-**LeadFinder fills every major gap in the current market** — no existing tool combines signal stacking, transparent scoring, morning briefings, and MLS behavioral analysis.
+**TheLeadEdge fills every major gap in the current market** — no existing tool combines signal stacking, transparent scoring, morning briefings, and MLS behavioral analysis.
 
 ---
 
-*This research provides a comprehensive survey of existing tools, open-source projects, and UI patterns that inform LeadFinder's dashboard design, ensuring it stands apart from every existing solution in the market.*
+*This research provides a comprehensive survey of existing tools, open-source projects, and UI patterns that inform TheLeadEdge's dashboard design, ensuring it stands apart from every existing solution in the market.*

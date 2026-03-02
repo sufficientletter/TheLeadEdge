@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-YaniVision — Yani's data-driven real estate lead generation system. Build intelligent tools that mine MLS data, public records, and digital signals to find motivated sellers and buyers before competitors.
+TheLeadEdge — Data-driven real estate lead generation system. Build intelligent tools that mine MLS data, public records, and digital signals to find motivated sellers and buyers before competitors.
 
 ## Master Build Plan
 
@@ -38,11 +38,11 @@ The cost of caution is zero. The cost of exposure is catastrophic.
 @.claude/rules/logging.md
 
 ## Project Context
-- **User**: Husband building tools for Yani (Ianula), his Realtor wife
-- **Key Asset**: Yani has full MLS access (Multiple Listing Service)
+- **User**: Developer building automated lead generation tools for licensed Realtors
+- **Key Asset**: The Realtor operator has full MLS access (Multiple Listing Service)
 - **Goal**: Find high-probability leads through creative data mining, not traditional cold-calling
 - **Philosophy**: Work smarter — use data patterns, public records, and MLS insights to identify motivated sellers/buyers before competitors
-- **Division of Labor**: We build the intelligence layer. Yani handles all client contact.
+- **Division of Labor**: We build the intelligence layer. The Realtor handles all client contact.
 
 ## Architecture Overview
 
@@ -129,7 +129,7 @@ Research/                                # Research corpus (16 files, 19,800+ li
 TeamLeadJournal/                         # Session journals
 logs/                                    # Agent action logs
 src/                                     # Source code (created during build)
-  yanivision/
+  theleadedge/
     ingestion/                           # Module 1-3: Data ingestion
     signals/                             # Module 4: Signal detection
     scoring/                             # Module 5: Scoring engine
@@ -177,5 +177,5 @@ All 6 native agents specify `model: claude-opus-4-6` (latest, most capable) and 
 - Expired listing agents are bombarded by competitors — differentiation is everything
 - FSBO sellers have already decided against agents — lead with value, not pitch
 - Scoring models need calibration data — track conversions from Day 1
-- Yani's personal touch is the product — we just surface the right leads at the right time
+- The Realtor's personal touch is the product — we just surface the right leads at the right time
 - Never automate the human contact — automation finds leads, humans build relationships

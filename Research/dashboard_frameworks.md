@@ -1,6 +1,6 @@
 # Dashboard Frameworks Research
 
-> **Project**: LeadFinder — Real Estate Lead Generation Dashboard
+> **Project**: TheLeadEdge — Real Estate Lead Generation Dashboard
 > **Created**: 2026-02-28
 > **Purpose**: Evaluate frameworks for building a beautiful, data-rich browser dashboard
 
@@ -398,7 +398,7 @@ Each card shows: metric value, label, trend indicator (up/down + delta).
 - **Pros**: Free, lightweight (42KB), huge plugin ecosystem, easy to use
 - **Cons**: Less visually polished than Mapbox, no 3D, basic vector tiles
 - **NiceGUI Integration**: Native `ui.leaflet()` — first-class support
-- **Best For**: LeadFinder — free, great for property markers, heat maps, boundaries
+- **Best For**: TheLeadEdge — free, great for property markers, heat maps, boundaries
 - **Plugins**: Leaflet.heat (heat maps), Leaflet.markercluster (clustering), Leaflet.draw (drawing)
 
 ### 4.2 Mapbox GL JS
@@ -441,7 +441,7 @@ Each card shows: metric value, label, trend indicator (up/down + delta).
 - **NiceGUI Integration**: Via custom element
 - **Best For**: Streamlit-based map visualizations
 
-### Map Library Recommendation for LeadFinder
+### Map Library Recommendation for TheLeadEdge
 
 **Primary: Leaflet** (via NiceGUI's native `ui.leaflet`)
 - Free, no API key needed
@@ -529,7 +529,7 @@ async def on_new_lead_scored(lead):
 - **Cost**: $0
 - **Pros**: Zero deployment complexity, fast iteration, full data privacy
 - **Cons**: Only accessible on local network, no mobile access outside home
-- **LAN access**: Set `ui.run(host='0.0.0.0')` — accessible from wife's phone on same WiFi
+- **LAN access**: Set `ui.run(host='0.0.0.0')` — accessible from the Realtor's phone on same WiFi
 
 ### 6.2 Docker
 
@@ -564,7 +564,7 @@ async def on_new_lead_scored(lead):
 
 ### Primary Framework: NiceGUI
 
-**Why NiceGUI wins for LeadFinder:**
+**Why NiceGUI wins for TheLeadEdge:**
 
 1. **Best visual quality** — Material Design (Quasar) + Tailwind CSS = professional without CSS expertise
 2. **Native maps** — `ui.leaflet()` with markers, popups, heat maps, clustering
@@ -646,7 +646,7 @@ dark = ui.dark_mode()
 @ui.page('/')
 async def dashboard():
     with ui.header().classes('bg-blue-900 text-white'):
-        ui.label('LeadFinder').classes('text-2xl font-bold')
+        ui.label('TheLeadEdge').classes('text-2xl font-bold')
         ui.space()
         ui.label(datetime.now().strftime('%B %d, %Y'))
         ui.switch('Dark Mode', on_change=dark.toggle)
@@ -686,7 +686,7 @@ async def dashboard():
                 ],
             }).classes('h-96')
 
-ui.run(title='LeadFinder', port=8080)
+ui.run(title='TheLeadEdge', port=8080)
 ```
 
 ---
@@ -703,4 +703,4 @@ ui.run(title='LeadFinder', port=8080)
 
 ---
 
-*This research recommends NiceGUI as the primary framework for LeadFinder based on visual quality, native map/table support, real-time capabilities, and developer productivity for a solo developer building an internal tool.*
+*This research recommends NiceGUI as the primary framework for TheLeadEdge based on visual quality, native map/table support, real-time capabilities, and developer productivity for a solo developer building an internal tool.*
