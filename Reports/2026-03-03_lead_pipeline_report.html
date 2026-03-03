@@ -1,0 +1,2114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Lead Edge - Lead Pipeline Report - March 3, 2026</title>
+<style>
+  /* ============================================
+     The Lead Edge Lead Pipeline Report
+     Self-contained HTML report -- no external deps
+     ============================================ */
+
+  :root {
+    --navy-900: #0f1b2d;
+    --navy-800: #1a2744;
+    --navy-700: #1a365d;
+    --navy-600: #2b4c7e;
+    --navy-500: #2b6cb0;
+    --navy-400: #4299e1;
+    --navy-300: #63b3ed;
+    --navy-200: #bee3f8;
+    --navy-100: #ebf8ff;
+    --white: #ffffff;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+    --red-100: #fee2e2;
+    --red-200: #fecaca;
+    --red-500: #ef4444;
+    --red-600: #dc2626;
+    --red-700: #b91c1c;
+    --red-800: #991b1b;
+    --orange-100: #ffedd5;
+    --orange-200: #fed7aa;
+    --orange-500: #f97316;
+    --orange-600: #ea580c;
+    --orange-700: #c2410c;
+    --orange-800: #9a3412;
+    --yellow-100: #fef9c3;
+    --yellow-200: #fef08a;
+    --yellow-500: #eab308;
+    --yellow-600: #ca8a04;
+    --yellow-700: #a16207;
+    --yellow-800: #854d0e;
+    --green-100: #dcfce7;
+    --green-200: #bbf7d0;
+    --green-500: #22c55e;
+    --green-600: #16a34a;
+    --green-700: #15803d;
+    --green-800: #166534;
+    --accent: #e8a838;
+    --accent-light: #f5d08c;
+    --accent-dark: #b07d1a;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    color: var(--gray-700);
+    background-color: var(--gray-100);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---- Top accent bar ---- */
+  .top-bar {
+    height: 4px;
+    background: linear-gradient(90deg, var(--navy-700), var(--navy-500), var(--accent), var(--navy-500), var(--navy-700));
+  }
+
+  /* ---- Header / Hero ---- */
+  .hero {
+    background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-700) 50%, var(--navy-600) 100%);
+    color: var(--white);
+    padding: 48px 40px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(66,153,225,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -5%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(232,168,56,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-brand {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--accent);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .hero h1 {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+    line-height: 1.2;
+  }
+  .hero-tagline {
+    font-size: 15px;
+    color: var(--navy-300);
+    font-weight: 400;
+    margin-bottom: 24px;
+  }
+  .hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    font-size: 13px;
+    color: var(--gray-400);
+  }
+  .hero-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .hero-meta strong {
+    color: var(--white);
+    font-weight: 600;
+  }
+
+  /* ---- Container ---- */
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ---- Executive Summary Cards ---- */
+  .summary-section {
+    margin-top: -28px;
+    position: relative;
+    z-index: 10;
+    padding-bottom: 16px;
+  }
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+  }
+  .summary-card {
+    background: var(--white);
+    border-radius: 10px;
+    padding: 18px 12px;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04);
+    border: 1px solid var(--gray-200);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .summary-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  }
+  .summary-card .card-count {
+    font-size: 32px;
+    font-weight: 800;
+    display: block;
+    line-height: 1.1;
+  }
+  .summary-card .card-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--gray-500);
+    display: block;
+    margin-top: 6px;
+    font-weight: 600;
+  }
+  .card-s .card-count { color: var(--red-700); }
+  .card-s { border-top: 3px solid var(--red-500); }
+  .card-a .card-count { color: var(--orange-700); }
+  .card-a { border-top: 3px solid var(--orange-500); }
+  .card-b .card-count { color: var(--yellow-700); }
+  .card-b { border-top: 3px solid var(--yellow-500); }
+  .card-c .card-count { color: var(--green-700); }
+  .card-c { border-top: 3px solid var(--green-500); }
+  .card-d .card-count { color: var(--gray-500); }
+  .card-d { border-top: 3px solid var(--gray-400); }
+  .card-total .card-count { color: var(--navy-500); }
+  .card-total { border-top: 3px solid var(--navy-500); }
+
+  /* ---- Key stats bar ---- */
+  .stats-bar {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin: 24px 0 8px;
+    padding: 16px 24px;
+    background: var(--white);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border: 1px solid var(--gray-200);
+  }
+  .stat-item {
+    text-align: center;
+  }
+  .stat-value {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--navy-700);
+    display: block;
+  }
+  .stat-label {
+    font-size: 11px;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+
+  /* ---- Section ---- */
+  .section {
+    background: var(--white);
+    border-radius: 10px;
+    padding: 32px;
+    margin: 20px 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border: 1px solid var(--gray-200);
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .section-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .section-icon-hot { background: var(--red-100); }
+  .section-icon-watch { background: var(--green-100); }
+  .section-icon-monitor { background: var(--gray-100); }
+  .section-icon-pipeline { background: var(--navy-100); }
+  .section-icon-scoring { background: var(--orange-100); }
+  .section-icon-signals { background: var(--yellow-100); }
+  .section-icon-next { background: linear-gradient(135deg, var(--navy-100), var(--accent-light)); }
+  .section-icon-tech { background: var(--gray-100); }
+  .section-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--navy-800);
+    letter-spacing: -0.3px;
+  }
+  .section-subtitle {
+    font-size: 13px;
+    color: var(--gray-500);
+  }
+
+  /* ---- Badges ---- */
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+    min-width: 28px;
+    letter-spacing: 0.5px;
+  }
+  .badge-s { background: var(--red-200); color: var(--red-800); }
+  .badge-a { background: var(--orange-200); color: var(--orange-800); }
+  .badge-b { background: var(--yellow-200); color: var(--yellow-800); }
+  .badge-c { background: var(--green-200); color: var(--green-800); }
+  .badge-d { background: var(--gray-200); color: var(--gray-600); }
+
+  .action-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .action-priority { background: var(--orange-100); color: var(--orange-800); }
+  .action-schedule { background: var(--yellow-100); color: var(--yellow-800); }
+  .action-nurture { background: var(--green-100); color: var(--green-800); }
+  .action-monitor { background: var(--gray-100); color: var(--gray-600); }
+
+  /* ---- Lead Card ---- */
+  .lead-card {
+    border: 1px solid var(--gray-200);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .lead-card:last-child {
+    margin-bottom: 0;
+  }
+  .lead-card-header {
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .lead-card-header-a {
+    background: linear-gradient(135deg, #fff7ed, #ffedd5);
+    border-bottom: 2px solid var(--orange-200);
+  }
+  .lead-card-header-b {
+    background: linear-gradient(135deg, #fefce8, #fef9c3);
+    border-bottom: 2px solid var(--yellow-200);
+  }
+  .lead-card-header-c {
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border-bottom: 2px solid var(--green-200);
+  }
+  .lead-id-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .lead-number {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--navy-800);
+  }
+  .lead-mls {
+    font-size: 13px;
+    color: var(--gray-500);
+    font-weight: 500;
+  }
+  .lead-score-group {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .lead-score {
+    text-align: right;
+  }
+  .lead-score-value {
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1;
+  }
+  .score-a { color: var(--orange-700); }
+  .score-b { color: var(--yellow-700); }
+  .score-c { color: var(--green-700); }
+  .lead-score-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--gray-500);
+    font-weight: 600;
+  }
+
+  /* Score progress bar */
+  .score-bar-container {
+    width: 120px;
+    height: 8px;
+    background: var(--gray-200);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .score-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+  }
+  .score-bar-a { background: linear-gradient(90deg, var(--orange-500), var(--orange-600)); }
+  .score-bar-b { background: linear-gradient(90deg, var(--yellow-500), var(--yellow-600)); }
+  .score-bar-c { background: linear-gradient(90deg, var(--green-500), var(--green-600)); }
+
+  .lead-card-body {
+    padding: 20px 24px;
+  }
+  .lead-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 32px;
+    margin-bottom: 20px;
+  }
+  .detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    border-bottom: 1px dotted var(--gray-200);
+    font-size: 13px;
+  }
+  .detail-label {
+    color: var(--gray-500);
+    font-weight: 500;
+  }
+  .detail-value {
+    color: var(--gray-800);
+    font-weight: 600;
+    text-align: right;
+  }
+  .price-original {
+    text-decoration: line-through;
+    color: var(--gray-400);
+    font-weight: 400;
+    margin-right: 4px;
+  }
+
+  /* Signals list */
+  .signals-title {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--gray-500);
+    font-weight: 700;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .signal-count-badge {
+    background: var(--navy-700);
+    color: var(--white);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .signal-item {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .signal-item:last-child {
+    margin-bottom: 0;
+  }
+  .signal-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+  }
+  .signal-name {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--navy-800);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .signal-points {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--navy-500);
+    background: var(--navy-100);
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+  .signal-desc {
+    font-size: 13px;
+    color: var(--gray-600);
+    line-height: 1.5;
+  }
+
+  /* Why this lead matters */
+  .lead-insight {
+    margin-top: 16px;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--navy-100), #f0f4ff);
+    border-left: 4px solid var(--navy-500);
+    border-radius: 0 8px 8px 0;
+  }
+  .lead-insight-title {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+    color: var(--navy-700);
+    margin-bottom: 6px;
+  }
+  .lead-insight p {
+    font-size: 13px;
+    color: var(--gray-700);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  /* Recommended Action box */
+  .lead-action {
+    margin-top: 12px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .lead-action-a {
+    background: var(--orange-100);
+    border: 1px solid var(--orange-200);
+    color: var(--orange-800);
+  }
+  .lead-action-b {
+    background: var(--yellow-100);
+    border: 1px solid var(--yellow-200);
+    color: var(--yellow-800);
+  }
+  .lead-action-c {
+    background: var(--green-100);
+    border: 1px solid var(--green-200);
+    color: var(--green-800);
+  }
+  .lead-action-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ---- Tables ---- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  th {
+    background: var(--gray-50);
+    color: var(--gray-500);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 0.8px;
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 2px solid var(--gray-200);
+  }
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--gray-100);
+    vertical-align: middle;
+  }
+  tr:last-child td {
+    border-bottom: none;
+  }
+  tr:hover td {
+    background: var(--gray-50);
+  }
+  .table-note {
+    font-size: 12px;
+    color: var(--gray-500);
+    font-style: italic;
+    margin-top: 4px;
+  }
+  .flag-note {
+    font-size: 11px;
+    color: var(--gray-500);
+    display: block;
+    margin-top: 2px;
+  }
+
+  /* ---- Pipeline flow diagram ---- */
+  .pipeline-flow {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin: 16px 0;
+    overflow-x: auto;
+  }
+  .pipeline-step {
+    flex: 1;
+    min-width: 120px;
+    text-align: center;
+    position: relative;
+  }
+  .pipeline-step-box {
+    background: var(--gray-50);
+    border: 2px solid var(--gray-200);
+    border-radius: 10px;
+    padding: 14px 10px 12px;
+    margin: 0 6px;
+    position: relative;
+    transition: border-color 0.2s ease;
+  }
+  .pipeline-step-box:hover {
+    border-color: var(--navy-400);
+  }
+  .pipeline-step-number {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--navy-700);
+    color: var(--white);
+    font-size: 10px;
+    font-weight: 700;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+  .pipeline-step-icon {
+    font-size: 22px;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .pipeline-step-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--navy-800);
+    display: block;
+    margin-bottom: 2px;
+  }
+  .pipeline-step-desc {
+    font-size: 10px;
+    color: var(--gray-500);
+    line-height: 1.4;
+  }
+  .pipeline-arrow {
+    display: flex;
+    align-items: center;
+    color: var(--navy-400);
+    font-size: 20px;
+    flex-shrink: 0;
+    padding: 0 2px;
+    margin-top: 10px;
+  }
+
+  /* ---- Signal detection rules table ---- */
+  .rules-table th:first-child,
+  .rules-table td:first-child {
+    width: 30px;
+    text-align: center;
+  }
+  .rules-table td:last-child {
+    font-weight: 700;
+    text-align: center;
+    color: var(--navy-700);
+  }
+
+  /* ---- Scoring Worked Example ---- */
+  .worked-example {
+    background: var(--gray-50);
+    border: 2px solid var(--gray-200);
+    border-radius: 10px;
+    padding: 24px;
+    margin-top: 20px;
+  }
+  .worked-example-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy-800);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .calc-table {
+    width: 100%;
+    margin-bottom: 16px;
+  }
+  .calc-table th {
+    background: var(--navy-700);
+    color: var(--white);
+    font-size: 10px;
+    padding: 8px 12px;
+    border-bottom: none;
+  }
+  .calc-table td {
+    font-size: 13px;
+    padding: 8px 12px;
+    background: var(--white);
+  }
+  .calc-table tr:last-child td {
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .calc-subtotal {
+    border-top: 2px solid var(--navy-700) !important;
+    font-weight: 700 !important;
+  }
+  .calc-subtotal td {
+    background: var(--navy-100) !important;
+    font-weight: 700;
+    color: var(--navy-800);
+  }
+  .calc-final {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .calc-final-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+  }
+  .calc-final-step .calc-val {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--navy-700);
+  }
+  .calc-final-step .calc-op {
+    color: var(--gray-400);
+    font-weight: 700;
+    font-size: 18px;
+  }
+  .calc-final-result {
+    background: var(--orange-100);
+    border: 2px solid var(--orange-500);
+    border-radius: 10px;
+    padding: 10px 20px;
+    text-align: center;
+  }
+  .calc-final-score {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--orange-700);
+    display: block;
+    line-height: 1;
+  }
+  .calc-final-tier {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--orange-600);
+    font-weight: 700;
+  }
+
+  /* ---- Decay visualization ---- */
+  .decay-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .decay-card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .decay-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy-800);
+    margin-bottom: 2px;
+  }
+  .decay-desc {
+    font-size: 11px;
+    color: var(--gray-500);
+    line-height: 1.4;
+  }
+  .decay-visual {
+    height: 6px;
+    background: var(--gray-200);
+    border-radius: 3px;
+    margin-top: 8px;
+    overflow: hidden;
+    display: flex;
+  }
+  .decay-bar-segment {
+    height: 100%;
+  }
+
+  /* ---- Stacking rules ---- */
+  .stack-table td:nth-child(3) {
+    font-weight: 700;
+    color: var(--navy-700);
+    text-align: center;
+  }
+
+  /* ---- Tier table ---- */
+  .tier-table td:first-child {
+    font-weight: 700;
+    text-align: center;
+  }
+
+  /* ---- Next Steps ---- */
+  .next-steps-list {
+    counter-reset: nextstep;
+    list-style: none;
+    padding: 0;
+  }
+  .next-step-item {
+    counter-increment: nextstep;
+    padding: 16px 16px 16px 56px;
+    border: 1px solid var(--gray-200);
+    border-radius: 10px;
+    margin-bottom: 12px;
+    position: relative;
+    background: var(--white);
+  }
+  .next-step-item:last-child {
+    margin-bottom: 0;
+  }
+  .next-step-item::before {
+    content: counter(nextstep);
+    position: absolute;
+    left: 16px;
+    top: 16px;
+    width: 28px;
+    height: 28px;
+    background: var(--navy-700);
+    color: var(--white);
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+  .next-step-priority {
+    display: inline-block;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-bottom: 4px;
+  }
+  .priority-critical { background: var(--red-100); color: var(--red-700); }
+  .priority-high { background: var(--orange-100); color: var(--orange-700); }
+  .priority-medium { background: var(--yellow-100); color: var(--yellow-700); }
+  .priority-low { background: var(--gray-100); color: var(--gray-600); }
+  .next-step-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--navy-800);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .next-step-desc {
+    font-size: 13px;
+    color: var(--gray-600);
+    line-height: 1.5;
+  }
+  .next-step-desc ul {
+    margin: 6px 0 0 16px;
+    padding: 0;
+  }
+  .next-step-desc li {
+    margin-bottom: 3px;
+  }
+
+  /* ---- Technical notes ---- */
+  .tech-note {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .tech-note:last-child {
+    margin-bottom: 0;
+  }
+  .tech-note-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--gray-700);
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tech-note-body {
+    font-size: 12px;
+    color: var(--gray-600);
+    line-height: 1.5;
+  }
+  .tech-label {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .label-non-critical { background: var(--yellow-100); color: var(--yellow-700); }
+
+  /* ---- Appendix config cards ---- */
+  .config-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .config-card {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .config-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    font-weight: 700;
+    color: var(--gray-500);
+    margin-bottom: 4px;
+  }
+  .config-value {
+    font-size: 14px;
+    color: var(--navy-800);
+    font-weight: 600;
+  }
+  .config-detail {
+    font-size: 11px;
+    color: var(--gray-500);
+    margin-top: 2px;
+  }
+
+  /* ---- Footer ---- */
+  .footer {
+    text-align: center;
+    padding: 32px 0 40px;
+    color: var(--gray-400);
+    font-size: 12px;
+  }
+  .footer-brand {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy-700);
+    margin-bottom: 4px;
+  }
+  .footer-tagline {
+    font-size: 12px;
+    color: var(--gray-500);
+    margin-bottom: 8px;
+  }
+  .footer-meta {
+    font-size: 11px;
+    color: var(--gray-400);
+  }
+  .footer-divider {
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, var(--navy-500), var(--accent));
+    border-radius: 2px;
+    margin: 16px auto;
+  }
+
+  /* ---- Utility ---- */
+  .text-muted { color: var(--gray-500); }
+  .text-small { font-size: 12px; }
+  .text-bold { font-weight: 700; }
+  .mt-0 { margin-top: 0; }
+  .mb-0 { margin-bottom: 0; }
+  .mb-8 { margin-bottom: 8px; }
+  .mb-12 { margin-bottom: 12px; }
+  .mb-16 { margin-bottom: 16px; }
+  .mb-24 { margin-bottom: 24px; }
+
+  /* ---- Responsive ---- */
+  @media (max-width: 720px) {
+    .hero { padding: 32px 20px 28px; }
+    .hero h1 { font-size: 24px; }
+    .hero-meta { gap: 12px; flex-direction: column; }
+    .summary-grid { grid-template-columns: repeat(3, 1fr); }
+    .stats-bar { flex-wrap: wrap; gap: 20px; }
+    .section { padding: 20px; }
+    .lead-details-grid { grid-template-columns: 1fr; }
+    .pipeline-flow { flex-direction: column; align-items: center; }
+    .pipeline-arrow { transform: rotate(90deg); padding: 4px 0; }
+    .decay-grid { grid-template-columns: 1fr; }
+    .config-grid { grid-template-columns: 1fr; }
+    .score-bar-container { display: none; }
+    .calc-final { flex-direction: column; }
+    .lead-card-header { flex-direction: column; align-items: flex-start; }
+    .lead-score-group { align-self: flex-end; }
+  }
+
+  @media (max-width: 480px) {
+    .summary-grid { grid-template-columns: repeat(2, 1fr); }
+    .container { padding: 0 12px; }
+  }
+
+  /* ---- Print ---- */
+  @media print {
+    body { background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .top-bar { display: none; }
+    .hero { padding: 24px 20px; }
+    .container { max-width: 100%; padding: 0 12px; }
+    .summary-card:hover, .pipeline-step-box:hover { transform: none; box-shadow: none; }
+    .section { box-shadow: none; break-inside: avoid; page-break-inside: avoid; }
+    .lead-card { break-inside: avoid; page-break-inside: avoid; }
+    .next-step-item { break-inside: avoid; page-break-inside: avoid; }
+    .footer { padding: 16px 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar"></div>
+
+<!-- ======================================
+     HERO / HEADER
+     ====================================== -->
+<div class="hero">
+  <div class="container">
+    <div class="hero-brand">The Lead Edge</div>
+    <h1>Lead Pipeline Report</h1>
+    <div class="hero-tagline">Data-driven lead intelligence for real estate professionals</div>
+    <div class="hero-meta">
+      <span>&#128197; <strong>March 3, 2026</strong></span>
+      <span>&#127758; <strong>SW Florida</strong> &mdash; Lee &amp; Collier Counties</span>
+      <span>&#128202; <strong>MLS Matrix CSV Export</strong> (sample dataset)</span>
+      <span>&#9881;&#65039; <strong>Phase 1 MVP v0.1.0</strong></span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ======================================
+     EXECUTIVE SUMMARY CARDS
+     ====================================== -->
+<div class="summary-section">
+  <div class="summary-grid">
+    <div class="summary-card card-s">
+      <span class="card-count">0</span>
+      <span class="card-label">S-Tier</span>
+    </div>
+    <div class="summary-card card-a">
+      <span class="card-count">1</span>
+      <span class="card-label">A-Tier</span>
+    </div>
+    <div class="summary-card card-b">
+      <span class="card-count">1</span>
+      <span class="card-label">B-Tier</span>
+    </div>
+    <div class="summary-card card-c">
+      <span class="card-count">1</span>
+      <span class="card-label">C-Tier</span>
+    </div>
+    <div class="summary-card card-d">
+      <span class="card-count">7</span>
+      <span class="card-label">D-Tier</span>
+    </div>
+    <div class="summary-card card-total">
+      <span class="card-count">10</span>
+      <span class="card-label">Total</span>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-item">
+      <span class="stat-value">10</span>
+      <span class="stat-label">Listings Analyzed</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-value">11</span>
+      <span class="stat-label">Signals Detected</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-value">3</span>
+      <span class="stat-label">Actionable Leads</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-value">7</span>
+      <span class="stat-label">Monitoring</span>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================
+     HOT LEADS (Tier A & B)
+     ====================================== -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon section-icon-hot">&#128293;</div>
+    <div>
+      <div class="section-title">Hot Leads</div>
+      <div class="section-subtitle">Tier A and B &mdash; active outreach recommended</div>
+    </div>
+  </div>
+
+  <!-- LEAD #1 -->
+  <div class="lead-card">
+    <div class="lead-card-header lead-card-header-a">
+      <div class="lead-id-group">
+        <span class="lead-number">Lead #1</span>
+        <span class="badge badge-a">TIER A</span>
+        <span class="action-badge action-priority">Priority &mdash; 48hr</span>
+      </div>
+      <div class="lead-score-group">
+        <div>
+          <div class="score-bar-container">
+            <div class="score-bar-fill score-bar-a" style="width: 73.5%;"></div>
+          </div>
+        </div>
+        <div class="lead-score">
+          <span class="lead-score-value score-a">73.5</span>
+          <span class="lead-score-label">Score</span>
+        </div>
+      </div>
+    </div>
+    <div class="lead-card-body">
+      <div class="lead-details-grid">
+        <div class="detail-row">
+          <span class="detail-label">MLS #</span>
+          <span class="detail-value">22401006</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Status</span>
+          <span class="detail-value">Active</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Location</span>
+          <span class="detail-value">Cape Coral, 33990 (Lee)</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Property</span>
+          <span class="detail-value">Townhouse &middot; 3/2 &middot; 1,650 sqft</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Year Built</span>
+          <span class="detail-value">2008</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Days on Market</span>
+          <span class="detail-value">75 DOM</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">List Price</span>
+          <span class="detail-value">
+            <span class="price-original">$450,000</span>
+            <strong>$365,000</strong>
+          </span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Price History</span>
+          <span class="detail-value">$450K &rarr; $410K &rarr; $365K</span>
+        </div>
+      </div>
+
+      <div class="signals-title">
+        Signals Detected <span class="signal-count-badge">4</span>
+      </div>
+
+      <div class="signal-item">
+        <div class="signal-item-header">
+          <span class="signal-name">&#128200; Price Reduction</span>
+          <span class="signal-points">8 pts</span>
+        </div>
+        <div class="signal-desc">Price reduced 18.9% from original list price. Seller dropped from $450K to $365K, a $85,000 cut. This is not a minor adjustment &mdash; this is a seller who needs to move.</div>
+      </div>
+
+      <div class="signal-item">
+        <div class="signal-item-header">
+          <span class="signal-name">&#128200;&#128200; Multiple Price Reductions</span>
+          <span class="signal-points">14 pts</span>
+        </div>
+        <div class="signal-desc">Three distinct price points on record ($450K &rarr; $410K &rarr; $365K). Each reduction signals increasing urgency. The seller has tried twice to find the market and is still chasing it down.</div>
+      </div>
+
+      <div class="signal-item">
+        <div class="signal-item-header">
+          <span class="signal-name">&#9888;&#65039; Severe Price Reduction</span>
+          <span class="signal-points">16 pts</span>
+        </div>
+        <div class="signal-desc">The 18.9% total reduction from original exceeds the 15% threshold that indicates significant financial pressure or extreme motivation to sell. Nearly 1 in 5 dollars has been shaved off.</div>
+      </div>
+
+      <div class="signal-item">
+        <div class="signal-item-header">
+          <span class="signal-name">&#9203; High Days on Market</span>
+          <span class="signal-points">11 pts</span>
+        </div>
+        <div class="signal-desc">75 cumulative days on market. The SWFLA median is roughly 35-45 days. At 75 days, this listing is stale. The seller is watching neighbors sell while they sit.</div>
+      </div>
+
+      <div class="lead-insight">
+        <div class="lead-insight-title">Why This Lead Matters</div>
+        <p>Four stacked signals on one property is unusual. The pattern &mdash; aggressive price cuts over an extended period &mdash; strongly suggests a motivated seller who may be open to creative offers or needs guidance on proper market positioning. A townhouse in Cape Coral at $365K with this much price movement is a conversation worth having.</p>
+      </div>
+
+      <div class="lead-action lead-action-a">
+        <span class="lead-action-icon">&#9889;</span>
+        <span><strong>Recommended Action:</strong> Priority outreach within 48 hours. Prepare a CMA showing comparable sales to frame a realistic pricing discussion.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEAD #2 -->
+  <div class="lead-card">
+    <div class="lead-card-header lead-card-header-b">
+      <div class="lead-id-group">
+        <span class="lead-number">Lead #2</span>
+        <span class="badge badge-b">TIER B</span>
+        <span class="action-badge action-schedule">Schedule This Week</span>
+      </div>
+      <div class="lead-score-group">
+        <div>
+          <div class="score-bar-container">
+            <div class="score-bar-fill score-bar-b" style="width: 55.5%;"></div>
+          </div>
+        </div>
+        <div class="lead-score">
+          <span class="lead-score-value score-b">55.5</span>
+          <span class="lead-score-label">Score</span>
+        </div>
+      </div>
+    </div>
+    <div class="lead-card-body">
+      <div class="lead-details-grid">
+        <div class="detail-row">
+          <span class="detail-label">MLS #</span>
+          <span class="detail-value">22401003</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Status</span>
+          <span class="detail-value">Expired</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Location</span>
+          <span class="detail-value">Naples, 34108 (Collier)</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Property</span>
+          <span class="detail-value">Condo &middot; 2/2 &middot; 1,400 sqft</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Year Built</span>
+          <span class="detail-value">2010</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Listing Office</span>
+          <span class="detail-value">Test Realty</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Last List Price</span>
+          <span class="detail-value">
+            <span class="price-original">$499,000</span>
+            <strong>$449,900</strong>
+          </span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Price History</span>
+          <span class="detail-value">$499K &rarr; $475K &rarr; $449.9K</span>
+        </div>
+      </div>
+
+      <div class="signals-title">
+        Signals Detected <span class="signal-count-badge">3</span>
+      </div>
+
+      <div class="signal-item">
+        <div class="signal-item-header">
+          <span class="signal-name">&#10060; Expired Listing</span>
+          <span class="signal-points">15 pts</span>
+        </div>
+        <div class="signal-desc">The listing expired without selling. The seller still owns the property and likely still wants to sell &mdash; they just couldn't get it done with their previous agent/strategy.</div>
+      </div>
+
+      <div class="signal-item">
+        <div class="signal-item-header">
+          <span class="signal-name">&#128200; Price Reduction</span>
+          <span class="signal-points">8 pts</span>
+        </div>
+        <div class="signal-desc">Reduced 9.8% from original $499K to $449.9K. The seller was willing to negotiate but the market didn't meet them.</div>
+      </div>
+
+      <div class="signal-item">
+        <div class="signal-item-header">
+          <span class="signal-name">&#128200;&#128200; Multiple Price Reductions</span>
+          <span class="signal-points">14 pts</span>
+        </div>
+        <div class="signal-desc">Three price points ($499K &rarr; $475K &rarr; $449.9K) show the seller tried repeatedly to find a buyer. Nearly $50K in reductions and still no sale.</div>
+      </div>
+
+      <div class="lead-insight">
+        <div class="lead-insight-title">Why This Lead Matters</div>
+        <p>Expired listings are one of the highest-converting lead types in real estate. The seller demonstrated motivation (price cuts) but couldn't close. They may be frustrated with their previous agent, receptive to a fresh approach, or may have unrealistic expectations that a good CMA conversation can address. Naples 34108 (Pelican Bay / Vanderbilt Beach area) is a desirable condo market.</p>
+      </div>
+
+      <div class="lead-action lead-action-b">
+        <span class="lead-action-icon">&#128197;</span>
+        <span><strong>Recommended Action:</strong> Schedule outreach this week. Lead with empathy &mdash; acknowledge the frustration of an expired listing. Bring a CMA showing what actually sold in 34108 recently.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================
+     WATCHLIST (Tier C)
+     ====================================== -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon section-icon-watch">&#128065;&#65039;</div>
+    <div>
+      <div class="section-title">Watchlist Lead</div>
+      <div class="section-subtitle">Tier C &mdash; nurture campaign</div>
+    </div>
+  </div>
+
+  <div class="lead-card">
+    <div class="lead-card-header lead-card-header-c">
+      <div class="lead-id-group">
+        <span class="lead-number">Lead #3</span>
+        <span class="badge badge-c">TIER C</span>
+        <span class="action-badge action-nurture">Nurture</span>
+      </div>
+      <div class="lead-score-group">
+        <div>
+          <div class="score-bar-container">
+            <div class="score-bar-fill score-bar-c" style="width: 34.5%;"></div>
+          </div>
+        </div>
+        <div class="lead-score">
+          <span class="lead-score-value score-c">34.5</span>
+          <span class="lead-score-label">Score</span>
+        </div>
+      </div>
+    </div>
+    <div class="lead-card-body">
+      <div class="lead-details-grid">
+        <div class="detail-row">
+          <span class="detail-label">MLS #</span>
+          <span class="detail-value">22401004</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Status</span>
+          <span class="detail-value">Expired</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Location</span>
+          <span class="detail-value">Fort Myers, 33901 (Lee)</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Property</span>
+          <span class="detail-value">SFR &middot; 3/2 &middot; 1,600 sqft</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Year Built</span>
+          <span class="detail-value">1998</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Cumulative DOM</span>
+          <span class="detail-value">180 days</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Last List Price</span>
+          <span class="detail-value">
+            <span class="price-original">$310,000</span>
+            <strong>$275,000</strong>
+          </span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Listing Office</span>
+          <span class="detail-value">Sunshine Realty</span>
+        </div>
+      </div>
+
+      <div class="signals-title">
+        Signals Detected <span class="signal-count-badge">2</span>
+      </div>
+
+      <div class="signal-item">
+        <div class="signal-item-header">
+          <span class="signal-name">&#10060; Expired Listing</span>
+          <span class="signal-points">15 pts</span>
+        </div>
+        <div class="signal-desc">Another expired listing. This one had a 180-day cumulative days on market, meaning the seller endured 6 months of showings, feedback, and price adjustments without a sale.</div>
+      </div>
+
+      <div class="signal-item">
+        <div class="signal-item-header">
+          <span class="signal-name">&#128200; Price Reduction</span>
+          <span class="signal-points">8 pts</span>
+        </div>
+        <div class="signal-desc">Reduced 11.3% from $310K to $275K. A $35,000 cut on a $310K property is meaningful at this price point.</div>
+      </div>
+
+      <div class="lead-insight">
+        <div class="lead-insight-title">Why This Lead Matters</div>
+        <p>Fort Myers 33901 is the downtown/River District area &mdash; a market that moves at a specific pace. Six months without a sale combined with an 11% price cut suggests either overpricing for the neighborhood or a property with condition issues. Either way, the seller has demonstrated patience and willingness to adjust. They may be ready for a new strategy.</p>
+      </div>
+
+      <div class="lead-action lead-action-c">
+        <span class="lead-action-icon">&#127793;</span>
+        <span><strong>Recommended Action:</strong> Add to monthly nurture campaign. This lead may need time to process the expired listing before being receptive to a new agent conversation.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================
+     MONITORED LEADS (Tier D)
+     ====================================== -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon section-icon-monitor">&#128225;</div>
+    <div>
+      <div class="section-title">Monitored Leads</div>
+      <div class="section-subtitle">7 Tier D leads &mdash; tracking for future signal development</div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>MLS #</th>
+        <th>Status</th>
+        <th>Location</th>
+        <th>Price</th>
+        <th>Signals</th>
+        <th>Notable Flags</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>22401005</strong></td>
+        <td><span class="badge badge-d">Pending</span></td>
+        <td>Naples, 34110</td>
+        <td>$615,000</td>
+        <td>1 <span class="text-muted text-small">(price reduction 5.4%)</span></td>
+        <td>Under contract &mdash; monitor for fall-through</td>
+      </tr>
+      <tr>
+        <td><strong>22401010</strong></td>
+        <td><span class="badge badge-d">Active</span></td>
+        <td>Naples, 34119</td>
+        <td>$550,000</td>
+        <td>1 <span class="text-muted text-small">(price reduction 5.2%)</span></td>
+        <td>Mild reduction &mdash; could escalate</td>
+      </tr>
+      <tr>
+        <td><strong>22401001</strong></td>
+        <td><span class="badge badge-d">Active</span></td>
+        <td>Naples, 34102</td>
+        <td>$525,000</td>
+        <td>0</td>
+        <td>45 CDOM, no price cuts yet</td>
+      </tr>
+      <tr>
+        <td><strong>22401009</strong></td>
+        <td><span class="badge badge-d">Active</span></td>
+        <td>Cape Coral, 33914</td>
+        <td>$475,000</td>
+        <td>0</td>
+        <td>CDOM=95 (approaching high DOM threshold), Gulf Access &#9971;&#65039;</td>
+      </tr>
+      <tr>
+        <td><strong>22401002</strong></td>
+        <td><span class="badge badge-d">Active</span></td>
+        <td>Cape Coral, 33904</td>
+        <td>$385,000</td>
+        <td>0</td>
+        <td>No signals &mdash; stable listing</td>
+      </tr>
+      <tr>
+        <td><strong>22401008</strong></td>
+        <td><span class="badge badge-d">Active</span></td>
+        <td>Naples, 34112</td>
+        <td>$289,000</td>
+        <td>0</td>
+        <td>Short sale flag &mdash; not yet triggering <span class="text-muted text-small">(see Tech Notes)</span></td>
+      </tr>
+      <tr>
+        <td><strong>22401007</strong></td>
+        <td><span class="badge badge-d">Active</span></td>
+        <td>Fort Myers, 33905</td>
+        <td>$198,000</td>
+        <td>0</td>
+        <td>Foreclosure/REO flag &mdash; not yet triggering <span class="text-muted text-small">(see Tech Notes)</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="margin-top: 16px; padding: 14px 16px; background: var(--navy-100); border-radius: 8px; border-left: 4px solid var(--navy-500);">
+    <div style="font-size: 12px; font-weight: 700; color: var(--navy-700); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px;">Leads to Watch</div>
+    <ul style="font-size: 13px; color: var(--gray-600); margin: 0 0 0 16px; padding: 0; line-height: 1.7;">
+      <li><strong>22401009</strong> (Cape Coral, Gulf Access) has 95 CDOM. At 120 CDOM it will trigger the <code style="background: var(--gray-100); padding: 1px 4px; border-radius: 3px; font-size: 12px;">high_dom</code> signal and score significantly higher.</li>
+      <li><strong>22401005</strong> (Naples, Pending) is under contract with a price reduction. If the deal falls through, the <code style="background: var(--gray-100); padding: 1px 4px; border-radius: 3px; font-size: 12px;">back_on_market</code> signal fires (13 base points).</li>
+      <li><strong>22401007</strong> and <strong>22401008</strong> have foreclosure and short sale flags in raw MLS data that should be triggering signals. A CSV field mapping issue is preventing detection (see Technical Notes).</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ======================================
+     DATA PIPELINE
+     ====================================== -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon section-icon-pipeline">&#9881;&#65039;</div>
+    <div>
+      <div class="section-title">How These Leads Were Found</div>
+      <div class="section-subtitle">Data pipeline from MLS export to scored leads</div>
+    </div>
+  </div>
+
+  <div class="pipeline-flow">
+    <div class="pipeline-step">
+      <div class="pipeline-step-box">
+        <span class="pipeline-step-number">1</span>
+        <span class="pipeline-step-icon">&#128196;</span>
+        <span class="pipeline-step-title">CSV Import</span>
+        <span class="pipeline-step-desc">Parse, normalize, validate MLS exports</span>
+      </div>
+    </div>
+    <div class="pipeline-arrow">&rarr;</div>
+    <div class="pipeline-step">
+      <div class="pipeline-step-box">
+        <span class="pipeline-step-number">2</span>
+        <span class="pipeline-step-icon">&#127968;</span>
+        <span class="pipeline-step-title">Address Normalize</span>
+        <span class="pipeline-step-desc">USPS-standard format, dedup key</span>
+      </div>
+    </div>
+    <div class="pipeline-arrow">&rarr;</div>
+    <div class="pipeline-step">
+      <div class="pipeline-step-box">
+        <span class="pipeline-step-number">3</span>
+        <span class="pipeline-step-icon">&#128451;&#65039;</span>
+        <span class="pipeline-step-title">Property Upsert</span>
+        <span class="pipeline-step-desc">Match, create, or update records</span>
+      </div>
+    </div>
+    <div class="pipeline-arrow">&rarr;</div>
+    <div class="pipeline-step">
+      <div class="pipeline-step-box">
+        <span class="pipeline-step-number">4</span>
+        <span class="pipeline-step-icon">&#128269;</span>
+        <span class="pipeline-step-title">Signal Detection</span>
+        <span class="pipeline-step-desc">12 rules scan each property</span>
+      </div>
+    </div>
+    <div class="pipeline-arrow">&rarr;</div>
+    <div class="pipeline-step">
+      <div class="pipeline-step-box">
+        <span class="pipeline-step-number">5</span>
+        <span class="pipeline-step-icon">&#127919;</span>
+        <span class="pipeline-step-title">Scoring Engine</span>
+        <span class="pipeline-step-desc">Decay, freshness, stacking, tier</span>
+      </div>
+    </div>
+    <div class="pipeline-arrow">&rarr;</div>
+    <div class="pipeline-step">
+      <div class="pipeline-step-box">
+        <span class="pipeline-step-number">6</span>
+        <span class="pipeline-step-icon">&#128200;</span>
+        <span class="pipeline-step-title">Lead Output</span>
+        <span class="pipeline-step-desc">Tiered leads, briefings, actions</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================
+     SIGNAL DETECTION RULES
+     ====================================== -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon section-icon-signals">&#128161;</div>
+    <div>
+      <div class="section-title">Signal Detection Rules</div>
+      <div class="section-subtitle">12 rules scanned against each property</div>
+    </div>
+  </div>
+
+  <table class="rules-table">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Signal</th>
+        <th>What Triggers It</th>
+        <th>Base Pts</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td><strong>Expired Listing</strong></td>
+        <td>Status = "Expired", within last 30 days</td>
+        <td>15</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td><strong>Expired Listing (Stale)</strong></td>
+        <td>Status = "Expired", 31-90 days ago</td>
+        <td>10</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td><strong>Price Reduction</strong></td>
+        <td>ListPrice &lt; OriginalListPrice</td>
+        <td>8</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td><strong>Multiple Price Reductions</strong></td>
+        <td>ListPrice &lt; PreviousListPrice &lt; OriginalListPrice</td>
+        <td>14</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td><strong>Severe Price Reduction</strong></td>
+        <td>Price drop &ge; 15% from original</td>
+        <td>16</td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td><strong>High Days on Market</strong></td>
+        <td>DOM &ge; 90 or CDOM &ge; 120</td>
+        <td>11</td>
+      </tr>
+      <tr>
+        <td>7</td>
+        <td><strong>Withdrawn &amp; Relisted</strong></td>
+        <td>CDOM &gt; DOM (listing was recycled)</td>
+        <td>12</td>
+      </tr>
+      <tr>
+        <td>8</td>
+        <td><strong>Back on Market</strong></td>
+        <td>Was Pending, now Active again</td>
+        <td>13</td>
+      </tr>
+      <tr>
+        <td>9</td>
+        <td><strong>Range Pricing</strong></td>
+        <td>ListPriceLow field is set</td>
+        <td>6</td>
+      </tr>
+      <tr>
+        <td>10</td>
+        <td><strong>Foreclosure Flag</strong></td>
+        <td>ForeclosedREOYN = True</td>
+        <td>18</td>
+      </tr>
+      <tr>
+        <td>11</td>
+        <td><strong>Short Sale Flag</strong></td>
+        <td>PotentialShortSaleYN = True</td>
+        <td>16</td>
+      </tr>
+      <tr>
+        <td>12</td>
+        <td><strong>Absentee Owner</strong></td>
+        <td>Owner mailing address differs from property</td>
+        <td>8</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ======================================
+     SCORING METHODOLOGY
+     ====================================== -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon section-icon-scoring">&#127919;</div>
+    <div>
+      <div class="section-title">Scoring Methodology</div>
+      <div class="section-subtitle">Multi-signal weighted scoring with temporal decay</div>
+    </div>
+  </div>
+
+  <!-- Scoring steps -->
+  <div class="mb-24">
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px;">
+      <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 8px; padding: 14px 16px; text-align: center;">
+        <div style="font-size: 24px; margin-bottom: 4px;">&#9312;</div>
+        <div style="font-size: 12px; font-weight: 700; color: var(--navy-800); margin-bottom: 2px;">Base Points</div>
+        <div style="font-size: 11px; color: var(--gray-500);">Each signal earns 6-20 base points from config</div>
+      </div>
+      <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 8px; padding: 14px 16px; text-align: center;">
+        <div style="font-size: 24px; margin-bottom: 4px;">&#9313;</div>
+        <div style="font-size: 12px; font-weight: 700; color: var(--navy-800); margin-bottom: 2px;">Temporal Decay</div>
+        <div style="font-size: 11px; color: var(--gray-500);">Signals lose value over time (4 decay types)</div>
+      </div>
+      <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 8px; padding: 14px 16px; text-align: center;">
+        <div style="font-size: 24px; margin-bottom: 4px;">&#9314;</div>
+        <div style="font-size: 12px; font-weight: 700; color: var(--navy-800); margin-bottom: 2px;">Freshness Premium</div>
+        <div style="font-size: 11px; color: var(--gray-500);">Signals within 24 hours get 1.3x-1.5x boost</div>
+      </div>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+      <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 8px; padding: 14px 16px; text-align: center;">
+        <div style="font-size: 24px; margin-bottom: 4px;">&#9315;</div>
+        <div style="font-size: 12px; font-weight: 700; color: var(--navy-800); margin-bottom: 2px;">Signal Stacking</div>
+        <div style="font-size: 11px; color: var(--gray-500);">Signal combos trigger 1.4x-2.5x multipliers</div>
+      </div>
+      <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 8px; padding: 14px 16px; text-align: center;">
+        <div style="font-size: 24px; margin-bottom: 4px;">&#9316;</div>
+        <div style="font-size: 12px; font-weight: 700; color: var(--navy-800); margin-bottom: 2px;">Normalization</div>
+        <div style="font-size: 11px; color: var(--gray-500);">Raw points scaled to 0-100 range</div>
+      </div>
+      <div style="background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 8px; padding: 14px 16px; text-align: center;">
+        <div style="font-size: 24px; margin-bottom: 4px;">&#9317;</div>
+        <div style="font-size: 12px; font-weight: 700; color: var(--navy-800); margin-bottom: 2px;">Tier Assignment</div>
+        <div style="font-size: 11px; color: var(--gray-500);">S / A / B / C / D classification</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Decay types -->
+  <div style="font-size: 13px; font-weight: 700; color: var(--navy-800); margin-bottom: 10px;">Temporal Decay Functions</div>
+  <div class="decay-grid mb-24">
+    <div class="decay-card">
+      <div class="decay-name">Exponential Decay</div>
+      <div class="decay-desc">Fast decline for time-sensitive signals (expired listings, price reductions). Half-life: 14-21 days.</div>
+      <div class="decay-visual">
+        <div class="decay-bar-segment" style="width:100%; background: var(--red-500);"></div>
+        <div class="decay-bar-segment" style="width:50%; background: var(--orange-500);"></div>
+        <div class="decay-bar-segment" style="width:25%; background: var(--yellow-500);"></div>
+        <div class="decay-bar-segment" style="width:12%; background: var(--gray-300);"></div>
+      </div>
+    </div>
+    <div class="decay-card">
+      <div class="decay-name">Linear Decay</div>
+      <div class="decay-desc">Steady decline for persistent conditions (foreclosure, absentee owner). Half-life: 90-180 days.</div>
+      <div class="decay-visual">
+        <div class="decay-bar-segment" style="width:100%; background: var(--navy-500);"></div>
+        <div class="decay-bar-segment" style="width:80%; background: var(--navy-400);"></div>
+        <div class="decay-bar-segment" style="width:60%; background: var(--navy-300);"></div>
+        <div class="decay-bar-segment" style="width:40%; background: var(--navy-200);"></div>
+      </div>
+    </div>
+    <div class="decay-card">
+      <div class="decay-name">Step Decay</div>
+      <div class="decay-desc">Full value for a period, then drops sharply (severe price reduction, high DOM). Half-life: 30-60 days.</div>
+      <div class="decay-visual">
+        <div class="decay-bar-segment" style="width:60%; background: var(--green-500);"></div>
+        <div class="decay-bar-segment" style="width:60%; background: var(--green-500);"></div>
+        <div class="decay-bar-segment" style="width:15%; background: var(--gray-300);"></div>
+        <div class="decay-bar-segment" style="width:5%; background: var(--gray-200);"></div>
+      </div>
+    </div>
+    <div class="decay-card">
+      <div class="decay-name">Escalating</div>
+      <div class="decay-desc">Increases in urgency over time (pre-foreclosure approaching auction date). Time-pressure amplifier.</div>
+      <div class="decay-visual">
+        <div class="decay-bar-segment" style="width:20%; background: var(--yellow-200);"></div>
+        <div class="decay-bar-segment" style="width:40%; background: var(--yellow-500);"></div>
+        <div class="decay-bar-segment" style="width:70%; background: var(--orange-500);"></div>
+        <div class="decay-bar-segment" style="width:100%; background: var(--red-500);"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stacking rules -->
+  <div style="font-size: 13px; font-weight: 700; color: var(--navy-800); margin-bottom: 10px;">Signal Stacking Rules</div>
+  <table class="stack-table mb-24">
+    <thead>
+      <tr>
+        <th>Stack Name</th>
+        <th>Required Signals</th>
+        <th>Multiplier</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Distressed Seller</strong></td>
+        <td>expired + multiple price cuts + high DOM</td>
+        <td>1.5x</td>
+      </tr>
+      <tr>
+        <td><strong>Financial Distress</strong></td>
+        <td>pre-foreclosure + tax delinquent</td>
+        <td>2.0x</td>
+      </tr>
+      <tr>
+        <td><strong>Life Event Vacant</strong></td>
+        <td>probate + absentee owner + vacant</td>
+        <td>2.5x</td>
+      </tr>
+      <tr>
+        <td><strong>Tired Landlord</strong></td>
+        <td>absentee owner + code violation</td>
+        <td>1.8x</td>
+      </tr>
+      <tr>
+        <td><strong>Failed Sale</strong></td>
+        <td>expired + withdrawn/relisted</td>
+        <td>1.4x</td>
+      </tr>
+      <tr>
+        <td><strong>Divorce Property</strong></td>
+        <td>divorce + high DOM</td>
+        <td>1.6x</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Tier definitions -->
+  <div style="font-size: 13px; font-weight: 700; color: var(--navy-800); margin-bottom: 10px;">Tier Definitions</div>
+  <table class="tier-table mb-24">
+    <thead>
+      <tr>
+        <th>Tier</th>
+        <th>Score</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="badge badge-s">S</span></td>
+        <td>80 &ndash; 100</td>
+        <td>Immediate outreach &mdash; phone + handwritten note</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-a">A</span></td>
+        <td>60 &ndash; 79</td>
+        <td>Priority within 48 hours &mdash; CMA + call</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-b">B</span></td>
+        <td>40 &ndash; 59</td>
+        <td>Schedule this week &mdash; add to priority drip</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-c">C</span></td>
+        <td>20 &ndash; 39</td>
+        <td>Monthly touch &mdash; nurture campaign</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-d">D</span></td>
+        <td>0 &ndash; 19</td>
+        <td>Monitor only &mdash; no active outreach</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- WORKED EXAMPLE -->
+  <div class="worked-example">
+    <div class="worked-example-title">
+      &#128270; Worked Example: How Lead #1 Scored 73.5
+    </div>
+    <p style="font-size: 13px; color: var(--gray-600); margin-bottom: 16px;">
+      MLS# 22401006 &mdash; Townhouse in Cape Coral, 33990. Four signals detected, all fresh (within 24 hours of import).
+    </p>
+
+    <table class="calc-table">
+      <thead>
+        <tr>
+          <th>Signal</th>
+          <th style="text-align: right;">Base Points</th>
+          <th style="text-align: center;">Decay Applied</th>
+          <th style="text-align: right;">After Decay</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>&#128200; Price Reduction</td>
+          <td style="text-align: right;">8.0</td>
+          <td style="text-align: center;"><span style="background: var(--green-100); color: var(--green-700); padding: 1px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;">Fresh</span></td>
+          <td style="text-align: right; font-weight: 700;">8.0</td>
+        </tr>
+        <tr>
+          <td>&#128200;&#128200; Multiple Price Reductions</td>
+          <td style="text-align: right;">14.0</td>
+          <td style="text-align: center;"><span style="background: var(--green-100); color: var(--green-700); padding: 1px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;">Fresh</span></td>
+          <td style="text-align: right; font-weight: 700;">14.0</td>
+        </tr>
+        <tr>
+          <td>&#9888;&#65039; Severe Price Reduction</td>
+          <td style="text-align: right;">16.0</td>
+          <td style="text-align: center;"><span style="background: var(--green-100); color: var(--green-700); padding: 1px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;">Step &mdash; full value</span></td>
+          <td style="text-align: right; font-weight: 700;">16.0</td>
+        </tr>
+        <tr>
+          <td>&#9203; High Days on Market</td>
+          <td style="text-align: right;">11.0</td>
+          <td style="text-align: center;"><span style="background: var(--green-100); color: var(--green-700); padding: 1px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;">Step &mdash; full value</span></td>
+          <td style="text-align: right; font-weight: 700;">11.0</td>
+        </tr>
+      </tbody>
+      <tr class="calc-subtotal">
+        <td colspan="3" style="text-align: right;">Raw Total</td>
+        <td style="text-align: right;">49.0</td>
+      </tr>
+    </table>
+
+    <div class="calc-final">
+      <div class="calc-final-step">
+        <span class="calc-val">49.0</span>
+        <span style="font-size: 12px; color: var(--gray-500);">raw points</span>
+      </div>
+      <div class="calc-final-step">
+        <span class="calc-op">&times;</span>
+      </div>
+      <div class="calc-final-step">
+        <span class="calc-val">1.5</span>
+        <span style="font-size: 12px; color: var(--gray-500);">freshness premium</span>
+      </div>
+      <div class="calc-final-step">
+        <span class="calc-op">=</span>
+      </div>
+      <div class="calc-final-result">
+        <span class="calc-final-score">73.5</span>
+        <span class="calc-final-tier">Tier A (60-79)</span>
+      </div>
+    </div>
+
+    <p style="font-size: 12px; color: var(--gray-500); margin-top: 14px; text-align: center;">
+      No stacking bonus triggered &mdash; the distressed_seller stack requires expired + high DOM + multiple price cuts.
+      <br>If this listing expires, it would gain an additional 15 base points and trigger the 1.5x distressed seller stack.
+    </p>
+  </div>
+</div>
+
+<!-- ======================================
+     TECHNICAL NOTES
+     ====================================== -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon section-icon-tech">&#128295;</div>
+    <div>
+      <div class="section-title">Technical Notes</div>
+      <div class="section-subtitle">Known issues and data quality observations</div>
+    </div>
+  </div>
+
+  <div class="tech-note">
+    <div class="tech-note-title">
+      <span class="tech-label label-non-critical">Non-Critical</span>
+      CSV Field Mapping Issue
+    </div>
+    <div class="tech-note-body">
+      <p>The sample CSV's <code style="background: var(--gray-100); padding: 1px 4px; border-radius: 3px;">DaysOnMarket</code> column has an empty value for row 1, but a duplicate <code style="background: var(--gray-100); padding: 1px 4px; border-radius: 3px;">CumulativeDaysOnMarket</code> value (45,45) is causing a column alignment shift in some rows. This results in city/zip_code/county being stored in incorrect columns for some records.</p>
+      <p style="margin-top: 8px;"><strong>Impact:</strong> Display data (city names, ZIP codes) may appear incorrect in the database for the test dataset. Signal detection and scoring are unaffected because they operate on the raw record before storage.</p>
+      <p style="margin-top: 8px;"><strong>Fix:</strong> This is a test data issue, not a code bug. Real Matrix CSV exports from SWFLAMLS will have consistent column alignment.</p>
+    </div>
+  </div>
+
+  <div class="tech-note">
+    <div class="tech-note-title">
+      <span class="tech-label label-non-critical">Non-Critical</span>
+      Signals Not Firing (22401007, 22401008)
+    </div>
+    <div class="tech-note-body">
+      <p>The foreclosure flag (MLS# 22401007) and short sale flag (MLS# 22401008) are set in the raw CSV (<code style="background: var(--gray-100); padding: 1px 4px; border-radius: 3px;">ForeclosedREOYN=Yes</code>, <code style="background: var(--gray-100); padding: 1px 4px; border-radius: 3px;">PotentialShortSaleYN=Yes</code>) but are not being detected as signals. This is likely related to the field mapping issue above &mdash; the boolean columns may be shifted.</p>
+      <p style="margin-top: 8px;">With real MLS data these will fire correctly.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================
+     WHAT WE NEED NEXT
+     ====================================== -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon section-icon-next">&#127937;</div>
+    <div>
+      <div class="section-title">What We Need Next</div>
+      <div class="section-subtitle">Prioritized roadmap to maximize the system</div>
+    </div>
+  </div>
+
+  <ol class="next-steps-list">
+    <li class="next-step-item">
+      <span class="next-step-priority priority-critical">Critical &mdash; Immediate</span>
+      <span class="next-step-title">Real MLS Data</span>
+      <div class="next-step-desc">
+        The sample dataset has 10 synthetic records. To generate actionable leads:
+        <ul>
+          <li>Export fresh CSV data from Matrix for Lee and Collier counties</li>
+          <li>Target: <strong>Expired listings</strong> (last 30-90 days), <strong>Active with price reductions</strong>, <strong>High DOM</strong> (90+ days), <strong>Withdrawn and Relisted</strong>, <strong>Back on Market</strong></li>
+          <li>Export the full 46 fields mapped in <code style="background: var(--gray-100); padding: 1px 4px; border-radius: 3px; font-size: 12px;">config/mls_fields.yaml</code></li>
+          <li>Cover all 52 ZIP codes defined in <code style="background: var(--gray-100); padding: 1px 4px; border-radius: 3px; font-size: 12px;">config/market.yaml</code></li>
+          <li>Frequency: Weekly minimum; daily for Expired and Price Change filters</li>
+        </ul>
+      </div>
+    </li>
+    <li class="next-step-item">
+      <span class="next-step-priority priority-critical">Critical &mdash; Immediate</span>
+      <span class="next-step-title">SMTP Email Configuration</span>
+      <div class="next-step-desc">
+        The daily briefing generator works but needs email credentials. Create a Gmail App Password at <a href="https://myaccount.google.com/apppasswords" style="color: var(--navy-500);">myaccount.google.com/apppasswords</a> (requires 2FA enabled) and add credentials to the <code style="background: var(--gray-100); padding: 1px 4px; border-radius: 3px; font-size: 12px;">.env</code> file. This enables the 6:30 AM daily briefing email.
+      </div>
+    </li>
+    <li class="next-step-item">
+      <span class="next-step-priority priority-high">High Priority</span>
+      <span class="next-step-title">Scheduled Automation (Phase 2)</span>
+      <div class="next-step-desc">
+        Currently the pipeline runs manually. To maximize value:
+        <ul>
+          <li><strong>APScheduler integration</strong> &mdash; Auto-run import + score + briefing daily at 6:00 AM</li>
+          <li><strong>File watcher</strong> &mdash; Detect new CSVs dropped into data/mls_imports/ and auto-process</li>
+          <li><strong>Re-scoring schedule</strong> &mdash; Re-score all active leads every 6 hours to capture decay changes</li>
+        </ul>
+      </div>
+    </li>
+    <li class="next-step-item">
+      <span class="next-step-priority priority-high">High Priority</span>
+      <span class="next-step-title">Public Records Data (Phase 2)</span>
+      <div class="next-step-desc">
+        Five additional signal types are configured but have no data source yet:
+        <ul>
+          <li><strong>Pre-Foreclosure</strong> (20 pts) &mdash; Lis Pendens filings from County Clerk</li>
+          <li><strong>Tax Delinquent</strong> (13 pts) &mdash; County Tax Collector records</li>
+          <li><strong>Code Violation</strong> (12 pts) &mdash; City/County code enforcement</li>
+          <li><strong>Probate</strong> (18 pts) &mdash; County Probate Court records</li>
+          <li><strong>Divorce</strong> (16 pts) &mdash; County domestic relations filings</li>
+        </ul>
+        These combined with MLS signals trigger the most powerful stacking rules (2.0x-2.5x multipliers).
+      </div>
+    </li>
+    <li class="next-step-item">
+      <span class="next-step-priority priority-medium">Medium Priority</span>
+      <span class="next-step-title">Historical Data for Trend Detection</span>
+      <div class="next-step-desc">
+        With historical imports over time: price trajectory tracking, DOM velocity vs. neighborhood median, re-listing detection (same property under new MLS number), and seasonal pattern calibration for SWFLA.
+      </div>
+    </li>
+    <li class="next-step-item">
+      <span class="next-step-priority priority-medium">Medium Priority</span>
+      <span class="next-step-title">CRM Integration (Phase 4 &mdash; Follow Up Boss)</span>
+      <div class="next-step-desc">
+        Auto-create contacts for A-tier leads, trigger action plans/drip sequences, track conversion outcomes to calibrate scoring weights, and close the feedback loop.
+      </div>
+    </li>
+    <li class="next-step-item">
+      <span class="next-step-priority priority-low">Ongoing</span>
+      <span class="next-step-title">Scoring Calibration</span>
+      <div class="next-step-desc">
+        Track conversion outcomes, A/B test tier boundaries, tune decay rates, and develop market-specific weights. All weights, thresholds, and decay rates live in <code style="background: var(--gray-100); padding: 1px 4px; border-radius: 3px; font-size: 12px;">config/scoring_weights.yaml</code> and can be tuned without changing code.
+      </div>
+    </li>
+  </ol>
+</div>
+
+<!-- ======================================
+     APPENDIX: SYSTEM CONFIGURATION
+     ====================================== -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon section-icon-tech">&#128218;</div>
+    <div>
+      <div class="section-title">System Configuration</div>
+      <div class="section-subtitle">Appendix &mdash; current configuration overview</div>
+    </div>
+  </div>
+
+  <div class="config-grid">
+    <div class="config-card">
+      <div class="config-label">Scoring Config</div>
+      <div class="config-value">scoring_weights.yaml</div>
+      <div class="config-detail">20 signal types, 6 stacking rules, 5 tiers</div>
+    </div>
+    <div class="config-card">
+      <div class="config-label">Field Mapping</div>
+      <div class="config-value">mls_fields.yaml</div>
+      <div class="config-detail">46 MLS fields, Name + Label header support</div>
+    </div>
+    <div class="config-card">
+      <div class="config-label">Market Definition</div>
+      <div class="config-value">market.yaml</div>
+      <div class="config-detail">52 ZIP codes across Lee &amp; Collier counties</div>
+    </div>
+    <div class="config-card">
+      <div class="config-label">Database</div>
+      <div class="config-value">SQLite (MVP)</div>
+      <div class="config-detail">7 tables, async access via SQLAlchemy 2.0</div>
+    </div>
+    <div class="config-card">
+      <div class="config-label">Test Suite</div>
+      <div class="config-value">64 unit tests passing</div>
+      <div class="config-detail">pytest + hypothesis</div>
+    </div>
+    <div class="config-card">
+      <div class="config-label">Pipeline Version</div>
+      <div class="config-value">Phase 1 MVP v0.1.0</div>
+      <div class="config-detail">CSV import &rarr; scoring &rarr; daily briefing</div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================
+     FOOTER
+     ====================================== -->
+<div class="footer">
+  <div class="footer-divider"></div>
+  <div class="footer-brand">The Lead Edge</div>
+  <div class="footer-tagline">Data-driven lead intelligence for real estate professionals</div>
+  <div class="footer-meta">
+    Report generated March 3, 2026 &bull; Phase 1 MVP v0.1.0
+    <br>Pipeline Version: The Lead Edge v0.1.0 &bull; SW Florida Market (Lee &amp; Collier Counties)
+  </div>
+</div>
+
+</div><!-- /.container -->
+
+</body>
+</html>
