@@ -1,0 +1,53 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# MLS data and PII - NEVER commit
+Data/
+data/
+*.db
+*.sqlite
+*.sqlite3
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Tool caches
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs (keep directory, ignore contents)
+logs/*.log
+logs/*.json
+
+# Temp files
+*.tmp
+*.bak

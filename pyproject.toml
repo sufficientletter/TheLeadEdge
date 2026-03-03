@@ -1,0 +1,58 @@
+[project]
+name = "theleadedge"
+version = "0.1.0"
+description = "Data-driven real estate lead generation system"
+requires-python = ">=3.11"
+
+dependencies = [
+    "pydantic>=2.6",
+    "pydantic-settings>=2.2",
+    "sqlalchemy[asyncio]>=2.0",
+    "aiosqlite>=0.20",
+    "alembic>=1.13",
+    "httpx>=0.27",
+    "tenacity>=8.2",
+    "jinja2>=3.1",
+    "aiosmtplib>=3.0",
+    "pyyaml>=6.0",
+    "python-dotenv>=1.0",
+    "structlog>=24.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "pytest-mock>=3.12",
+    "factory-boy>=3.3",
+    "coverage>=7.4",
+    "ruff>=0.3",
+    "mypy>=1.8",
+    "pre-commit>=3.6",
+]
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "SIM", "TCH"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/theleadedge/models/*.py" = ["TCH001", "TCH003"]
+"src/theleadedge/storage/*.py" = ["TCH002", "TCH003"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.mypy]
+python_version = "3.11"
+plugins = ["pydantic.mypy"]

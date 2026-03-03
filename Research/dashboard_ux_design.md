@@ -474,7 +474,7 @@ For showing impact of signal stacking:
 Subject: TheLeadEdge Morning Briefing — Feb 28, 2026
 
 ╔══════════════════════════════════════════════════╗
-║  LEADFINDER MORNING BRIEFING                     ║
+║  THELEADEDGE MORNING BRIEFING                     ║
 ║  Friday, February 28, 2026                       ║
 ╠══════════════════════════════════════════════════╣
 ║                                                  ║

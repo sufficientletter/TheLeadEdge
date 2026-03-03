@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TheLeadEdge Daily Briefing - {{ date }}</title>
+<style>
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+  }
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  .header {
+    background: linear-gradient(135deg, #1a365d, #2b6cb0);
+    color: #fff;
+    padding: 24px 30px;
+    border-radius: 8px 8px 0 0;
+  }
+  .header h1 {
+    margin: 0 0 4px 0;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+  .header .date {
+    font-size: 14px;
+    opacity: 0.85;
+  }
+  .content {
+    background: #fff;
+    padding: 24px 30px;
+    border-radius: 0 0 8px 8px;
+    border: 1px solid #e2e8f0;
+    border-top: none;
+  }
+  .section {
+    margin-bottom: 28px;
+  }
+  .section:last-child {
+    margin-bottom: 0;
+  }
+  .section-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a365d;
+    margin: 0 0 12px 0;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #e2e8f0;
+  }
+  .summary-grid {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .summary-card {
+    flex: 1;
+    min-width: 100px;
+    padding: 12px 16px;
+    border-radius: 6px;
+    text-align: center;
+    border: 1px solid #e2e8f0;
+  }
+  .summary-card .count {
+    font-size: 28px;
+    font-weight: 700;
+    display: block;
+    line-height: 1.2;
+  }
+  .summary-card .label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #718096;
+    display: block;
+    margin-top: 2px;
+  }
+  .tier-s { background-color: #fff5f5; }
+  .tier-s .count { color: #c53030; }
+  .tier-a { background-color: #fffaf0; }
+  .tier-a .count { color: #c05621; }
+  .tier-b { background-color: #fffff0; }
+  .tier-b .count { color: #975a16; }
+  .tier-c { background-color: #f0fff4; }
+  .tier-c .count { color: #276749; }
+  .tier-d { background-color: #f7fafc; }
+  .tier-d .count { color: #718096; }
+  .tier-total { background-color: #ebf8ff; }
+  .tier-total .count { color: #2b6cb0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  th {
+    background: #f7fafc;
+    color: #4a5568;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 2px solid #e2e8f0;
+  }
+  td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #edf2f7;
+    vertical-align: top;
+  }
+  tr:last-child td {
+    border-bottom: none;
+  }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+    min-width: 18px;
+  }
+  .badge-s { background: #fed7d7; color: #c53030; }
+  .badge-a { background: #feebc8; color: #c05621; }
+  .badge-b { background: #fefcbf; color: #975a16; }
+  .badge-c { background: #c6f6d5; color: #276749; }
+  .badge-d { background: #e2e8f0; color: #718096; }
+  .score {
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .arrow-up { color: #38a169; }
+  .arrow-down { color: #e53e3e; }
+  .empty-state {
+    color: #a0aec0;
+    font-style: italic;
+    padding: 16px 0;
+    text-align: center;
+  }
+  .footer {
+    text-align: center;
+    padding: 16px 0;
+    color: #a0aec0;
+    font-size: 12px;
+  }
+  .footer a {
+    color: #718096;
+    text-decoration: none;
+  }
+  .action-text {
+    color: #4a5568;
+    font-size: 12px;
+  }
+  .signal-tag {
+    display: inline-block;
+    background: #edf2f7;
+    color: #4a5568;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    margin-right: 3px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>TheLeadEdge Daily Briefing</h1>
+    <div class="date">{{ date }}</div>
+  </div>
+
+  <div class="content">
+
+    <!-- Pipeline Summary -->
+    <div class="section">
+      <h2 class="section-title">Pipeline Summary</h2>
+      <div class="summary-grid">
+        <div class="summary-card tier-s">
+          <span class="count">{{ pipeline.tiers.get('S', 0) }}</span>
+          <span class="label">S-Tier</span>
+        </div>
+        <div class="summary-card tier-a">
+          <span class="count">{{ pipeline.tiers.get('A', 0) }}</span>
+          <span class="label">A-Tier</span>
+        </div>
+        <div class="summary-card tier-b">
+          <span class="count">{{ pipeline.tiers.get('B', 0) }}</span>
+          <span class="label">B-Tier</span>
+        </div>
+        <div class="summary-card tier-c">
+          <span class="count">{{ pipeline.tiers.get('C', 0) }}</span>
+          <span class="label">C-Tier</span>
+        </div>
+        <div class="summary-card tier-d">
+          <span class="count">{{ pipeline.tiers.get('D', 0) }}</span>
+          <span class="label">D-Tier</span>
+        </div>
+        <div class="summary-card tier-total">
+          <span class="count">{{ pipeline.total_active }}</span>
+          <span class="label">Total Active</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hot Leads -->
+    <div class="section">
+      <h2 class="section-title">Hot Leads (B-Tier and Above)</h2>
+      {% if hot_leads %}
+      <table>
+        <thead>
+          <tr>
+            <th>MLS#</th>
+            <th>Location</th>
+            <th>Tier</th>
+            <th>Score</th>
+            <th>Top Signal</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for lead in hot_leads %}
+          <tr>
+            <td>{{ lead.property_rel.listing_id or lead.property_rel.listing_key or '---' }}</td>
+            <td>{{ lead.property_rel.city or '' }}, {{ lead.property_rel.zip_code or '' }}</td>
+            <td>
+              <span class="badge badge-{{ lead.tier|lower }}">{{ lead.tier }}</span>
+            </td>
+            <td class="score">{{ "%.0f"|format(lead.current_score) }}</td>
+            <td>
+              {% if lead.signals %}
+                <span class="signal-tag">{{ lead.signals[0].signal_type|replace('_', ' ') }}</span>
+              {% else %}
+                <span class="signal-tag">scored</span>
+              {% endif %}
+            </td>
+            <td class="action-text">
+              {% if lead.tier == 'S' %}
+                Immediate outreach
+              {% elif lead.tier == 'A' %}
+                Priority - 48hr
+              {% elif lead.tier == 'B' %}
+                Schedule this week
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-state">No hot leads at this time. Pipeline is monitoring.</div>
+      {% endif %}
+    </div>
+
+    <!-- Tier Changes -->
+    <div class="section">
+      <h2 class="section-title">Tier Changes (Last 24 Hours)</h2>
+      {% if tier_changes %}
+      <table>
+        <thead>
+          <tr>
+            <th>MLS#</th>
+            <th>Location</th>
+            <th>Change</th>
+            <th>Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for change in tier_changes %}
+          <tr>
+            <td>{{ change.lead.property_rel.listing_id or change.lead.property_rel.listing_key or '---' }}</td>
+            <td>{{ change.lead.property_rel.city or '' }}, {{ change.lead.property_rel.zip_code or '' }}</td>
+            <td>
+              <span class="badge badge-{{ change.old_tier|lower }}">{{ change.old_tier }}</span>
+              &rarr;
+              <span class="badge badge-{{ change.new_tier|lower }}">{{ change.new_tier }}</span>
+            </td>
+            <td>
+              <span class="score">{{ "%.0f"|format(change.new_score) }}</span>
+              {% if change.new_score > change.old_score %}
+                <span class="arrow-up">&uarr;</span>
+              {% elif change.new_score < change.old_score %}
+                <span class="arrow-down">&darr;</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-state">No tier changes in the last 24 hours.</div>
+      {% endif %}
+    </div>
+
+    <!-- Follow-Ups Due -->
+    <div class="section">
+      <h2 class="section-title">Follow-Ups Due Today</h2>
+      {% if follow_ups %}
+      <table>
+        <thead>
+          <tr>
+            <th>MLS#</th>
+            <th>Location</th>
+            <th>Tier</th>
+            <th>Due</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for lead in follow_ups %}
+          <tr>
+            <td>{{ lead.property_rel.listing_id or lead.property_rel.listing_key or '---' }}</td>
+            <td>{{ lead.property_rel.city or '' }}, {{ lead.property_rel.zip_code or '' }}</td>
+            <td>
+              <span class="badge badge-{{ lead.tier|lower }}">{{ lead.tier }}</span>
+            </td>
+            <td>{{ lead.next_touch_date.strftime('%m/%d') if lead.next_touch_date else '---' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-state">No follow-ups due today.</div>
+      {% endif %}
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    Generated by TheLeadEdge at {{ now.strftime('%I:%M %p') }} &bull;
+    Data-driven lead intelligence for real estate professionals
+  </div>
+
+</div>
+</body>
+</html>

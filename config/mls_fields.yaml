@@ -1,0 +1,748 @@
+# =============================================================================
+# TheLeadEdge -- Matrix MLS CSV Field Mapping Configuration
+# =============================================================================
+#
+# This file maps Matrix CSV column headers to RESO-standard internal field
+# names used throughout the TheLeadEdge pipeline.
+#
+# Matrix CSV exports support two column-header formats:
+#   - "Name" format  : PascalCase RESO names (e.g. ListPrice)
+#   - "Label" format : Human-readable labels  (e.g. "List Price")
+#
+# The Realtor may accidentally export with either format.  Every field_mapping
+# entry therefore lists BOTH the Name and Label variant so the CSV importer can
+# resolve either one to the same canonical internal name.
+#
+# Internal names follow the RESO Data Dictionary 2.0 naming convention
+# (PascalCase, no spaces).
+#
+# Last updated : 2026-03-02
+# MLS board    : SWFLAMLS (Southwest Florida MLS) via Matrix
+# =============================================================================
+
+
+# -----------------------------------------------------------------------------
+# Section 1 -- Recommended Export Template
+# -----------------------------------------------------------------------------
+# When setting up a Custom Export in Matrix, include exactly these 45 fields.
+# They cover every signal TheLeadEdge needs for scoring, lifecycle tracking,
+# and daily briefing generation.
+#
+# To create the template in Matrix:
+#   1. Search > Residential > Results tab
+#   2. Click "Export" > "Customize Columns"
+#   3. Add the fields listed below (search by Name or Label)
+#   4. Save the template as "TheLeadEdge Export"
+#   5. IMPORTANT: Export using "Name" format for reliable machine parsing.
+#      If only "Label" format is available, that works too -- this config
+#      handles both.
+# -----------------------------------------------------------------------------
+
+export_template:
+  name: "TheLeadEdge Export"
+  description: "45-field Matrix custom export for lead generation pipeline"
+  format_preference: "Name"  # Prefer Name (PascalCase) over Label (readable)
+
+  fields:
+
+    # -- Identification (2 fields) ------------------------------------------
+    # Unique identifiers for deduplication and cross-reference.
+    - ListingKey          # System-generated unique key (preferred primary key)
+    - ListingId           # Human-readable MLS number (e.g. "224012345")
+
+    # -- Status (2 fields) --------------------------------------------------
+    # Current listing status -- the single most important field for lead gen.
+    - StandardStatus      # RESO standard: Active, Pending, Closed, Expired...
+    - MlsStatus           # Board-specific status (may be more granular)
+
+    # -- Dates (12 fields) --------------------------------------------------
+    # Every date tells a story. Status changes, contract milestones, and
+    # modification timestamps drive signal detection and decay calculations.
+    - StatusChangeTimestamp    # When status last changed (expiration detection)
+    - ListingContractDate     # Date listing agreement was signed
+    - ExpirationDate          # When listing agreement expires (predict expireds)
+    - OnMarketDate            # Date listing went active on MLS
+    - OffMarketDate           # Date listing left active status
+    - PendingTimestamp        # When listing went to pending status
+    - WithdrawnDate           # When listing was withdrawn from MLS
+    - CancellationDate        # When listing was cancelled
+    - CloseDate               # Settlement/closing date
+    - PriceChangeTimestamp    # When price was last changed
+    - ModificationTimestamp   # Last modification of any field (sync anchor)
+    - OriginalEntryTimestamp  # First entry into MLS (true listing origin)
+
+    # -- Prices (5 fields) --------------------------------------------------
+    # Price trajectory reveals motivation. OriginalListPrice vs ListPrice
+    # calculates total reduction. PreviousListPrice captures the latest drop.
+    - ListPrice               # Current asking price
+    - OriginalListPrice       # Initial asking price when first listed
+    - PreviousListPrice       # Price before the most recent change
+    - ClosePrice              # Final sale price (on sold listings)
+    - ListPriceLow            # Low end of range pricing (desperation signal)
+
+    # -- Days on Market (2 fields) ------------------------------------------
+    # CDOM surviving across relists is the true exposure metric.
+    - DaysOnMarket            # Days in current listing period
+    - CumulativeDaysOnMarket  # Total days across all listing periods
+
+    # -- Property Details (7 fields) ----------------------------------------
+    # Core property attributes for CMA matching and filtering.
+    - PropertyType            # Residential, Land, Commercial, etc.
+    - PropertySubType         # SingleFamily, Condo, Townhouse, etc.
+    - BedroomsTotal           # Number of bedrooms
+    - BathroomsTotalInteger   # Number of bathrooms (integer)
+    - LivingArea              # Square footage of living space
+    - LotSizeAcres            # Lot size in acres
+    - YearBuilt               # Year structure was built
+
+    # -- Location (6 fields) ------------------------------------------------
+    # Address components for dedup, geocoding, and geographic filtering.
+    - City                    # City name
+    - PostalCode              # ZIP code
+    - CountyOrParish          # County (cross-ref with public records)
+    - StreetNumberNumeric     # Street number
+    - StreetName              # Street name
+    - Latitude                # GPS latitude  (for map display)
+    - Longitude               # GPS longitude (for map display)
+
+    # -- Agent & Office (5 fields) ------------------------------------------
+    # Agent tracking for pattern detection (agent churn, low-production agents).
+    - ListAgentKey            # Listing agent unique key
+    - ListAgentMlsId          # Listing agent MLS ID
+    - ListAgentFullName       # Listing agent name
+    - ListOfficeMlsId         # Listing office MLS ID
+    - ListOfficeName          # Listing brokerage name
+    - BuyerAgentKey           # Buyer agent key (on sold/pending)
+
+    # -- SWFLAMLS Custom Fields (3 fields) ----------------------------------
+    # Board-specific fields not in RESO standard but valuable for signal
+    # detection in the Southwest Florida market.
+    - ForeclosedREOYN         # Foreclosure/REO flag (Yes/No)
+    - PotentialShortSaleYN    # Potential short sale flag (Yes/No)
+    - GulfAccessYN            # Gulf access flag (premium feature filter)
+
+
+# -----------------------------------------------------------------------------
+# Section 2 -- Field Mapping
+# -----------------------------------------------------------------------------
+# Maps both Name (PascalCase) and Label (human-readable) column headers to
+# our canonical internal field name.
+#
+# Structure per entry:
+#   internal  : RESO-standard internal name used in Pydantic models and DB
+#   name      : Matrix "Name" format column header
+#   label     : Matrix "Label" format column header
+#   type      : Python type for parsing (str, int, float, date, datetime, bool)
+#   required  : Whether the field is required for a valid import
+#   category  : Logical grouping for documentation
+#
+# The CSV importer should build a lookup dict from both `name` and `label`
+# pointing to `internal`, then use that to normalize any Matrix export.
+# -----------------------------------------------------------------------------
+
+field_mapping:
+
+  # ---------- Identification ------------------------------------------------
+
+  - internal: ListingKey
+    name: ListingKey
+    label: "Listing Key"
+    type: str
+    required: true
+    category: identification
+    description: "System-generated unique listing identifier"
+
+  - internal: ListingId
+    name: ListingId
+    label: "Listing Id"
+    type: str
+    required: true
+    category: identification
+    description: "Human-readable MLS number"
+
+  # ---------- Status --------------------------------------------------------
+
+  - internal: StandardStatus
+    name: StandardStatus
+    label: "Standard Status"
+    type: str
+    required: true
+    category: status
+    description: "RESO standard listing status"
+
+  - internal: MlsStatus
+    name: MlsStatus
+    label: "MLS Status"
+    type: str
+    required: false
+    category: status
+    description: "Board-specific listing status (may be more granular than StandardStatus)"
+
+  # ---------- Dates ---------------------------------------------------------
+
+  - internal: StatusChangeTimestamp
+    name: StatusChangeTimestamp
+    label: "Status Change Timestamp"
+    type: datetime
+    required: false
+    category: dates
+    description: "When the listing status last changed"
+
+  - internal: ListingContractDate
+    name: ListingContractDate
+    label: "Listing Contract Date"
+    type: date
+    required: false
+    category: dates
+    description: "Date the listing agreement was signed"
+
+  - internal: ExpirationDate
+    name: ExpirationDate
+    label: "Expiration Date"
+    type: date
+    required: false
+    category: dates
+    description: "When the listing agreement expires"
+
+  - internal: OnMarketDate
+    name: OnMarketDate
+    label: "On Market Date"
+    type: date
+    required: false
+    category: dates
+    description: "Date the listing went active on MLS"
+
+  - internal: OffMarketDate
+    name: OffMarketDate
+    label: "Off Market Date"
+    type: date
+    required: false
+    category: dates
+    description: "Date the listing left active status"
+
+  - internal: PendingTimestamp
+    name: PendingTimestamp
+    label: "Pending Timestamp"
+    type: datetime
+    required: false
+    category: dates
+    description: "When the listing entered pending status"
+
+  - internal: WithdrawnDate
+    name: WithdrawnDate
+    label: "Withdrawn Date"
+    type: date
+    required: false
+    category: dates
+    description: "When the listing was withdrawn from MLS"
+
+  - internal: CancellationDate
+    name: CancellationDate
+    label: "Cancellation Date"
+    type: date
+    required: false
+    category: dates
+    description: "When the listing was cancelled"
+
+  - internal: CloseDate
+    name: CloseDate
+    label: "Close Date"
+    type: date
+    required: false
+    category: dates
+    description: "Settlement/closing date"
+
+  - internal: PriceChangeTimestamp
+    name: PriceChangeTimestamp
+    label: "Price Change Timestamp"
+    type: datetime
+    required: false
+    category: dates
+    description: "When the price was last changed"
+
+  - internal: ModificationTimestamp
+    name: ModificationTimestamp
+    label: "Modification Timestamp"
+    type: datetime
+    required: false
+    category: dates
+    description: "When any field on the listing was last modified"
+
+  - internal: OriginalEntryTimestamp
+    name: OriginalEntryTimestamp
+    label: "Original Entry Timestamp"
+    type: datetime
+    required: false
+    category: dates
+    description: "When the listing was first entered into the MLS"
+
+  # ---------- Prices --------------------------------------------------------
+
+  - internal: ListPrice
+    name: ListPrice
+    label: "List Price"
+    type: float
+    required: true
+    category: prices
+    description: "Current asking price"
+
+  - internal: OriginalListPrice
+    name: OriginalListPrice
+    label: "Original List Price"
+    type: float
+    required: false
+    category: prices
+    description: "Initial asking price when first listed"
+
+  - internal: PreviousListPrice
+    name: PreviousListPrice
+    label: "Previous List Price"
+    type: float
+    required: false
+    category: prices
+    description: "Price before the most recent change"
+
+  - internal: ClosePrice
+    name: ClosePrice
+    label: "Close Price"
+    type: float
+    required: false
+    category: prices
+    description: "Final sale price"
+
+  - internal: ListPriceLow
+    name: ListPriceLow
+    label: "List Price Low"
+    type: float
+    required: false
+    category: prices
+    description: "Low end of range pricing (desperation signal when present)"
+
+  # ---------- Days on Market ------------------------------------------------
+
+  - internal: DaysOnMarket
+    name: DaysOnMarket
+    label: "Days On Market"
+    type: int
+    required: false
+    category: dom
+    description: "Days in the current listing period"
+
+  - internal: CumulativeDaysOnMarket
+    name: CumulativeDaysOnMarket
+    label: "Cumulative Days On Market"
+    type: int
+    required: false
+    category: dom
+    description: "Total days across all listing periods (survives relisting)"
+
+  # ---------- Property Details ----------------------------------------------
+
+  - internal: PropertyType
+    name: PropertyType
+    label: "Property Type"
+    type: str
+    required: false
+    category: property
+    description: "Residential, Land, Commercial, etc."
+
+  - internal: PropertySubType
+    name: PropertySubType
+    label: "Property Sub Type"
+    type: str
+    required: false
+    category: property
+    description: "SingleFamily, Condo, Townhouse, etc."
+
+  - internal: BedroomsTotal
+    name: BedroomsTotal
+    label: "Bedrooms Total"
+    type: int
+    required: false
+    category: property
+    description: "Number of bedrooms"
+
+  - internal: BathroomsTotalInteger
+    name: BathroomsTotalInteger
+    label: "Bathrooms Total Integer"
+    type: int
+    required: false
+    category: property
+    description: "Number of bathrooms (integer)"
+
+  - internal: LivingArea
+    name: LivingArea
+    label: "Living Area"
+    type: float
+    required: false
+    category: property
+    description: "Square footage of living space"
+
+  - internal: LotSizeAcres
+    name: LotSizeAcres
+    label: "Lot Size Acres"
+    type: float
+    required: false
+    category: property
+    description: "Lot size in acres"
+
+  - internal: YearBuilt
+    name: YearBuilt
+    label: "Year Built"
+    type: int
+    required: false
+    category: property
+    description: "Year the structure was built"
+
+  # ---------- Location ------------------------------------------------------
+
+  - internal: City
+    name: City
+    label: "City"
+    type: str
+    required: false
+    category: location
+    description: "City name"
+
+  - internal: PostalCode
+    name: PostalCode
+    label: "Postal Code"
+    type: str
+    required: false
+    category: location
+    description: "ZIP code"
+
+  - internal: CountyOrParish
+    name: CountyOrParish
+    label: "County Or Parish"
+    type: str
+    required: false
+    category: location
+    description: "County name (used for public records cross-reference)"
+
+  - internal: StreetNumberNumeric
+    name: StreetNumberNumeric
+    label: "Street Number Numeric"
+    type: str
+    required: false
+    category: location
+    description: "Street number component of address"
+
+  - internal: StreetName
+    name: StreetName
+    label: "Street Name"
+    type: str
+    required: false
+    category: location
+    description: "Street name component of address"
+
+  - internal: Latitude
+    name: Latitude
+    label: "Latitude"
+    type: float
+    required: false
+    category: location
+    description: "GPS latitude for map display and radius searches"
+
+  - internal: Longitude
+    name: Longitude
+    label: "Longitude"
+    type: float
+    required: false
+    category: location
+    description: "GPS longitude for map display and radius searches"
+
+  # ---------- Agent & Office ------------------------------------------------
+
+  - internal: ListAgentKey
+    name: ListAgentKey
+    label: "List Agent Key"
+    type: str
+    required: false
+    category: agent
+    description: "Listing agent unique system key"
+
+  - internal: ListAgentMlsId
+    name: ListAgentMlsId
+    label: "List Agent MLS Id"
+    type: str
+    required: false
+    category: agent
+    description: "Listing agent MLS ID number"
+
+  - internal: ListAgentFullName
+    name: ListAgentFullName
+    label: "List Agent Full Name"
+    type: str
+    required: false
+    category: agent
+    description: "Listing agent full name"
+
+  - internal: ListOfficeMlsId
+    name: ListOfficeMlsId
+    label: "List Office MLS Id"
+    type: str
+    required: false
+    category: agent
+    description: "Listing office MLS ID"
+
+  - internal: ListOfficeName
+    name: ListOfficeName
+    label: "List Office Name"
+    type: str
+    required: false
+    category: agent
+    description: "Listing brokerage name"
+
+  - internal: BuyerAgentKey
+    name: BuyerAgentKey
+    label: "Buyer Agent Key"
+    type: str
+    required: false
+    category: agent
+    description: "Buyer agent unique key (populated on sold/pending listings)"
+
+  # ---------- SWFLAMLS Custom Fields ----------------------------------------
+  # These fields are specific to the Southwest Florida MLS board and are not
+  # part of the RESO Data Dictionary.  They use board-specific naming that
+  # may differ in Name vs Label format.
+
+  - internal: ForeclosedREOYN
+    name: ForeclosedREOYN
+    label: "Foreclosed/REO"
+    type: bool
+    required: false
+    category: swflamls_custom
+    description: "Whether the property is a foreclosure or REO (bank-owned)"
+
+  - internal: PotentialShortSaleYN
+    name: PotentialShortSaleYN
+    label: "Potential Short Sale"
+    type: bool
+    required: false
+    category: swflamls_custom
+    description: "Whether the property is a potential short sale"
+
+  - internal: GulfAccessYN
+    name: GulfAccessYN
+    label: "Gulf Access"
+    type: bool
+    required: false
+    category: swflamls_custom
+    description: "Whether the property has Gulf of Mexico water access"
+
+
+# -----------------------------------------------------------------------------
+# Section 3 -- Status Mapping
+# -----------------------------------------------------------------------------
+# Maps MLS-specific status codes and display values to RESO StandardStatus
+# enum values.  The CSV importer should normalize all status values through
+# this mapping before storing in the database.
+#
+# Each entry maps one or more raw values (case-insensitive) to the canonical
+# RESO StandardStatus string.
+#
+# Note: "Canceled" uses the RESO spelling (one L), not "Cancelled".
+# -----------------------------------------------------------------------------
+
+status_mapping:
+
+  Active:
+    canonical: "Active"
+    raw_values:
+      - "Active"
+      - "ACT"
+      - "A"
+      - "active"
+
+  ActiveUnderContract:
+    canonical: "Active Under Contract"
+    raw_values:
+      - "Active Under Contract"
+      - "AUC"
+      - "Active/Under Contract"
+      - "Under Contract"
+      - "active under contract"
+
+  Pending:
+    canonical: "Pending"
+    raw_values:
+      - "Pending"
+      - "PND"
+      - "P"
+      - "pending"
+
+  Closed:
+    canonical: "Closed"
+    raw_values:
+      - "Closed"
+      - "Sold"
+      - "SLD"
+      - "S"
+      - "CL"
+      - "closed"
+      - "sold"
+
+  Expired:
+    canonical: "Expired"
+    raw_values:
+      - "Expired"
+      - "EXP"
+      - "E"
+      - "expired"
+
+  Withdrawn:
+    canonical: "Withdrawn"
+    raw_values:
+      - "Withdrawn"
+      - "WDN"
+      - "W"
+      - "withdrawn"
+
+  Canceled:
+    canonical: "Canceled"
+    raw_values:
+      - "Canceled"
+      - "Cancelled"
+      - "CAN"
+      - "C"
+      - "canceled"
+      - "cancelled"
+
+  ComingSoon:
+    canonical: "Coming Soon"
+    raw_values:
+      - "Coming Soon"
+      - "CS"
+      - "coming soon"
+
+  Hold:
+    canonical: "Hold"
+    raw_values:
+      - "Hold"
+      - "H"
+      - "Temporarily Off Market"
+      - "hold"
+
+  Delete:
+    canonical: "Delete"
+    raw_values:
+      - "Delete"
+      - "DEL"
+      - "Deleted"
+      - "delete"
+
+
+# -----------------------------------------------------------------------------
+# Section 4 -- Boolean Value Mapping
+# -----------------------------------------------------------------------------
+# Matrix exports boolean fields inconsistently.  Map all known representations
+# to Python True/False for reliable parsing.
+# -----------------------------------------------------------------------------
+
+boolean_mapping:
+  true_values:
+    - "Yes"
+    - "Y"
+    - "True"
+    - "true"
+    - "1"
+    - "yes"
+    - "YES"
+  false_values:
+    - "No"
+    - "N"
+    - "False"
+    - "false"
+    - "0"
+    - "no"
+    - "NO"
+    - ""  # Empty string treated as false for boolean fields
+
+
+# -----------------------------------------------------------------------------
+# Section 5 -- Date/Datetime Format Patterns
+# -----------------------------------------------------------------------------
+# Matrix exports dates in various formats depending on the field type and
+# export settings.  The CSV importer should try each pattern in order until
+# one succeeds.
+# -----------------------------------------------------------------------------
+
+date_formats:
+  date_patterns:
+    - "%Y-%m-%d"          # 2026-03-02          (ISO 8601, most common)
+    - "%m/%d/%Y"          # 03/02/2026          (US format)
+    - "%m/%d/%y"          # 03/02/26            (US short year)
+    - "%m-%d-%Y"          # 03-02-2026
+    - "%Y%m%d"            # 20260302            (compact)
+
+  datetime_patterns:
+    - "%Y-%m-%dT%H:%M:%S"        # 2026-03-02T14:30:00        (ISO 8601)
+    - "%Y-%m-%dT%H:%M:%S.%f"     # 2026-03-02T14:30:00.000    (ISO with ms)
+    - "%Y-%m-%dT%H:%M:%SZ"       # 2026-03-02T14:30:00Z       (UTC)
+    - "%Y-%m-%dT%H:%M:%S%z"      # 2026-03-02T14:30:00-05:00  (with timezone)
+    - "%m/%d/%Y %H:%M:%S"        # 03/02/2026 14:30:00        (US format)
+    - "%m/%d/%Y %I:%M:%S %p"     # 03/02/2026 02:30:00 PM     (US 12-hour)
+    - "%Y-%m-%d %H:%M:%S"        # 2026-03-02 14:30:00        (space separated)
+
+
+# -----------------------------------------------------------------------------
+# Section 6 -- Validation Rules
+# -----------------------------------------------------------------------------
+# Constraints the CSV importer should enforce during parsing.  Records that
+# fail required-field validation are logged and skipped.  Records that fail
+# range validation are imported with a warning flag.
+# -----------------------------------------------------------------------------
+
+validation:
+  required_fields:
+    - ListingKey
+    - ListingId
+    - StandardStatus
+    - ListPrice
+
+  range_checks:
+    ListPrice:
+      min: 1000
+      max: 100000000
+      description: "List price must be between $1K and $100M"
+    OriginalListPrice:
+      min: 1000
+      max: 100000000
+      description: "Original list price must be between $1K and $100M"
+    ClosePrice:
+      min: 1000
+      max: 100000000
+      description: "Close price must be between $1K and $100M"
+    BedroomsTotal:
+      min: 0
+      max: 50
+      description: "Bedrooms must be between 0 and 50"
+    BathroomsTotalInteger:
+      min: 0
+      max: 50
+      description: "Bathrooms must be between 0 and 50"
+    LivingArea:
+      min: 100
+      max: 100000
+      description: "Living area must be between 100 and 100,000 sqft"
+    YearBuilt:
+      min: 1800
+      max: 2030
+      description: "Year built must be between 1800 and 2030"
+    DaysOnMarket:
+      min: 0
+      max: 9999
+      description: "DOM must be non-negative and under 10,000"
+    CumulativeDaysOnMarket:
+      min: 0
+      max: 9999
+      description: "CDOM must be non-negative and under 10,000"
+    Latitude:
+      min: 24.0
+      max: 28.0
+      description: "Latitude range for Southwest Florida"
+    Longitude:
+      min: -83.0
+      max: -80.0
+      description: "Longitude range for Southwest Florida"

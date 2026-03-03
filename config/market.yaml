@@ -1,0 +1,150 @@
+# =============================================================================
+# TheLeadEdge - Market Configuration
+# =============================================================================
+# Single source of truth for the target market.
+#
+# ZIP CODE EDITING:
+#   - To add a ZIP: add a new "- XXXXX" line under the appropriate area
+#   - To remove a ZIP: delete the line or comment it out with #
+#   - Each ZIP is on its own line for easy git diffs
+# =============================================================================
+
+market:
+  name: "Southwest Florida"
+  state: "FL"
+  counties:
+    - Lee
+    - Collier
+
+# -----------------------------------------------------------------------------
+# MLS Platform
+# -----------------------------------------------------------------------------
+mls:
+  board: "SWFLAMLS"
+  board_name: "Southwest Florida MLS"
+  platform: "Matrix"
+  vendor: "CoreLogic/Cotality"
+
+# -----------------------------------------------------------------------------
+# CRM
+# -----------------------------------------------------------------------------
+crm:
+  platform: "Follow Up Boss"
+
+# -----------------------------------------------------------------------------
+# ZIP Codes by Area
+#
+# To disable an area: comment out its ZIPs with #
+# To add a new ZIP: add a "- XXXXX" line under the right area
+# To remove a ZIP: delete the line or prefix it with #
+# -----------------------------------------------------------------------------
+zip_codes:
+
+  # --- Naples (Collier County) ---
+  naples:
+    - 34102
+    - 34103
+    - 34104
+    - 34105
+    - 34108
+    - 34109
+    - 34110
+    - 34112
+    - 34113
+    - 34114
+    - 34116
+    - 34117
+    - 34119
+    - 34120
+
+  # --- Marco Island (Collier County) ---
+  marco_island:
+    - 34145
+
+  # --- Cape Coral (Lee County) ---
+  cape_coral:
+    - 33904
+    - 33909
+    - 33914
+    - 33990
+    - 33991
+    - 33993
+
+  # --- Fort Myers (Lee County) ---
+  fort_myers:
+    - 33901
+    - 33905
+    - 33907
+    - 33908
+    - 33912
+    - 33913
+    - 33916
+    - 33919
+    - 33966
+    - 33967
+
+  # --- North Fort Myers (Lee County) ---
+  north_fort_myers:
+    - 33903
+    - 33917
+
+  # --- Lehigh Acres (Lee County) ---
+  lehigh_acres:
+    - 33936
+    - 33971
+    - 33972
+    - 33973
+    - 33974
+    - 33976
+
+  # --- Bonita Springs (Lee/Collier County) ---
+  bonita_springs:
+    - 34134
+    - 34135
+
+  # --- Estero (Lee County) ---
+  estero:
+    - 33928
+
+  # --- Fort Myers Beach (Lee County) ---
+  fort_myers_beach:
+    - 33931
+
+  # --- Islands / Rural (OPTIONAL) ---
+  # These areas have low volume and unique market dynamics.
+  # Uncomment individual ZIPs to include them in your pipeline.
+  islands_rural:
+    # - 33957  # Sanibel
+    # - 33922  # Bokeelia
+    # - 33956  # St. James City
+    # - 33920  # Alva
+
+  # --- Excluded ZIPs ---
+  # These are intentionally excluded from the pipeline.
+  # Do NOT uncomment unless you have a specific reason.
+  excluded:
+    # - 34142  # Immokalee - agricultural area, different market dynamics
+    # - 34141  # Ochopee - Everglades, minimal residential activity
+
+# -----------------------------------------------------------------------------
+# Matrix CSV Export Settings
+#
+# These control how we parse CSV files exported from the Matrix MLS platform.
+# -----------------------------------------------------------------------------
+matrix_export:
+  # Matrix can export in different encodings depending on the machine.
+  # We try utf-8 first, then fall back to cp-1252 (Windows Latin-1).
+  encoding_fallback:
+    - utf-8
+    - cp-1252
+
+  # Matrix exports use comma-delimited CSV
+  delimiter: ","
+
+  # Matrix columns can display as "Name" (internal field name) or "Label"
+  # (human-readable). We use Name for consistency and programmatic mapping.
+  header_format: "Name"
+
+  # Matrix has a limit on how many fields can be included per export.
+  # Split large exports into multiple files if you exceed this.
+  max_fields_per_export: 50

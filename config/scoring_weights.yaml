@@ -1,0 +1,232 @@
+# TheLeadEdge - Scoring Weights Configuration
+# Tune signal weights without code changes.
+#
+# Each signal defines:
+#   signal_type     - unique identifier used by the signal detector
+#   category        - mls | public_record | life_event | market | digital
+#   base_points     - raw points awarded when signal is first detected
+#   decay_type      - linear | exponential | step | escalating
+#   half_life_days  - days until signal loses half its value
+#   description     - human-readable explanation
+#
+# Stacking rules apply a multiplier when specific signal combinations
+# co-occur on the same lead (signal stacking = high motivation).
+#
+# Tiers map normalized scores (0-100) to urgency levels and actions.
+
+signals:
+  # --- MLS Signals ---
+  - signal_type: expired_listing
+    category: mls
+    base_points: 15
+    decay_type: exponential
+    half_life_days: 21
+    description: "Listing expired without selling"
+
+  - signal_type: expired_listing_stale
+    category: mls
+    base_points: 10
+    decay_type: exponential
+    half_life_days: 45
+    description: "Listing expired 31-90 days ago"
+
+  - signal_type: price_reduction
+    category: mls
+    base_points: 8
+    decay_type: exponential
+    half_life_days: 14
+    description: "Single price reduction"
+
+  - signal_type: price_reduction_multiple
+    category: mls
+    base_points: 14
+    decay_type: exponential
+    half_life_days: 21
+    description: "Multiple price reductions (2+)"
+
+  - signal_type: price_reduction_severe
+    category: mls
+    base_points: 16
+    decay_type: step
+    half_life_days: 30
+    description: "Price reduction 15%+ from original"
+
+  - signal_type: high_dom
+    category: mls
+    base_points: 11
+    decay_type: step
+    half_life_days: 60
+    description: "Days on market exceeding 2x area median"
+
+  - signal_type: withdrawn_relisted
+    category: mls
+    base_points: 12
+    decay_type: exponential
+    half_life_days: 30
+    description: "Withdrawn then relisted (CDOM > DOM)"
+
+  - signal_type: back_on_market
+    category: mls
+    base_points: 13
+    decay_type: exponential
+    half_life_days: 14
+    description: "Deal fell through - pending back to active"
+
+  - signal_type: listing_price_low_set
+    category: mls
+    base_points: 6
+    decay_type: linear
+    half_life_days: 30
+    description: "ListPriceLow field is set (range pricing)"
+
+  - signal_type: foreclosure_flag
+    category: mls
+    base_points: 18
+    decay_type: linear
+    half_life_days: 90
+    description: "Foreclosure/REO flag on listing"
+
+  - signal_type: short_sale_flag
+    category: mls
+    base_points: 16
+    decay_type: linear
+    half_life_days: 90
+    description: "Short sale flag on listing"
+
+  - signal_type: absentee_owner
+    category: mls
+    base_points: 8
+    decay_type: linear
+    half_life_days: 180
+    description: "Owner address differs from property address"
+
+  # --- Public Record Signals ---
+  - signal_type: pre_foreclosure
+    category: public_record
+    base_points: 20
+    decay_type: escalating
+    half_life_days: 60
+    description: "Notice of Default / Lis Pendens filed"
+
+  - signal_type: tax_delinquent
+    category: public_record
+    base_points: 13
+    decay_type: linear
+    half_life_days: 120
+    description: "Property taxes delinquent 1+ years"
+
+  - signal_type: code_violation
+    category: public_record
+    base_points: 12
+    decay_type: step
+    half_life_days: 60
+    description: "Active code enforcement violation"
+
+  # --- Life Event Signals ---
+  - signal_type: probate
+    category: life_event
+    base_points: 18
+    decay_type: linear
+    half_life_days: 90
+    description: "Probate filing - inherited property"
+
+  - signal_type: divorce
+    category: life_event
+    base_points: 16
+    decay_type: step
+    half_life_days: 45
+    description: "Divorce filing with property"
+
+  - signal_type: vacant_property
+    category: life_event
+    base_points: 10
+    decay_type: linear
+    half_life_days: 180
+    description: "Property appears vacant"
+
+  # --- Market Signals ---
+  - signal_type: neighborhood_hot
+    category: market
+    base_points: 5
+    decay_type: linear
+    half_life_days: 90
+    description: "Neighborhood absorption rate above median"
+
+  - signal_type: agent_churn
+    category: market
+    base_points: 7
+    decay_type: exponential
+    half_life_days: 30
+    description: "Listing agent changed (indicates frustration)"
+
+stacking_rules:
+  - name: distressed_seller
+    required_signals:
+      - expired_listing
+      - price_reduction_multiple
+      - high_dom
+    multiplier: 1.5
+    description: "Expired + multiple price cuts + high DOM"
+
+  - name: financial_distress
+    required_signals:
+      - pre_foreclosure
+      - tax_delinquent
+    multiplier: 2.0
+    description: "Foreclosure + tax delinquency"
+
+  - name: life_event_vacant
+    required_signals:
+      - probate
+      - absentee_owner
+      - vacant_property
+    multiplier: 2.5
+    description: "Inherited + out-of-state heir + vacant"
+
+  - name: tired_landlord
+    required_signals:
+      - absentee_owner
+      - code_violation
+    multiplier: 1.8
+    description: "Distant owner with code problems"
+
+  - name: failed_sale
+    required_signals:
+      - expired_listing
+      - withdrawn_relisted
+    multiplier: 1.4
+    description: "Failed once, trying again"
+
+  - name: divorce_property
+    required_signals:
+      - divorce
+      - high_dom
+    multiplier: 1.6
+    description: "Court-ordered sale + stale listing"
+
+tiers:
+  S:
+    min_score: 80
+    max_score: 100
+    action: "Immediate personal outreach - phone call + handwritten note"
+    urgency: "immediate"
+  A:
+    min_score: 60
+    max_score: 79
+    action: "Priority outreach within 48 hours - CMA + call"
+    urgency: "today"
+  B:
+    min_score: 40
+    max_score: 59
+    action: "Scheduled outreach this week - add to priority drip"
+    urgency: "this_week"
+  C:
+    min_score: 20
+    max_score: 39
+    action: "Monthly touch - add to nurture campaign"
+    urgency: "this_month"
+  D:
+    min_score: 0
+    max_score: 19
+    action: "Monitor only - no active outreach"
+    urgency: "monitor"

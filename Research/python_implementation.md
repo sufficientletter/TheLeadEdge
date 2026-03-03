@@ -24,7 +24,7 @@
 ## 1. Project Structure
 
 ```
-leadfinder/
+theleadedge/
 ├── pyproject.toml              # Project metadata, dependencies (PEP 621)
 ├── alembic.ini                 # Alembic migration config
 ├── alembic/                    # Database migrations
@@ -36,7 +36,7 @@ leadfinder/
 │   ├── settings.py             # Pydantic Settings (env-based config)
 │   ├── scoring_weights.yaml    # Tunable signal weights
 │   └── feature_flags.yaml      # Enable/disable data sources
-├── leadfinder/
+├── theleadedge/
 │   ├── __init__.py
 │   ├── main.py                 # Application entrypoint (scheduler + dashboard)
 │   ├── models/
@@ -133,7 +133,7 @@ leadfinder/
 ```toml
 # pyproject.toml
 [project]
-name = "leadfinder"
+name = "theleadedge"
 version = "0.1.0"
 requires-python = ">=3.11"
 
@@ -217,7 +217,7 @@ All models use Pydantic v2 for validation and serialization. SQLAlchemy models m
 ### 3.1 Shared Enumerations
 
 ```python
-# leadfinder/models/enums.py
+# theleadedge/models/enums.py
 from enum import StrEnum
 
 class Tier(StrEnum):
@@ -281,7 +281,7 @@ class OutreachOutcome(StrEnum):
 ### 3.2 Property Model
 
 ```python
-# leadfinder/models/property.py
+# theleadedge/models/property.py
 from datetime import date, datetime
 from typing import Optional
 from pydantic import BaseModel, Field, field_validator
@@ -383,7 +383,7 @@ class PropertyUpdate(BaseModel):
 ### 3.3 Signal Model
 
 ```python
-# leadfinder/models/signal.py
+# theleadedge/models/signal.py
 from datetime import date, datetime
 from typing import Any, Optional
 from pydantic import BaseModel, Field
@@ -438,7 +438,7 @@ class SignalConfig(BaseModel):
 ### 3.4 Lead Model
 
 ```python
-# leadfinder/models/lead.py
+# theleadedge/models/lead.py
 from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, Field, computed_field
@@ -517,7 +517,7 @@ class LeadUpdate(BaseModel):
 ### 3.5 Score Model
 
 ```python
-# leadfinder/models/score.py
+# theleadedge/models/score.py
 from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, Field
@@ -565,7 +565,7 @@ class ScoreHistory(BaseModel):
 ### 3.6 OutreachEvent Model
 
 ```python
-# leadfinder/models/outreach.py
+# theleadedge/models/outreach.py
 from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, Field
@@ -606,7 +606,7 @@ class OutreachEventCreate(BaseModel):
 All data sources implement a common interface. This enables the Strategy pattern -- connectors are interchangeable and testable behind a uniform contract.
 
 ```python
-# leadfinder/sources/base.py
+# theleadedge/sources/base.py
 from abc import ABC, abstractmethod
 from datetime import date, datetime
 from typing import Any, Optional
@@ -723,7 +723,7 @@ class DataSourceConnector(ABC):
 ### 4.2 MLS Connector (RESO Web API)
 
 ```python
-# leadfinder/sources/mls.py
+# theleadedge/sources/mls.py
 from datetime import datetime
 from typing import Any, Optional
 import httpx
@@ -951,7 +951,7 @@ class MLSConnector(DataSourceConnector):
 ### 4.3 MLS CSV Import Connector (Fallback)
 
 ```python
-# leadfinder/sources/mls_csv.py
+# theleadedge/sources/mls_csv.py
 import csv
 from datetime import datetime
 from pathlib import Path
@@ -1050,7 +1050,7 @@ class MLSCsvConnector(DataSourceConnector):
 ### 4.4 ATTOM Property Data Connector
 
 ```python
-# leadfinder/sources/attom.py
+# theleadedge/sources/attom.py
 from datetime import datetime
 from typing import Any, Optional
 import httpx
@@ -1179,7 +1179,7 @@ class AttomConnector(DataSourceConnector):
 ### 4.5 Skip Trace Connector (BatchLeads)
 
 ```python
-# leadfinder/sources/skip_trace.py
+# theleadedge/sources/skip_trace.py
 from datetime import datetime
 from typing import Any, Optional
 import httpx
@@ -1265,7 +1265,7 @@ class SkipTraceConnector(DataSourceConnector):
 ### 4.6 Connector Registry (Strategy Pattern)
 
 ```python
-# leadfinder/sources/__init__.py
+# theleadedge/sources/__init__.py
 from typing import Optional
 from config.settings import Settings
 from .base import DataSourceConnector
@@ -1330,10 +1330,10 @@ The scoring engine is the core intelligence of TheLeadEdge. It takes a collectio
 ### 5.1 Decay Functions
 
 ```python
-# leadfinder/scoring/decay.py
+# theleadedge/scoring/decay.py
 import math
 from datetime import datetime
-from leadfinder.models.enums import DecayType
+from theleadedge.models.enums import DecayType
 
 def apply_decay(
     base_points: float,
@@ -1419,7 +1419,7 @@ def freshness_premium(detected_at: datetime, now: datetime) -> float:
 ### 5.2 Signal Stacking Rules
 
 ```python
-# leadfinder/scoring/stacking.py
+# theleadedge/scoring/stacking.py
 from dataclasses import dataclass
 
 @dataclass
@@ -1671,12 +1671,12 @@ signals:
 ### 5.4 Config Loader
 
 ```python
-# leadfinder/scoring/config_loader.py
+# theleadedge/scoring/config_loader.py
 from pathlib import Path
 from typing import Any
 import yaml
-from leadfinder.models.signal import SignalConfig
-from leadfinder.models.enums import SignalCategory, DecayType
+from theleadedge.models.signal import SignalConfig
+from theleadedge.models.enums import SignalCategory, DecayType
 
 def load_scoring_config(
     config_path: str = "config/scoring_weights.yaml",
@@ -1710,11 +1710,11 @@ def load_scoring_config(
 ### 5.5 Scoring Engine
 
 ```python
-# leadfinder/scoring/engine.py
+# theleadedge/scoring/engine.py
 from datetime import datetime
-from leadfinder.models.signal import Signal, SignalConfig
-from leadfinder.models.score import ScoreResult
-from leadfinder.models.enums import Tier, DecayType
+from theleadedge.models.signal import Signal, SignalConfig
+from theleadedge.models.score import ScoreResult
+from theleadedge.models.enums import Tier, DecayType
 from .decay import apply_decay, freshness_premium
 from .stacking import calculate_stacking_bonus
 from .config_loader import load_scoring_config
@@ -1868,7 +1868,7 @@ class ScoringEngine:
 ### 6.1 Pipeline Orchestrator
 
 ```python
-# leadfinder/pipelines/orchestrator.py
+# theleadedge/pipelines/orchestrator.py
 import asyncio
 from datetime import datetime, timedelta
 from typing import Optional
@@ -1877,11 +1877,11 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 
 from config.settings import Settings
-from leadfinder.sources import ConnectorRegistry
-from leadfinder.scoring.engine import ScoringEngine
-from leadfinder.storage.database import Database
-from leadfinder.storage.repositories import PropertyRepo, LeadRepo, SignalRepo, ScoreHistoryRepo
-from leadfinder.notifications.dispatcher import NotificationDispatcher
+from theleadedge.sources import ConnectorRegistry
+from theleadedge.scoring.engine import ScoringEngine
+from theleadedge.storage.database import Database
+from theleadedge.storage.repositories import PropertyRepo, LeadRepo, SignalRepo, ScoreHistoryRepo
+from theleadedge.notifications.dispatcher import NotificationDispatcher
 from .ingest import IngestPipeline
 from .detect import SignalDetector
 from .score import ScorePipeline
@@ -2086,17 +2086,17 @@ class DailyPipelineOrchestrator:
 ### 6.2 Ingestion Pipeline
 
 ```python
-# leadfinder/pipelines/ingest.py
+# theleadedge/pipelines/ingest.py
 from datetime import datetime
 from typing import Any, Optional
 import structlog
 
-from leadfinder.sources import ConnectorRegistry
-from leadfinder.sources.base import SyncResult
-from leadfinder.storage.database import Database
-from leadfinder.storage.repositories import PropertyRepo, SyncLogRepo
-from leadfinder.models.property import PropertyCreate
-from leadfinder.utils.address import normalize_address
+from theleadedge.sources import ConnectorRegistry
+from theleadedge.sources.base import SyncResult
+from theleadedge.storage.database import Database
+from theleadedge.storage.repositories import PropertyRepo, SyncLogRepo
+from theleadedge.models.property import PropertyCreate
+from theleadedge.utils.address import normalize_address
 
 logger = structlog.get_logger()
 
@@ -2177,15 +2177,15 @@ class IngestPipeline:
 ### 6.3 Signal Detector
 
 ```python
-# leadfinder/pipelines/detect.py
+# theleadedge/pipelines/detect.py
 from datetime import datetime
 from typing import Optional
 import structlog
 
-from leadfinder.models.signal import SignalConfig, SignalCreate
-from leadfinder.models.enums import SignalCategory
-from leadfinder.storage.database import Database
-from leadfinder.storage.repositories import SignalRepo
+from theleadedge.models.signal import SignalConfig, SignalCreate
+from theleadedge.models.enums import SignalCategory
+from theleadedge.storage.database import Database
+from theleadedge.storage.repositories import SignalRepo
 
 logger = structlog.get_logger()
 
@@ -2315,15 +2315,15 @@ class SignalDetector:
 ### 6.4 Daily Briefing Generator
 
 ```python
-# leadfinder/pipelines/briefing.py
+# theleadedge/pipelines/briefing.py
 from datetime import datetime, timedelta
 from pathlib import Path
 import structlog
 from jinja2 import Environment, FileSystemLoader
 
 from config.settings import Settings
-from leadfinder.storage.database import Database
-from leadfinder.storage.repositories import LeadRepo, SignalRepo, ScoreHistoryRepo
+from theleadedge.storage.database import Database
+from theleadedge.storage.repositories import LeadRepo, SignalRepo, ScoreHistoryRepo
 
 logger = structlog.get_logger()
 
@@ -2383,7 +2383,7 @@ class BriefingGenerator:
 ### 7.1 SQLAlchemy Table Definitions
 
 ```python
-# leadfinder/storage/database.py
+# theleadedge/storage/database.py
 from datetime import datetime
 from typing import AsyncGenerator
 from sqlalchemy import (
@@ -2662,7 +2662,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
 from config.settings import Settings
-from leadfinder.storage.database import Base
+from theleadedge.storage.database import Base
 
 # Load settings
 settings = Settings()
@@ -2727,7 +2727,7 @@ The system starts with SQLite for zero-ops simplicity. When scaling requires it,
 - Need for streaming replication or point-in-time recovery
 
 **Migration steps:**
-1. Update `DATABASE_URL` in `.env` from `sqlite+aiosqlite:///./data/leadfinder.db` to `postgresql+asyncpg://user:pass@host/leadfinder`
+1. Update `DATABASE_URL` in `.env` from `sqlite+aiosqlite:///./data/theleadedge.db` to `postgresql+asyncpg://user:pass@host/theleadedge`
 2. Replace `aiosqlite` dependency with `asyncpg`
 3. Run `alembic upgrade head` against the new PostgreSQL database
 4. Use `pgloader` or a custom script to migrate existing SQLite data
@@ -2738,9 +2738,9 @@ The system starts with SQLite for zero-ops simplicity. When scaling requires it,
 [alembic]
 script_location = alembic
 # SQLite (default)
-sqlalchemy.url = sqlite+aiosqlite:///./data/leadfinder.db
+sqlalchemy.url = sqlite+aiosqlite:///./data/theleadedge.db
 # PostgreSQL (uncomment when ready)
-# sqlalchemy.url = postgresql+asyncpg://leadfinder:password@localhost/leadfinder
+# sqlalchemy.url = postgresql+asyncpg://theleadedge:password@localhost/theleadedge
 ```
 
 ---
@@ -2783,7 +2783,7 @@ class Settings(BaseSettings):
     log_format: str = "json"  # "json" for production, "console" for dev
 
     # ---- Database ----
-    database_url: str = "sqlite+aiosqlite:///./data/leadfinder.db"
+    database_url: str = "sqlite+aiosqlite:///./data/theleadedge.db"
     database_echo: bool = False  # Log all SQL statements (noisy, dev only)
 
     # ---- MLS / RESO API ----
@@ -2816,7 +2816,7 @@ class Settings(BaseSettings):
     smtp_username: Optional[str] = None
     smtp_password: Optional[SecretStr] = None
     sendgrid_api_key: Optional[SecretStr] = None
-    email_from: str = "leadfinder@yourdomain.com"
+    email_from: str = "theleadedge@yourdomain.com"
     email_to: str = "sarah@yourdomain.com"  # Daily briefing recipient
 
     # ---- Dashboard ----
@@ -2864,8 +2864,8 @@ LOG_LEVEL=INFO
 SECRET_KEY=generate-a-random-string-here
 
 # Database
-DATABASE_URL=sqlite+aiosqlite:///./data/leadfinder.db
-# DATABASE_URL=postgresql+asyncpg://leadfinder:password@localhost/leadfinder
+DATABASE_URL=sqlite+aiosqlite:///./data/theleadedge.db
+# DATABASE_URL=postgresql+asyncpg://theleadedge:password@localhost/theleadedge
 
 # MLS / RESO API (Phase 3+)
 # MLS_BASE_URL=https://api.mlsboard.com/reso/odata
@@ -2894,7 +2894,7 @@ SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USERNAME=your_email@gmail.com
 SMTP_PASSWORD=your_app_password
-EMAIL_FROM=leadfinder@yourdomain.com
+EMAIL_FROM=theleadedge@yourdomain.com
 EMAIL_TO=sarah@yourdomain.com
 
 # Dashboard
@@ -2985,7 +2985,7 @@ pipeline:
 ### 9.1 Retry Logic with Exponential Backoff
 
 ```python
-# leadfinder/utils/retry.py
+# theleadedge/utils/retry.py
 import asyncio
 from functools import wraps
 from typing import Any, Callable, Type
@@ -3027,7 +3027,7 @@ gentle_retry = retry(
 ### 9.2 Circuit Breaker for External Services
 
 ```python
-# leadfinder/utils/rate_limit.py
+# theleadedge/utils/rate_limit.py
 import asyncio
 import time
 from dataclasses import dataclass, field
@@ -3115,7 +3115,7 @@ class CircuitBreaker:
 ### 9.3 Graceful Degradation
 
 ```python
-# leadfinder/pipelines/ingest.py (additional method)
+# theleadedge/pipelines/ingest.py (additional method)
 
 async def run_with_degradation(self, since=None) -> dict:
     """
@@ -3175,7 +3175,7 @@ async def run_with_degradation(self, since=None) -> dict:
 ### 9.4 Structured Logging Setup
 
 ```python
-# leadfinder/utils/logging.py
+# theleadedge/utils/logging.py
 import logging
 import sys
 import structlog
@@ -3270,8 +3270,8 @@ import pytest
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 
-from leadfinder.storage.database import Base, Database
-from leadfinder.scoring.engine import ScoringEngine
+from theleadedge.storage.database import Base, Database
+from theleadedge.scoring.engine import ScoringEngine
 from config.settings import Settings
 
 @pytest.fixture(scope="session")
@@ -3328,10 +3328,10 @@ def now() -> datetime:
 # tests/factories.py
 from datetime import datetime, timedelta, date
 import factory
-from leadfinder.models.property import Property
-from leadfinder.models.lead import Lead
-from leadfinder.models.signal import Signal
-from leadfinder.models.enums import (
+from theleadedge.models.property import Property
+from theleadedge.models.lead import Lead
+from theleadedge.models.signal import Signal
+from theleadedge.models.enums import (
     Tier, LeadStatus, SignalCategory, DecayType, MLSStatus,
 )
 
@@ -3410,8 +3410,8 @@ class SignalFactory(factory.Factory):
 # tests/unit/test_scoring.py
 from datetime import datetime, timedelta
 import pytest
-from leadfinder.scoring.engine import ScoringEngine
-from leadfinder.models.enums import Tier, DecayType, SignalCategory
+from theleadedge.scoring.engine import ScoringEngine
+from theleadedge.models.enums import Tier, DecayType, SignalCategory
 from tests.factories import SignalFactory
 
 class TestScoringEngine:
@@ -3510,8 +3510,8 @@ class TestScoringEngine:
 # tests/unit/test_decay.py
 from datetime import datetime, timedelta
 import pytest
-from leadfinder.scoring.decay import apply_decay, freshness_premium
-from leadfinder.models.enums import DecayType
+from theleadedge.scoring.decay import apply_decay, freshness_premium
+from theleadedge.models.enums import DecayType
 
 class TestLinearDecay:
     def test_no_decay_at_time_zero(self):
@@ -3603,7 +3603,7 @@ import httpx
 from unittest.mock import AsyncMock, patch
 from datetime import datetime
 
-from leadfinder.sources.mls import MLSConnector
+from theleadedge.sources.mls import MLSConnector
 from config.settings import Settings
 
 @pytest.fixture
@@ -3740,10 +3740,10 @@ import pytest_asyncio
 from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from leadfinder.pipelines.orchestrator import DailyPipelineOrchestrator
-from leadfinder.sources import ConnectorRegistry
-from leadfinder.scoring.engine import ScoringEngine
-from leadfinder.storage.database import Database
+from theleadedge.pipelines.orchestrator import DailyPipelineOrchestrator
+from theleadedge.sources import ConnectorRegistry
+from theleadedge.scoring.engine import ScoringEngine
+from theleadedge.storage.database import Database
 from config.settings import Settings
 
 @pytest.fixture
@@ -3792,7 +3792,7 @@ class TestDailyPipeline:
 
         # Verify: properties were ingested
         async for session in e2e_db.get_session():
-            from leadfinder.storage.database import PropertyTable, LeadTable, SignalTable
+            from theleadedge.storage.database import PropertyTable, LeadTable, SignalTable
             from sqlalchemy import select, func
 
             prop_count = await session.scalar(select(func.count()).select_from(PropertyTable))
@@ -3814,7 +3814,7 @@ pytest tests/ -v
 pytest tests/unit/ -v
 
 # Run with coverage report
-pytest tests/ --cov=leadfinder --cov-report=html
+pytest tests/ --cov=theleadedge --cov-report=html
 
 # Run specific test class
 pytest tests/unit/test_scoring.py::TestScoringEngine -v
@@ -3828,16 +3828,16 @@ pytest tests/ -n auto
 ## Appendix A: Application Entrypoint
 
 ```python
-# leadfinder/main.py
+# theleadedge/main.py
 import asyncio
 import structlog
 
 from config.settings import Settings
-from leadfinder.utils.logging import setup_logging
-from leadfinder.storage.database import Database
-from leadfinder.sources import ConnectorRegistry
-from leadfinder.scoring.engine import ScoringEngine
-from leadfinder.pipelines.orchestrator import DailyPipelineOrchestrator
+from theleadedge.utils.logging import setup_logging
+from theleadedge.storage.database import Database
+from theleadedge.sources import ConnectorRegistry
+from theleadedge.scoring.engine import ScoringEngine
+from theleadedge.pipelines.orchestrator import DailyPipelineOrchestrator
 
 logger = structlog.get_logger()
 
@@ -3893,7 +3893,7 @@ if __name__ == "__main__":
 ## Appendix B: Address Normalization Utility
 
 ```python
-# leadfinder/utils/address.py
+# theleadedge/utils/address.py
 import re
 
 # Common abbreviation mappings (USPS standard)

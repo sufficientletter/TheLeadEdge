@@ -228,9 +228,9 @@ class FollowUpBossClient:
             "tags": lead.get("tags", []),  # e.g., ["S-Tier", "Expired", "TheLeadEdge"]
             "source": "TheLeadEdge",
             "customFields": {
-                "leadfinder_score": str(lead.get("score", 0)),
-                "leadfinder_tier": lead.get("tier", "D"),
-                "leadfinder_signals": lead.get("signal_summary", ""),
+                "theleadedge_score": str(lead.get("score", 0)),
+                "theleadedge_tier": lead.get("tier", "D"),
+                "theleadedge_signals": lead.get("signal_summary", ""),
                 "property_address": lead.get("address", ""),
             }
         }

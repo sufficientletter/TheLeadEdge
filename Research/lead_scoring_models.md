@@ -1397,7 +1397,7 @@ def create_lead_in_fub(lead_data, score_data):
 def build_lead_summary(lead_data, score_data):
     """Build a human-readable summary for the CRM note."""
     summary = f"""
-LEADFINDER SCORE: {score_data['score']}/100 (Tier: {score_data['tier']})
+THELEADEDGE SCORE: {score_data['score']}/100 (Tier: {score_data['tier']})
 MOTIVATION QUADRANT: {score_data['quadrant']}
 
 PROPERTY: {lead_data.get('property_address', 'Unknown')}
@@ -1426,10 +1426,10 @@ def create_hubspot_contact(lead_data, score_data):
     """Create contact in HubSpot with custom scoring properties."""
 
     # Requires custom properties to be created first in HubSpot:
-    # - leadfinder_score (number)
-    # - leadfinder_tier (dropdown)
-    # - leadfinder_quadrant (dropdown)
-    # - leadfinder_signals (multi-checkbox)
+    # - theleadedge_score (number)
+    # - theleadedge_tier (dropdown)
+    # - theleadedge_quadrant (dropdown)
+    # - theleadedge_signals (multi-checkbox)
     # - property_address (text)
     # - estimated_value (number)
     # - estimated_equity_pct (number)
@@ -1443,10 +1443,10 @@ def create_hubspot_contact(lead_data, score_data):
         "city": lead_data.get('city', ''),
         "state": lead_data.get('state', ''),
         "zip": lead_data.get('zip', ''),
-        "leadfinder_score": score_data['score'],
-        "leadfinder_tier": score_data['tier'],
-        "leadfinder_quadrant": score_data['quadrant'],
-        "leadfinder_signals": ";".join(score_data.get('active_signals', [])),
+        "theleadedge_score": score_data['score'],
+        "theleadedge_tier": score_data['tier'],
+        "theleadedge_quadrant": score_data['quadrant'],
+        "theleadedge_signals": ";".join(score_data.get('active_signals', [])),
         "estimated_value": lead_data.get('estimated_value', 0),
         "estimated_equity_pct": lead_data.get('equity_pct', 0),
     }

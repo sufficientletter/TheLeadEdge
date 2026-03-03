@@ -1,0 +1,50 @@
+# TheLeadEdge - Feature Flags
+# Toggle data sources and integrations without code changes.
+#
+# Each flag has:
+#   enabled     - true/false to activate the feature
+#   description - human-readable explanation and target phase
+
+data_sources:
+  mls_csv:
+    enabled: true
+    description: "Import from Matrix CSV exports"
+  mls_api:
+    enabled: false
+    description: "RESO Web API (Phase 2)"
+  public_records:
+    enabled: false
+    description: "County public records (Phase 2)"
+  redx:
+    enabled: false
+    description: "REDX expired/FSBO feed (Phase 2)"
+  attom:
+    enabled: false
+    description: "ATTOM property enrichment (Phase 5)"
+  skip_trace:
+    enabled: false
+    description: "BatchLeads skip tracing (Phase 4)"
+
+integrations:
+  follow_up_boss:
+    enabled: false
+    description: "CRM sync (Phase 2)"
+  claude_ai:
+    enabled: false
+    description: "AI lead summaries (Phase 4)"
+  direct_mail:
+    enabled: false
+    description: "Click2Mail/Handwrytten (Phase 4)"
+
+notifications:
+  daily_briefing:
+    enabled: true
+    description: "Morning email digest"
+  s_tier_alerts:
+    enabled: false
+    description: "Instant S-tier email alerts (Phase 2)"
+
+pipeline:
+  auto_score_on_import: true
+  auto_detect_signals: true
+  archive_processed_csv: true
