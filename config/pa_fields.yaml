@@ -9,35 +9,35 @@
 collier:
   source_name: "collier_pa"
 
-  # Parcels CSV columns
+  # Parcels CSV columns (int_parcels.csv from collierappraiser.com)
   parcels:
-    parcel_id: "PARCEL_ID"
-    owner_name: "OWNER_NAME"
-    site_address: "SITE_ADDR"
-    site_city: "SITE_CITY"
-    site_state: "SITE_STATE"
-    site_zip: "SITE_ZIP"
-    mail_address: "MAIL_ADDR"
-    mail_city: "MAIL_CITY"
-    mail_state: "MAIL_STATE"
-    mail_zip: "MAIL_ZIP"
-    use_code: "USE_CODE"
+    parcel_id: "ParcelId"
+    owner_name: "OwnerLine1"
+    site_address: "SiteStreetAddress"
+    site_city: "SiteCity"
+    site_state: "FL"  # Not in CSV; hardcoded
+    site_zip: "SiteZipCode"
+    mail_address: "OwnerLine3"
+    mail_city: "OwnerCity"
+    mail_state: "OwnerState"
+    mail_zip: "OwnerZip"
+    use_code: "UseCode"
 
-  # Sales CSV columns
+  # Sales CSV columns (int_sales.csv)
   sales:
-    parcel_id: "PARCEL_ID"
-    sale_date: "SALE_DATE"
-    sale_price: "SALE_PRICE"
-    deed_type: "DEED_TYPE"
-    qualified: "QUALIFIED"
+    parcel_id: "ParcelId"
+    sale_date: "SaleDate"
+    sale_price: "SaleAmount"
+    deed_type: ""
+    qualified: "Qualified"
 
-  # Values CSV columns
+  # Values CSV columns (int_values_rp_history.csv)
   values:
-    parcel_id: "PARCEL_ID"
-    assessed_value: "ASSESSED_VALUE"
-    market_value: "MARKET_VALUE"
-    homestead_exempt: "HOMESTEAD"
-    taxable_value: "TAXABLE_VALUE"
+    parcel_id: "ParcelId"
+    assessed_value: "CountyAssessedValue"
+    market_value: "TotalJustValue"
+    homestead_exempt: "HmstdExemptAmount"
+    taxable_value: "CountyTaxableValue"
 
 lee:
   source_name: "lee_pa"

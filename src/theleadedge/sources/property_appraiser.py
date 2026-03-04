@@ -33,6 +33,7 @@ from __future__ import annotations
 import csv
 import io
 import re
+import urllib.parse
 import zipfile
 from datetime import date, datetime
 from pathlib import Path
@@ -367,8 +368,6 @@ class CollierPAConnector(DataSourceConnector):
         str
             Fully-qualified URL for the download handler.
         """
-        import urllib.parse
-
         params = urllib.parse.urlencode({
             "folderName": _DOWNLOAD_FOLDER,
             "file": filename,
@@ -379,9 +378,14 @@ class CollierPAConnector(DataSourceConnector):
         """Download ZIP archives and extract their CSV contents.
 
         The Collier PA serves ZIP files via an ASP handler that redirects
-        to Google Drive.  Each ZIP contains one or more CSV files.  This
-        method downloads the ZIPs, extracts CSVs, and returns paths to
-        the extracted CSV files keyed by the original ZIP filename.
+        to Google Drive.  Google Drive returns an HTML confirmation page
+        for large files instead of the actual content.  This method
+        handles the confirmation by injecting ``confirm=t`` into the
+        Google Drive URL.
+
+        Each ZIP contains one or more CSV files.  This method downloads
+        the ZIPs, extracts CSVs, and returns paths to the extracted CSV
+        files keyed by the original ZIP filename.
 
         Returns
         -------
@@ -400,7 +404,8 @@ class CollierPAConnector(DataSourceConnector):
         paths: dict[str, Path] = {}
 
         client = self._http_client or httpx.AsyncClient(
-            follow_redirects=True, timeout=300
+            follow_redirects=True,
+            timeout=httpx.Timeout(30.0, read=300.0),
         )
         should_close = self._http_client is None
 
@@ -413,13 +418,9 @@ class CollierPAConnector(DataSourceConnector):
                     file=filename,
                 )
                 try:
-                    async with client.stream("GET", url) as resp:
-                        resp.raise_for_status()
-                        with open(zip_dest, "wb") as f:
-                            async for chunk in resp.aiter_bytes(
-                                chunk_size=_DOWNLOAD_CHUNK_SIZE
-                            ):
-                                f.write(chunk)
+                    await self._download_with_gdrive_confirm(
+                        client, url, zip_dest
+                    )
                     self.log.info(
                         "download_complete",
                         file=filename,
@@ -442,6 +443,161 @@ class CollierPAConnector(DataSourceConnector):
                 await client.aclose()
 
         return paths
+
+    async def _download_with_gdrive_confirm(
+        self,
+        client: httpx.AsyncClient,
+        url: str,
+        dest: Path,
+    ) -> None:
+        """Download a file, handling Google Drive confirmation pages.
+
+        Google Drive serves an HTML confirmation page (with a "Download
+        anyway" button) for large files instead of the actual content.
+        This method detects that situation and retries with the
+        ``confirm=t`` query parameter, which bypasses the interstitial.
+
+        The detection works as follows:
+
+        1. Follow the initial redirect from the Collier PA ASP handler
+           to Google Drive.
+        2. Stream the response body.  If the first chunk starts with
+           ``<`` (HTML), the response is likely the confirmation page.
+        3. In that case, rebuild the URL with ``confirm=t`` and retry.
+
+        Parameters
+        ----------
+        client:
+            An ``httpx.AsyncClient`` with ``follow_redirects=True``.
+        url:
+            The initial download URL (Collier PA ASP handler).
+        dest:
+            Local file path to write the downloaded content.
+        """
+        retry_url: str | None = None
+
+        async with client.stream("GET", url) as resp:
+            resp.raise_for_status()
+            final_url = str(resp.url)
+
+            # Check if we landed on Google Drive
+            if "drive.google.com" not in final_url and "drive.usercontent.google.com" not in final_url:
+                # Not Google Drive (e.g. test mocks) -- stream directly
+                with open(dest, "wb") as f:
+                    async for chunk in resp.aiter_bytes(
+                        chunk_size=_DOWNLOAD_CHUNK_SIZE
+                    ):
+                        f.write(chunk)
+                return
+
+            # Google Drive URL -- use a single iterator to probe the first
+            # chunk and then continue streaming remaining data.
+            aiter = resp.aiter_bytes(chunk_size=_DOWNLOAD_CHUNK_SIZE)
+            try:
+                probe = await aiter.__anext__()
+            except StopAsyncIteration:
+                probe = b""
+
+            if not probe or probe.lstrip()[:1] != b"<":
+                # Actual file content -- write probe + remaining chunks
+                with open(dest, "wb") as f:
+                    f.write(probe)
+                    async for chunk in aiter:
+                        f.write(chunk)
+                return
+
+            # Got HTML confirmation page -- parse the form action URL
+            # and its hidden fields to build the real download URL.
+            html = probe
+            async for chunk in aiter:
+                html += chunk
+            self.log.info(
+                "gdrive_confirmation_detected",
+                original_url=final_url,
+            )
+            retry_url = self._extract_gdrive_download_url(html, final_url)
+
+        # Stream context is closed; retry with the confirmed URL
+        if retry_url is not None:
+            await self._stream_download(client, retry_url, dest)
+
+    @staticmethod
+    def _extract_gdrive_download_url(html: bytes, fallback_url: str) -> str:
+        """Parse the Google Drive confirmation page for the real download URL.
+
+        Google Drive serves an HTML page with a ``<form>`` whose ``action``
+        points to ``drive.usercontent.google.com/download`` and whose hidden
+        inputs provide ``id``, ``export``, ``confirm``, and ``uuid`` params.
+
+        Parameters
+        ----------
+        html:
+            Raw bytes of the confirmation HTML page.
+        fallback_url:
+            URL to fall back to (with ``confirm=t`` injected) if parsing fails.
+
+        Returns
+        -------
+        str
+            The direct download URL with all required parameters.
+        """
+        import re
+
+        text = html.decode("utf-8", errors="replace")
+
+        # Extract form action URL
+        action_match = re.search(
+            r'<form[^>]+action="([^"]+)"', text
+        )
+        if not action_match:
+            # Fallback: inject confirm=t into the original URL
+            parsed = urllib.parse.urlparse(fallback_url)
+            params = urllib.parse.parse_qs(parsed.query)
+            params["confirm"] = ["t"]
+            new_query = urllib.parse.urlencode(params, doseq=True)
+            return urllib.parse.urlunparse(parsed._replace(query=new_query))
+
+        action_url = action_match.group(1)
+
+        # Extract all hidden input fields
+        hidden_inputs = re.findall(
+            r'<input[^>]+type="hidden"[^>]+name="([^"]+)"[^>]+value="([^"]*)"',
+            text,
+        )
+        params_dict = {name: value for name, value in hidden_inputs}
+        query_string = urllib.parse.urlencode(params_dict)
+
+        return f"{action_url}?{query_string}"
+
+    async def _stream_download(
+        self,
+        client: httpx.AsyncClient,
+        url: str,
+        dest: Path,
+    ) -> None:
+        """Stream-download a URL to a local file.
+
+        Parameters
+        ----------
+        client:
+            An ``httpx.AsyncClient``.
+        url:
+            URL to download.
+        dest:
+            Local file path to write.
+
+        Raises
+        ------
+        httpx.HTTPStatusError
+            If the response status is not 2xx.
+        """
+        async with client.stream("GET", url) as resp:
+            resp.raise_for_status()
+            with open(dest, "wb") as f:
+                async for chunk in resp.aiter_bytes(
+                    chunk_size=_DOWNLOAD_CHUNK_SIZE
+                ):
+                    f.write(chunk)
 
     def _extract_csv_from_zip(self, zip_path: Path) -> Path:
         """Extract the first CSV file from a ZIP archive.

@@ -855,3 +855,235 @@ class TestHomesteadDetection:
         """Empty HOMESTEAD field means NOT homestead exempt."""
         assert connector._detect_homestead({"HOMESTEAD": ""}) is False
         assert connector._detect_homestead({}) is False
+
+
+class TestExtractGdriveDownloadUrl:
+    """Tests for _extract_gdrive_download_url static method."""
+
+    def test_parses_form_action_and_hidden_inputs(self) -> None:
+        """Should extract form action URL and hidden input params."""
+        html = (
+            b'<form id="download-form" action="https://drive.usercontent.google.com/download" method="get">'
+            b'<input type="hidden" name="id" value="ABC123">'
+            b'<input type="hidden" name="export" value="download">'
+            b'<input type="hidden" name="confirm" value="t">'
+            b'<input type="hidden" name="uuid" value="test-uuid">'
+            b'</form>'
+        )
+        result = CollierPAConnector._extract_gdrive_download_url(
+            html, "https://drive.google.com/uc?id=ABC123"
+        )
+        assert "drive.usercontent.google.com/download" in result
+        assert "id=ABC123" in result
+        assert "confirm=t" in result
+        assert "uuid=test-uuid" in result
+
+    def test_fallback_when_no_form(self) -> None:
+        """Should fall back to injecting confirm=t when no form found."""
+        html = b"<html><body>No form here</body></html>"
+        fallback = "https://drive.google.com/uc?export=download&id=XYZ"
+        result = CollierPAConnector._extract_gdrive_download_url(html, fallback)
+        assert "confirm=t" in result
+        assert "id=XYZ" in result
+
+    def test_preserves_all_hidden_fields(self) -> None:
+        """Should include all hidden input fields in the result URL."""
+        html = (
+            b'<form action="https://example.com/dl" method="get">'
+            b'<input type="hidden" name="a" value="1">'
+            b'<input type="hidden" name="b" value="2">'
+            b'</form>'
+        )
+        result = CollierPAConnector._extract_gdrive_download_url(
+            html, "https://fallback.com"
+        )
+        assert "example.com/dl" in result
+        assert "a=1" in result
+        assert "b=2" in result
+
+
+class TestGdriveConfirmDownload:
+    """Tests for Google Drive confirmation page handling in downloads.
+
+    The ``_download_with_gdrive_confirm`` method checks ``resp.url`` to
+    detect whether the response came from Google Drive.  Since
+    ``httpx.MockTransport`` sets ``resp.url`` to the request URL, we
+    simulate the Google Drive flow by requesting URLs that contain
+    ``drive.google.com`` directly.
+    """
+
+    async def test_gdrive_html_triggers_confirm_retry(
+        self, tmp_path: Path
+    ) -> None:
+        """When Google Drive returns HTML confirmation, should parse form and retry."""
+        csv_content = _make_parcels_csv(DEFAULT_PARCELS)
+        real_zip = _csv_to_zip(csv_content, "Parcels.csv")
+
+        gdrive_html = (
+            b'<!DOCTYPE html><html><head><title>Google Drive</title></head><body>'
+            b'<form id="download-form" action="https://drive.usercontent.google.com/download" method="get">'
+            b'<input type="hidden" name="id" value="ABC">'
+            b'<input type="hidden" name="export" value="download">'
+            b'<input type="hidden" name="confirm" value="t">'
+            b'<input type="hidden" name="uuid" value="test-uuid">'
+            b'</form></body></html>'
+        )
+
+        request_log: list[str] = []
+
+        async def mock_handler(request: httpx.Request) -> httpx.Response:
+            url_str = str(request.url)
+            request_log.append(url_str)
+
+            if "drive.usercontent.google.com" in url_str:
+                # Retry request to the real download endpoint
+                return httpx.Response(200, content=real_zip)
+            # First request -- return HTML confirmation page
+            return httpx.Response(200, content=gdrive_html)
+
+        transport = httpx.MockTransport(mock_handler)
+        client = httpx.AsyncClient(transport=transport)
+
+        conn = CollierPAConnector(
+            download_dir=tmp_path,
+            config=SAMPLE_CONFIG,
+            http_client=client,
+        )
+
+        dest = tmp_path / "test.zip"
+        gdrive_url = "https://drive.google.com/uc?export=download&id=ABC"
+        await conn._download_with_gdrive_confirm(client, gdrive_url, dest)
+
+        # Should have made 2 requests: initial + retry to usercontent domain
+        assert len(request_log) == 2
+        assert "drive.google.com" in request_log[0]
+        assert "drive.usercontent.google.com" in request_log[1]
+        assert "confirm=t" in request_log[1]
+
+        # Downloaded file should be a valid ZIP
+        assert dest.exists()
+        assert dest.read_bytes() == real_zip
+
+        await client.aclose()
+
+    async def test_gdrive_direct_zip_no_retry(
+        self, tmp_path: Path
+    ) -> None:
+        """When Google Drive returns ZIP directly, should NOT retry."""
+        csv_content = _make_parcels_csv(DEFAULT_PARCELS)
+        real_zip = _csv_to_zip(csv_content, "Parcels.csv")
+
+        request_log: list[str] = []
+
+        async def mock_handler(request: httpx.Request) -> httpx.Response:
+            request_log.append(str(request.url))
+            return httpx.Response(200, content=real_zip)
+
+        transport = httpx.MockTransport(mock_handler)
+        client = httpx.AsyncClient(transport=transport)
+
+        conn = CollierPAConnector(
+            download_dir=tmp_path,
+            config=SAMPLE_CONFIG,
+            http_client=client,
+        )
+
+        dest = tmp_path / "test.zip"
+        gdrive_url = "https://drive.google.com/uc?export=download&id=XYZ"
+        await conn._download_with_gdrive_confirm(client, gdrive_url, dest)
+
+        # Should have made only 1 request (no retry needed)
+        assert len(request_log) == 1
+
+        # Downloaded file should be the real ZIP (first chunk starts with PK)
+        assert dest.exists()
+        assert dest.read_bytes() == real_zip
+
+        await client.aclose()
+
+    async def test_non_gdrive_url_streams_directly(
+        self, tmp_path: Path
+    ) -> None:
+        """Non-Google-Drive URLs should stream directly without probing."""
+        content = b"PK\x03\x04 some zip content"
+
+        request_log: list[str] = []
+
+        async def mock_handler(request: httpx.Request) -> httpx.Response:
+            request_log.append(str(request.url))
+            return httpx.Response(200, content=content)
+
+        transport = httpx.MockTransport(mock_handler)
+        client = httpx.AsyncClient(transport=transport)
+
+        conn = CollierPAConnector(
+            download_dir=tmp_path,
+            config=SAMPLE_CONFIG,
+            http_client=client,
+        )
+
+        dest = tmp_path / "test.zip"
+        await conn._download_with_gdrive_confirm(
+            client, "https://example.com/file.zip", dest
+        )
+
+        assert len(request_log) == 1
+        assert dest.exists()
+        assert dest.read_bytes() == content
+
+        await client.aclose()
+
+    async def test_stream_download_writes_file(self, tmp_path: Path) -> None:
+        """_stream_download should write response content to disk."""
+        content = b"PK\x03\x04 fake zip content here"
+
+        async def mock_handler(request: httpx.Request) -> httpx.Response:
+            return httpx.Response(200, content=content)
+
+        transport = httpx.MockTransport(mock_handler)
+        client = httpx.AsyncClient(transport=transport)
+
+        conn = CollierPAConnector(
+            download_dir=tmp_path,
+            config=SAMPLE_CONFIG,
+            http_client=client,
+        )
+
+        dest = tmp_path / "test_download.zip"
+        await conn._stream_download(
+            client,
+            "https://drive.google.com/uc?export=download&confirm=t&id=X",
+            dest,
+        )
+
+        assert dest.exists()
+        assert dest.read_bytes() == content
+
+        await client.aclose()
+
+    async def test_stream_download_raises_on_error(
+        self, tmp_path: Path
+    ) -> None:
+        """_stream_download should raise on HTTP error."""
+
+        async def error_handler(request: httpx.Request) -> httpx.Response:
+            return httpx.Response(500, content=b"Server Error")
+
+        transport = httpx.MockTransport(error_handler)
+        client = httpx.AsyncClient(transport=transport)
+
+        conn = CollierPAConnector(
+            download_dir=tmp_path,
+            config=SAMPLE_CONFIG,
+            http_client=client,
+        )
+
+        dest = tmp_path / "will_fail.zip"
+        with pytest.raises(httpx.HTTPStatusError):
+            await conn._stream_download(
+                client,
+                "https://drive.google.com/uc?export=download&confirm=t&id=X",
+                dest,
+            )
+
+        await client.aclose()
