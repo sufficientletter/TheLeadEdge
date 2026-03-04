@@ -11,12 +11,15 @@ PII display requires the authenticated session.
 from __future__ import annotations
 
 import asyncio
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import structlog
-from nicegui import app, ui
+from nicegui import ui
 
-from theleadedge.config import Settings
+from theleadedge.dashboard.app import get_settings
+
+if TYPE_CHECKING:
+    from theleadedge.config import Settings
 from theleadedge.dashboard.components.activity_timeline import activity_timeline
 from theleadedge.dashboard.components.public_records_panel import (
     public_records_panel,
@@ -266,9 +269,7 @@ async def page_lead_detail(lead_id: int) -> None:
     create_layout("Lead Detail")
     with ui.column().classes("w-full p-4"):
         try:
-            settings: Settings = app.storage.general.get(
-                "settings", Settings()
-            )
+            settings: Settings = get_settings()
             data = await _load_lead(settings, lead_id)
             if data is None:
                 ui.label(f"Lead #{lead_id} not found").classes(

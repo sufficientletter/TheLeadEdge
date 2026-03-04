@@ -15,6 +15,7 @@ Usage:
     python -m theleadedge data-health  # Data pipeline health report
     python -m theleadedge match-records  # Process unmatched source records
     python -m theleadedge download-pa   # Download PA data (both counties)
+    python -m theleadedge fetch-alerts  # Fetch Google Alerts RSS feeds
     python -m theleadedge dashboard  # Launch the web dashboard
 
 Each command loads settings from ``.env``, initializes the database, and
@@ -631,8 +632,12 @@ async def cmd_match_records(settings: Settings) -> int:
     return 0
 
 
-async def cmd_dashboard(settings: Settings, args: argparse.Namespace) -> int:
+def cmd_dashboard(settings: Settings, args: argparse.Namespace) -> int:
     """Launch the NiceGUI dashboard web server.
+
+    This is a synchronous function because NiceGUI's ``ui.run()``
+    starts its own event loop via uvicorn.  Wrapping it in
+    ``asyncio.run()`` would create a nested loop conflict.
 
     Parameters
     ----------
@@ -660,6 +665,139 @@ async def cmd_dashboard(settings: Settings, args: argparse.Namespace) -> int:
     return 0
 
 
+async def cmd_fetch_fsbo(settings: Settings) -> int:
+    """Fetch FSBO listings from Craigslist RSS and persist to database.
+
+    Initializes the CraigslistFSBOConnector, fetches the RSS feed,
+    transforms entries into listing dicts, deduplicates by source URL,
+    and persists new listings via FSBOListingRepo.
+
+    Returns
+    -------
+    int
+        Exit code: 0 on success, 1 on failure.
+    """
+    log = logger.bind(command="fetch-fsbo")
+
+    from theleadedge.sources.fsbo import CraigslistFSBOConnector
+    from theleadedge.storage.repositories import FSBOListingRepo
+
+    connector = CraigslistFSBOConnector()
+
+    try:
+        await connector.authenticate()
+        raw = await connector.fetch()
+        listings = connector.transform(raw)
+    except Exception as exc:
+        log.error("fsbo_fetch_failed", error=str(exc))
+        print(f"FSBO fetch failed: {exc}")
+        return 1
+
+    if not listings:
+        log.info("no_fsbo_listings")
+        print("No FSBO listings found in feed.")
+        return 0
+
+    engine = get_engine(settings.database_url)
+    await init_db(engine)
+
+    created_count = 0
+    skipped_count = 0
+    async with get_session(engine) as session:
+        repo = FSBOListingRepo(session)
+        for listing in listings:
+            source_url = listing.get("source_url")
+            if source_url:
+                existing = await repo.get_by_source_url(source_url)
+                if existing is not None:
+                    skipped_count += 1
+                    continue
+            await repo.create(**listing)
+            created_count += 1
+
+    log.info(
+        "fsbo_fetch_finished",
+        fetched=len(listings),
+        created=created_count,
+        skipped=skipped_count,
+    )
+    print("FSBO listing fetch complete:")
+    print(f"  Fetched:  {len(listings)}")
+    print(f"  Created:  {created_count}")
+    print(f"  Skipped:  {skipped_count}")
+
+    return 0
+
+
+async def cmd_fetch_alerts(settings: Settings) -> int:
+    """Fetch Google Alerts RSS feeds and extract real estate intelligence.
+
+    Loads feed URLs from ``config/google_alerts.yaml``, fetches each
+    RSS feed, parses entries, and extracts potential address mentions.
+    If no RSS URLs are configured, logs a warning and returns 0.
+
+    Returns
+    -------
+    int
+        Exit code: 0 on success, 1 on failure.
+    """
+    log = logger.bind(command="fetch-alerts")
+
+    from theleadedge.sources.market_data import GoogleAlertsConnector
+
+    # Load google_alerts.yaml config
+    config_path = settings.config_dir / "google_alerts.yaml"
+    if not config_path.exists():
+        log.warning("google_alerts_config_not_found", path=str(config_path))
+        print(f"Google Alerts config not found: {config_path}")
+        return 0
+
+    with open(config_path, encoding="utf-8") as f:
+        import yaml
+
+        config_data = yaml.safe_load(f) or {}
+
+    feeds = config_data.get("feeds", [])
+    feed_urls = [
+        feed["url"]
+        for feed in feeds
+        if feed.get("url")
+    ]
+
+    if not feed_urls:
+        log.warning(
+            "no_feed_urls_configured",
+            config_path=str(config_path),
+            feeds_defined=len(feeds),
+        )
+        print("No RSS feed URLs configured in google_alerts.yaml.")
+        print("Add your Google Alerts RSS URLs to the config file.")
+        return 0
+
+    connector = GoogleAlertsConnector(feed_urls=feed_urls)
+
+    try:
+        await connector.authenticate()
+        raw = await connector.fetch()
+        records = connector.transform(raw)
+    except Exception as exc:
+        log.error("fetch_alerts_failed", error=str(exc))
+        print(f"Google Alerts fetch failed: {exc}")
+        return 1
+
+    log.info(
+        "fetch_alerts_finished",
+        feeds_fetched=len(raw),
+        total_feeds=len(feed_urls),
+        alerts_extracted=len(records),
+    )
+    print("Google Alerts fetch complete:")
+    print(f"  Feeds fetched:    {len(raw)}/{len(feed_urls)}")
+    print(f"  Alerts extracted: {len(records)}")
+
+    return 0
+
+
 async def cmd_download_pa(settings: Settings) -> int:
     """Download Property Appraiser data for both counties.
 
@@ -676,10 +814,19 @@ async def cmd_download_pa(settings: Settings) -> int:
     from theleadedge.sources.property_appraiser import (
         CollierPAConnector,
         LeePAConnector,
+        load_pa_config,
     )
 
     download_dir = settings.pa_download_dir
     download_dir.mkdir(parents=True, exist_ok=True)
+
+    # Load PA field configuration
+    pa_config_path = settings.config_dir / "pa_fields.yaml"
+    if not pa_config_path.exists():
+        log.error("pa_config_not_found", path=str(pa_config_path))
+        print(f"PA config not found: {pa_config_path}")
+        return 1
+    pa_config = load_pa_config(pa_config_path)
 
     total_records = 0
     failures = 0
@@ -688,6 +835,7 @@ async def cmd_download_pa(settings: Settings) -> int:
     try:
         collier = CollierPAConnector(
             download_dir=download_dir / "collier",
+            config=pa_config,
         )
         await collier.authenticate()
         raw = await collier.fetch()
@@ -704,6 +852,7 @@ async def cmd_download_pa(settings: Settings) -> int:
     try:
         lee = LeePAConnector(
             download_dir=download_dir / "lee",
+            config=pa_config,
         )
         await lee.authenticate()
         raw = await lee.fetch()
@@ -803,6 +952,14 @@ def build_parser() -> argparse.ArgumentParser:
         "download-pa",
         help="Download PA data (both counties)",
     )
+    subparsers.add_parser(
+        "fetch-fsbo",
+        help="Fetch FSBO listings from Craigslist RSS",
+    )
+    subparsers.add_parser(
+        "fetch-alerts",
+        help="Fetch Google Alerts RSS feeds for real estate intelligence",
+    )
 
     # Phase 3 commands
     dashboard_parser = subparsers.add_parser(
@@ -845,14 +1002,17 @@ def cli() -> None:
         "data-health": cmd_data_health,
         "match-records": cmd_match_records,
         "download-pa": cmd_download_pa,
+        "fetch-fsbo": cmd_fetch_fsbo,
+        "fetch-alerts": cmd_fetch_alerts,
     }
 
-    if args.command == "import-public-records":
+    if args.command == "dashboard":
+        # cmd_dashboard is synchronous -- NiceGUI starts its own event loop
+        exit_code = cmd_dashboard(settings, args)
+    elif args.command == "import-public-records":
         exit_code = asyncio.run(cmd_import_public_records(settings, args))
     elif args.command == "enrich":
         exit_code = asyncio.run(cmd_enrich(settings, args))
-    elif args.command == "dashboard":
-        exit_code = asyncio.run(cmd_dashboard(settings, args))
     else:
         handler = commands[args.command]
         exit_code = asyncio.run(handler(settings))

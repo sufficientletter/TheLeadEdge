@@ -9,12 +9,15 @@ Only street-level address, city, ZIP, and MLS data are displayed.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import structlog
-from nicegui import app, ui
+from nicegui import ui
 
-from theleadedge.config import Settings
+from theleadedge.dashboard.app import get_settings
+
+if TYPE_CHECKING:
+    from theleadedge.config import Settings
 from theleadedge.dashboard.components.filter_bar import FilterState, filter_bar
 from theleadedge.dashboard.layout import create_layout
 from theleadedge.dashboard.theme import (
@@ -217,7 +220,7 @@ async def page_leads() -> None:
     """Lead Pipeline page -- AG Grid of all active leads."""
     create_layout("Lead Pipeline")
 
-    settings: Settings = app.storage.general.get("settings", Settings())
+    settings: Settings = get_settings()
     filters = FilterState()
 
     # ── Header section ───────────────────────────────────────────────────

@@ -1,8 +1,17 @@
 """Property Appraiser data connectors for Collier and Lee counties.
 
 Collier County:
-    Downloads bulk property data CSV files from collierappraiser.com,
-    joins on PARCELID, and produces SourceRecords with parcel enrichment data.
+    Downloads bulk property data ZIP files from collierappraiser.com via their
+    ASP download handler (which 302-redirects to Google Drive), extracts the
+    CSV contents, joins on PARCELID, and produces SourceRecords with parcel
+    enrichment data.
+
+    As of 2026, the download mechanism uses::
+
+        https://www.collierappraiser.com/Main_Data/downloadgdfile.asp
+            ?folderName=INT%20FILES%20(NEW)&file=<filename>.zip
+
+    Each ZIP archive contains one or more CSV files.
 
 Lee County:
     Downloads ZIP archives from leepa.org containing NAL (Name-Address-Legal)
@@ -47,12 +56,23 @@ logger = structlog.get_logger()
 # Constants
 # ---------------------------------------------------------------------------
 
-BASE_URL = "https://www.collierappraiser.com/Downloads"
-PARCELS_FILE = "Parcels.csv"
-SALES_FILE = "Sales.csv"
-VALUES_FILE = "Values.csv"
+# The Collier PA switched from direct CSV downloads to an ASP handler that
+# 302-redirects to Google Drive.  Each download is a ZIP containing CSV(s).
+BASE_URL = "https://www.collierappraiser.com/Main_Data/downloadgdfile.asp"
+_DOWNLOAD_FOLDER = "INT FILES (NEW)"
+
+# ZIP filenames served by the ASP handler (contain CSV files inside)
+PARCELS_FILE = "int_parcels_csv.zip"
+SALES_FILE = "int_sales_csv.zip"
+VALUES_FILE = "int_values_rp_history_csv.zip"
 
 _ALL_FILES = [PARCELS_FILE, SALES_FILE, VALUES_FILE]
+
+# Legacy filenames kept for backward compatibility in tests and references.
+# These are the names of the CSV files *inside* the ZIP archives.
+PARCELS_CSV = "Parcels.csv"
+SALES_CSV = "Sales.csv"
+VALUES_CSV = "Values.csv"
 
 # Chunk size for streaming downloads (64 KB)
 _DOWNLOAD_CHUNK_SIZE = 65_536
@@ -261,6 +281,11 @@ class CollierPAConnector(DataSourceConnector):
     async def health_check_detailed(self) -> dict[str, Any]:
         """Detailed health check with per-URL status codes.
 
+        Sends HEAD requests to the ASP download handler for each file.
+        The handler returns 302 redirects to Google Drive; we consider
+        a 2xx or 3xx response as healthy (the redirect itself indicates
+        the file is configured).
+
         Returns
         -------
         dict
@@ -270,17 +295,20 @@ class CollierPAConnector(DataSourceConnector):
         response_codes: dict[str, int] = {}
         all_ok = True
 
+        # For health checks we do NOT follow redirects, because the ASP
+        # handler returns 302 -> Google Drive.  A 302 means the file exists.
         client = self._http_client or httpx.AsyncClient(
-            follow_redirects=True, timeout=30
+            follow_redirects=False, timeout=30
         )
         should_close = self._http_client is None
 
         try:
             for filename in _ALL_FILES:
-                url = f"{BASE_URL}/{filename}"
+                url = self._build_download_url(filename)
                 try:
                     resp = await client.head(url)
                     response_codes[url] = resp.status_code
+                    # 2xx or 3xx (redirect) both indicate the file is available
                     if resp.status_code >= 400:
                         all_ok = False
                 except httpx.HTTPError:
@@ -321,18 +349,52 @@ class CollierPAConnector(DataSourceConnector):
     # Internal helpers
     # ------------------------------------------------------------------
 
+    @staticmethod
+    def _build_download_url(filename: str) -> str:
+        """Build the full ASP download URL for a given ZIP filename.
+
+        The Collier PA serves files through an ASP handler that accepts
+        ``folderName`` and ``file`` query parameters and 302-redirects
+        to Google Drive for the actual download.
+
+        Parameters
+        ----------
+        filename:
+            ZIP filename, e.g. ``"int_parcels_csv.zip"``.
+
+        Returns
+        -------
+        str
+            Fully-qualified URL for the download handler.
+        """
+        import urllib.parse
+
+        params = urllib.parse.urlencode({
+            "folderName": _DOWNLOAD_FOLDER,
+            "file": filename,
+        })
+        return f"{BASE_URL}?{params}"
+
     async def _download_files(self) -> dict[str, Path]:
-        """Download the three CSV files via httpx streaming.
+        """Download ZIP archives and extract their CSV contents.
+
+        The Collier PA serves ZIP files via an ASP handler that redirects
+        to Google Drive.  Each ZIP contains one or more CSV files.  This
+        method downloads the ZIPs, extracts CSVs, and returns paths to
+        the extracted CSV files keyed by the original ZIP filename.
 
         Returns
         -------
         dict[str, Path]
-            Mapping from filename (``"Parcels.csv"``, etc.) to local path.
+            Mapping from ZIP filename to local path of the extracted CSV.
+            The CSV path is the first ``.csv`` file found inside each ZIP.
 
         Raises
         ------
         httpx.HTTPStatusError
             If any download returns a non-2xx response.
+        ValueError
+            If a ZIP archive contains no CSV files.
         """
         self.download_dir.mkdir(parents=True, exist_ok=True)
         paths: dict[str, Path] = {}
@@ -344,8 +406,8 @@ class CollierPAConnector(DataSourceConnector):
 
         try:
             for filename in _ALL_FILES:
-                url = f"{BASE_URL}/{filename}"
-                dest = self.download_dir / filename
+                url = self._build_download_url(filename)
+                zip_dest = self.download_dir / filename
                 self.log.info(
                     "download_start",
                     file=filename,
@@ -353,17 +415,21 @@ class CollierPAConnector(DataSourceConnector):
                 try:
                     async with client.stream("GET", url) as resp:
                         resp.raise_for_status()
-                        with open(dest, "wb") as f:
+                        with open(zip_dest, "wb") as f:
                             async for chunk in resp.aiter_bytes(
                                 chunk_size=_DOWNLOAD_CHUNK_SIZE
                             ):
                                 f.write(chunk)
-                    paths[filename] = dest
                     self.log.info(
                         "download_complete",
                         file=filename,
-                        size_bytes=dest.stat().st_size,
+                        size_bytes=zip_dest.stat().st_size,
                     )
+
+                    # Extract CSV from ZIP
+                    csv_path = self._extract_csv_from_zip(zip_dest)
+                    paths[filename] = csv_path
+
                 except httpx.HTTPError as exc:
                     self.log.error(
                         "download_failed",
@@ -377,13 +443,54 @@ class CollierPAConnector(DataSourceConnector):
 
         return paths
 
+    def _extract_csv_from_zip(self, zip_path: Path) -> Path:
+        """Extract the first CSV file from a ZIP archive.
+
+        Parameters
+        ----------
+        zip_path:
+            Path to the downloaded ZIP file.
+
+        Returns
+        -------
+        Path
+            Path to the extracted CSV file.
+
+        Raises
+        ------
+        ValueError
+            If the ZIP contains no ``.csv`` files.
+        """
+        with zipfile.ZipFile(zip_path, "r") as zf:
+            csv_members = [
+                name for name in zf.namelist()
+                if name.lower().endswith(".csv")
+            ]
+            if not csv_members:
+                msg = f"No CSV files found in {zip_path.name}"
+                self.log.error("zip_no_csv", archive=zip_path.name)
+                raise ValueError(msg)
+
+            # Extract all CSV files; return path to the first one
+            for member in csv_members:
+                zf.extract(member, self.download_dir)
+                self.log.info(
+                    "zip_extract",
+                    archive=zip_path.name,
+                    member=member,
+                )
+
+            extracted_path = self.download_dir / csv_members[0]
+            return extracted_path
+
     def _load_and_join(self, paths: dict[str, Path]) -> list[dict[str, Any]]:
         """Read and join the three CSV files on PARCEL_ID.
 
         Parameters
         ----------
         paths:
-            Mapping of filename to local Path (from ``_download_files``).
+            Mapping of ZIP filename (or legacy CSV filename) to local
+            CSV Path (from ``_download_files``).
 
         Returns
         -------
@@ -690,12 +797,37 @@ LEE_SDF_FIELDS: list[NalFieldSpec] = [
 _LEE_DOWNLOAD_CHUNK_SIZE = 65_536
 
 
+def _latest_available_tax_year() -> int:
+    """Return the most recently published Lee County PA tax roll year.
+
+    Florida DOR certifies the final tax roll in October of the roll year.
+    Before October the current-year roll does not yet exist, so we fall
+    back to the previous year.  After certification (October–December)
+    the current year is available.
+
+    Examples
+    --------
+    - Called in January 2026  -> returns 2025
+    - Called in October 2026  -> returns 2026
+    """
+    today = date.today()
+    # October == month 10; certification happens during that month
+    if today.month >= 10:
+        return today.year
+    return today.year - 1
+
+
 class LeePAConnector(DataSourceConnector):
     """Lee County Property Appraiser connector (NAL fixed-width format).
 
-    Downloads ZIP archives from Lee County PA, extracts NAL/SDF files,
-    parses fixed-width records, and joins on STRAP (Situs/Tax Roll
-    Assessment Parcel) identifier.
+    Downloads NAL tax roll ZIP archives and SDF sale data text files from
+    the Lee County PA website, parses the fixed-width records, and joins
+    on STRAP (Situs/Tax Roll Assessment Parcel) identifier.
+
+    The Lee PA publishes data at year-specific URLs:
+    - NAL: ``/TaxRoll/nalzip/{YEAR} Tax Roll NAL12D8.zip``
+    - SDF: ``/TaxRoll/sdftxt/SDF{YEAR}Final.TXT`` (plain text, not zipped)
+    - Parcel Data: ``/TaxRoll/ParcelData/LCPA_Parcel_Data_TXT.zip`` (monthly)
 
     Parameters
     ----------
@@ -706,26 +838,33 @@ class LeePAConnector(DataSourceConnector):
         or just the ``lee`` section).
     http_client:
         Optional pre-configured ``httpx.AsyncClient`` for testing / reuse.
+    tax_year:
+        Tax roll year for NAL/SDF downloads (default: current year).
     """
 
     source_name = "lee_pa"
 
-    # Lee County PA download URLs (public bulk data)
-    BASE_URL = "https://www.leepa.org/Downloads"
-    NAL_FILE = "NAL.zip"
-    SDF_FILE = "SDF.zip"
+    # Lee County PA base URL
+    BASE_URL = "https://www.leepa.org"
 
-    _ALL_ZIP_FILES = [NAL_FILE, SDF_FILE]
+    # URL path templates (year is interpolated at runtime)
+    NAL_ZIP_PATH = "/TaxRoll/nalzip/{year} Tax Roll NAL12D8.zip"
+    SDF_TXT_PATH = "/TaxRoll/sdftxt/SDF{year}Final.TXT"
+
+    # Monthly parcel data (alternative to annual NAL files)
+    PARCEL_DATA_PATH = "/TaxRoll/ParcelData/LCPA_Parcel_Data_TXT.zip"
 
     def __init__(
         self,
         download_dir: Path,
         config: dict[str, Any],
         http_client: httpx.AsyncClient | None = None,
+        tax_year: int | None = None,
     ) -> None:
         super().__init__(name=self.source_name)
         self.download_dir = download_dir
         self._http_client = http_client
+        self.tax_year = tax_year or _latest_available_tax_year()
 
         # Load field specs from config or fall back to hardcoded defaults
         lee_config = config.get("lee", config)
@@ -737,6 +876,18 @@ class LeePAConnector(DataSourceConnector):
         self._sdf_fields = (
             load_nal_field_specs(sdf_section) if sdf_section else LEE_SDF_FIELDS
         )
+
+    @property
+    def nal_url(self) -> str:
+        """Full URL for the NAL ZIP archive for the configured tax year."""
+        path = self.NAL_ZIP_PATH.format(year=self.tax_year)
+        return f"{self.BASE_URL}{path}"
+
+    @property
+    def sdf_url(self) -> str:
+        """Full URL for the SDF text file for the configured tax year."""
+        path = self.SDF_TXT_PATH.format(year=self.tax_year)
+        return f"{self.BASE_URL}{path}"
 
     # ------------------------------------------------------------------
     # DataSourceConnector interface
@@ -755,7 +906,10 @@ class LeePAConnector(DataSourceConnector):
         since: datetime | None = None,
         **filters: Any,
     ) -> list[dict[str, Any]]:
-        """Download ZIP files, extract, and return raw joined records.
+        """Download NAL ZIP and SDF text file, then return raw joined records.
+
+        The NAL file is downloaded as a ZIP archive and extracted.  The SDF
+        file is a plain text file (not zipped) and is saved directly.
 
         Parameters
         ----------
@@ -769,9 +923,9 @@ class LeePAConnector(DataSourceConnector):
         list[dict]
             Raw joined records ready for ``transform()``.
         """
-        zip_paths = await self._download_zips()
-        extracted = self._extract_all_zips(zip_paths)
-        return self._load_and_join(extracted)
+        nal_paths = await self._download_nal_zip()
+        sdf_path = await self._download_sdf_txt()
+        return self._load_and_join_from_paths(nal_paths, sdf_path)
 
     def transform(self, raw_records: list[dict[str, Any]]) -> list[dict[str, Any]]:
         """Transform raw joined records into SourceRecord-compatible dicts.
@@ -870,8 +1024,8 @@ class LeePAConnector(DataSourceConnector):
     async def health_check(self) -> bool:
         """Check that the Lee PA download URLs are accessible.
 
-        Sends HEAD requests to each ZIP file URL.  Returns ``True`` if all
-        respond with 2xx, ``False`` otherwise.
+        Sends HEAD requests to the NAL ZIP and SDF TXT URLs.  Returns
+        ``True`` if both respond with 2xx, ``False`` otherwise.
         """
         result = await self.health_check_detailed()
         return result.get("status") == "healthy"
@@ -889,6 +1043,7 @@ class LeePAConnector(DataSourceConnector):
             ``{"status": "healthy"|"unhealthy", "urls_checked": int,
             "response_codes": {url: code, ...}}``
         """
+        urls_to_check = [self.nal_url, self.sdf_url]
         response_codes: dict[str, int] = {}
         all_ok = True
 
@@ -898,8 +1053,7 @@ class LeePAConnector(DataSourceConnector):
         should_close = self._http_client is None
 
         try:
-            for filename in self._ALL_ZIP_FILES:
-                url = f"{self.BASE_URL}/{filename}"
+            for url in urls_to_check:
                 try:
                     resp = await client.head(url)
                     response_codes[url] = resp.status_code
@@ -916,11 +1070,12 @@ class LeePAConnector(DataSourceConnector):
         self.log.info(
             "health_check",
             status=status,
-            urls_checked=len(self._ALL_ZIP_FILES),
+            urls_checked=len(urls_to_check),
+            tax_year=self.tax_year,
         )
         return {
             "status": status,
-            "urls_checked": len(self._ALL_ZIP_FILES),
+            "urls_checked": len(urls_to_check),
             "response_codes": response_codes,
         }
 
@@ -943,21 +1098,27 @@ class LeePAConnector(DataSourceConnector):
     # Internal helpers
     # ------------------------------------------------------------------
 
-    async def _download_zips(self) -> dict[str, Path]:
-        """Download the ZIP files via httpx streaming.
+    async def _download_nal_zip(self) -> list[Path]:
+        """Download and extract the NAL ZIP archive via httpx streaming.
+
+        The Lee PA publishes NAL files as year-specific ZIP archives at
+        ``/TaxRoll/nalzip/{YEAR} Tax Roll NAL12D8.zip``.
 
         Returns
         -------
-        dict[str, Path]
-            Mapping from filename (``"NAL.zip"``, ``"SDF.zip"``) to local path.
+        list[Path]
+            Paths of extracted files from the NAL ZIP.
 
         Raises
         ------
         httpx.HTTPStatusError
-            If any download returns a non-2xx response.
+            If the download returns a non-2xx response.
         """
         self.download_dir.mkdir(parents=True, exist_ok=True)
-        paths: dict[str, Path] = {}
+
+        url = self.nal_url
+        dest = self.download_dir / f"NAL_{self.tax_year}.zip"
+        self.log.info("download_start", file="NAL", tax_year=self.tax_year)
 
         client = self._http_client or httpx.AsyncClient(
             follow_redirects=True, timeout=300
@@ -965,36 +1126,89 @@ class LeePAConnector(DataSourceConnector):
         should_close = self._http_client is None
 
         try:
-            for filename in self._ALL_ZIP_FILES:
-                url = f"{self.BASE_URL}/{filename}"
-                dest = self.download_dir / filename
-                self.log.info("download_start", file=filename)
-                try:
-                    async with client.stream("GET", url) as resp:
-                        resp.raise_for_status()
-                        with open(dest, "wb") as f:
-                            async for chunk in resp.aiter_bytes(
-                                chunk_size=_LEE_DOWNLOAD_CHUNK_SIZE
-                            ):
-                                f.write(chunk)
-                    paths[filename] = dest
-                    self.log.info(
-                        "download_complete",
-                        file=filename,
-                        size_bytes=dest.stat().st_size,
-                    )
-                except httpx.HTTPError as exc:
-                    self.log.error(
-                        "download_failed",
-                        file=filename,
-                        error=str(exc),
-                    )
-                    raise
+            try:
+                async with client.stream("GET", url) as resp:
+                    resp.raise_for_status()
+                    with open(dest, "wb") as f:
+                        async for chunk in resp.aiter_bytes(
+                            chunk_size=_LEE_DOWNLOAD_CHUNK_SIZE
+                        ):
+                            f.write(chunk)
+                self.log.info(
+                    "download_complete",
+                    file="NAL",
+                    tax_year=self.tax_year,
+                    size_bytes=dest.stat().st_size,
+                )
+            except httpx.HTTPError as exc:
+                self.log.error(
+                    "download_failed",
+                    file="NAL",
+                    tax_year=self.tax_year,
+                    error=str(exc),
+                )
+                raise
         finally:
             if should_close:
                 await client.aclose()
 
-        return paths
+        return self._extract_zip(dest)
+
+    async def _download_sdf_txt(self) -> Path | None:
+        """Download the SDF sale data text file.
+
+        The Lee PA publishes SDF files as plain text (not zipped) at
+        ``/TaxRoll/sdftxt/SDF{YEAR}Final.TXT``.
+
+        Returns
+        -------
+        Path or None
+            Path to the downloaded SDF text file, or None on failure.
+
+        Raises
+        ------
+        httpx.HTTPStatusError
+            If the download returns a non-2xx response.
+        """
+        self.download_dir.mkdir(parents=True, exist_ok=True)
+
+        url = self.sdf_url
+        dest = self.download_dir / f"SDF_{self.tax_year}.txt"
+        self.log.info("download_start", file="SDF", tax_year=self.tax_year)
+
+        client = self._http_client or httpx.AsyncClient(
+            follow_redirects=True, timeout=300
+        )
+        should_close = self._http_client is None
+
+        try:
+            try:
+                async with client.stream("GET", url) as resp:
+                    resp.raise_for_status()
+                    with open(dest, "wb") as f:
+                        async for chunk in resp.aiter_bytes(
+                            chunk_size=_LEE_DOWNLOAD_CHUNK_SIZE
+                        ):
+                            f.write(chunk)
+                self.log.info(
+                    "download_complete",
+                    file="SDF",
+                    tax_year=self.tax_year,
+                    size_bytes=dest.stat().st_size,
+                )
+            except httpx.HTTPError as exc:
+                self.log.error(
+                    "download_failed",
+                    file="SDF",
+                    tax_year=self.tax_year,
+                    error=str(exc),
+                )
+                raise
+        finally:
+            if should_close:
+                await client.aclose()
+
+        return dest
 
     def _extract_zip(self, zip_path: Path) -> list[Path]:
         """Extract a ZIP file into the download directory.
@@ -1022,49 +1236,37 @@ class LeePAConnector(DataSourceConnector):
                 )
         return extracted
 
-    def _extract_all_zips(
-        self, zip_paths: dict[str, Path]
-    ) -> dict[str, list[Path]]:
-        """Extract all downloaded ZIP files.
-
-        Returns
-        -------
-        dict[str, list[Path]]
-            Mapping from ZIP filename to list of extracted file paths.
-        """
-        result: dict[str, list[Path]] = {}
-        for filename, path in zip_paths.items():
-            result[filename] = self._extract_zip(path)
-        return result
-
-    def _load_and_join(
-        self, extracted: dict[str, list[Path]]
+    def _load_and_join_from_paths(
+        self,
+        nal_paths: list[Path],
+        sdf_path: Path | None,
     ) -> list[dict[str, Any]]:
         """Parse NAL and SDF files and join on STRAP.
 
         Parameters
         ----------
-        extracted:
-            Mapping from ZIP filename to extracted file paths.
+        nal_paths:
+            List of extracted file paths from the NAL ZIP.
+        sdf_path:
+            Path to the downloaded SDF text file (may be None).
 
         Returns
         -------
         list[dict]
             Joined records with NAL and SDF data merged by STRAP.
         """
-        # Parse NAL records from all files in the NAL zip
+        # Parse NAL records from all extracted files
         nal_records: list[dict[str, Any]] = []
-        for path in extracted.get(self.NAL_FILE, []):
+        for path in nal_paths:
             content = self._read_file_content(path)
             records = parse_nal_file(content, self._nal_fields)
             nal_records.extend(records)
 
-        # Parse SDF records from all files in the SDF zip
+        # Parse SDF records from the text file
         sdf_records: list[dict[str, Any]] = []
-        for path in extracted.get(self.SDF_FILE, []):
-            content = self._read_file_content(path)
-            records = parse_nal_file(content, self._sdf_fields)
-            sdf_records.extend(records)
+        if sdf_path and sdf_path.exists():
+            content = self._read_file_content(sdf_path)
+            sdf_records = parse_nal_file(content, self._sdf_fields)
 
         self.log.info(
             "nal_sdf_parsed",

@@ -4,6 +4,10 @@ Tests cover authentication, ZIP download and extraction (mocked HTTP),
 NAL/SDF parsing and joining on STRAP, absentee detection, homestead
 detection, and health checks.
 
+The Lee PA publishes data at year-specific URLs:
+- NAL: /TaxRoll/nalzip/{YEAR} Tax Roll NAL12D8.zip
+- SDF: /TaxRoll/sdftxt/SDF{YEAR}Final.TXT (plain text, not zipped)
+
 All HTTP calls are mocked -- no real network requests are made.
 All test data is synthetic -- no real PII.
 """
@@ -32,6 +36,8 @@ SAMPLE_LEE_CONFIG: dict[str, Any] = {
         "format": "nal_fixed_width",
     }
 }
+
+TEST_TAX_YEAR = 2025
 
 
 def _create_mock_zip(content: str, filename: str = "data.txt") -> bytes:
@@ -129,6 +135,7 @@ def connector(tmp_path: Path) -> LeePAConnector:
     return LeePAConnector(
         download_dir=tmp_path,
         config=SAMPLE_LEE_CONFIG,
+        tax_year=TEST_TAX_YEAR,
     )
 
 
@@ -194,6 +201,48 @@ SDF_CONTENT = f"{SDF_LINE_A}\n{SDF_LINE_B}"
 # ---------------------------------------------------------------------------
 
 
+class TestUrlProperties:
+    """Tests for the URL generation properties."""
+
+    def test_nal_url_uses_tax_year(self, tmp_path: Path) -> None:
+        """nal_url should contain the configured tax year."""
+        conn = LeePAConnector(
+            download_dir=tmp_path,
+            config=SAMPLE_LEE_CONFIG,
+            tax_year=2025,
+        )
+        assert "2025 Tax Roll NAL12D8.zip" in conn.nal_url
+        assert conn.nal_url.startswith("https://www.leepa.org")
+
+    def test_sdf_url_uses_tax_year(self, tmp_path: Path) -> None:
+        """sdf_url should contain the configured tax year."""
+        conn = LeePAConnector(
+            download_dir=tmp_path,
+            config=SAMPLE_LEE_CONFIG,
+            tax_year=2024,
+        )
+        assert "SDF2024Final.TXT" in conn.sdf_url
+        assert conn.sdf_url.startswith("https://www.leepa.org")
+
+    def test_default_tax_year_uses_latest_available(self, tmp_path: Path) -> None:
+        """Without explicit tax_year, default is year - 1 before Oct, year after.
+
+        Florida DOR certifies the final tax roll in October of the roll year.
+        Before October the current-year roll does not yet exist.
+        """
+        from theleadedge.sources.property_appraiser import _latest_available_tax_year
+
+        conn = LeePAConnector(
+            download_dir=tmp_path,
+            config=SAMPLE_LEE_CONFIG,
+        )
+        assert conn.tax_year == _latest_available_tax_year()
+        # Verify the function itself returns a sane year
+        today = date.today()
+        expected = today.year if today.month >= 10 else today.year - 1
+        assert conn.tax_year == expected
+
+
 class TestAuthenticate:
     """Tests for the authenticate method."""
 
@@ -217,19 +266,20 @@ class TestAuthenticate:
 
 
 class TestFetch:
-    """Tests for the fetch method (ZIP download + extraction)."""
+    """Tests for the fetch method (NAL ZIP download + SDF TXT download)."""
 
-    async def test_fetch_downloads_and_extracts_zip(self, tmp_path: Path) -> None:
-        """fetch() should download ZIP files, extract, and return joined records."""
-        nal_zip = _create_mock_zip(NAL_CONTENT, "NAL.txt")
-        sdf_zip = _create_mock_zip(SDF_CONTENT, "SDF.txt")
+    async def test_fetch_downloads_and_joins(self, tmp_path: Path) -> None:
+        """fetch() should download NAL ZIP + SDF TXT and return joined records."""
+        nal_zip = _create_mock_zip(NAL_CONTENT, "NAL12D8.txt")
 
         async def mock_handler(request: httpx.Request) -> httpx.Response:
             url_str = str(request.url)
-            if "NAL.zip" in url_str:
+            if "NAL12D8.zip" in url_str:
                 return httpx.Response(200, content=nal_zip)
-            if "SDF.zip" in url_str:
-                return httpx.Response(200, content=sdf_zip)
+            if "SDFFinal.TXT" in url_str or "SDF" in url_str:
+                return httpx.Response(
+                    200, content=SDF_CONTENT.encode("utf-8")
+                )
             return httpx.Response(404)
 
         transport = httpx.MockTransport(mock_handler)
@@ -239,25 +289,29 @@ class TestFetch:
             download_dir=tmp_path,
             config=SAMPLE_LEE_CONFIG,
             http_client=client,
+            tax_year=TEST_TAX_YEAR,
         )
         await conn.authenticate()
         raw_records = await conn.fetch()
 
-        # Should have downloaded both ZIP files
-        assert (tmp_path / "NAL.zip").exists()
-        assert (tmp_path / "SDF.zip").exists()
+        # Should have downloaded NAL ZIP
+        assert (tmp_path / f"NAL_{TEST_TAX_YEAR}.zip").exists()
 
-        # Should have extracted contents
-        assert (tmp_path / "NAL.txt").exists()
-        assert (tmp_path / "SDF.txt").exists()
+        # Should have downloaded SDF TXT (not a ZIP)
+        assert (tmp_path / f"SDF_{TEST_TAX_YEAR}.txt").exists()
+
+        # Should have extracted NAL contents
+        assert (tmp_path / "NAL12D8.txt").exists()
 
         # Should return joined records (one per NAL line)
         assert len(raw_records) == 2
 
         await client.aclose()
 
-    async def test_fetch_handles_download_error(self, tmp_path: Path) -> None:
-        """fetch() should raise on HTTP error."""
+    async def test_fetch_handles_nal_download_error(
+        self, tmp_path: Path
+    ) -> None:
+        """fetch() should raise on NAL HTTP error."""
 
         async def error_handler(request: httpx.Request) -> httpx.Response:
             return httpx.Response(500, content=b"Internal Server Error")
@@ -269,6 +323,35 @@ class TestFetch:
             download_dir=tmp_path,
             config=SAMPLE_LEE_CONFIG,
             http_client=client,
+            tax_year=TEST_TAX_YEAR,
+        )
+        await conn.authenticate()
+
+        with pytest.raises(httpx.HTTPStatusError):
+            await conn.fetch()
+
+        await client.aclose()
+
+    async def test_fetch_handles_sdf_download_error(
+        self, tmp_path: Path
+    ) -> None:
+        """fetch() should raise when SDF download fails."""
+        nal_zip = _create_mock_zip(NAL_CONTENT, "NAL12D8.txt")
+
+        async def mixed_handler(request: httpx.Request) -> httpx.Response:
+            url_str = str(request.url)
+            if "NAL12D8.zip" in url_str:
+                return httpx.Response(200, content=nal_zip)
+            return httpx.Response(500, content=b"Server Error")
+
+        transport = httpx.MockTransport(mixed_handler)
+        client = httpx.AsyncClient(transport=transport)
+
+        conn = LeePAConnector(
+            download_dir=tmp_path,
+            config=SAMPLE_LEE_CONFIG,
+            http_client=client,
+            tax_year=TEST_TAX_YEAR,
         )
         await conn.authenticate()
 
@@ -291,12 +374,7 @@ class TestTransform:
         nal_path.write_text(NAL_CONTENT, encoding="utf-8")
         sdf_path.write_text(SDF_CONTENT, encoding="utf-8")
 
-        # Simulate extracted paths structure
-        extracted = {
-            "NAL.zip": [nal_path],
-            "SDF.zip": [sdf_path],
-        }
-        raw_records = connector._load_and_join(extracted)
+        raw_records = connector._load_and_join_from_paths([nal_path], sdf_path)
         results = connector.transform(raw_records)
 
         assert len(results) == 2
@@ -321,11 +399,7 @@ class TestTransform:
         nal_path.write_text(NAL_CONTENT, encoding="utf-8")
         sdf_path.write_text(SDF_CONTENT, encoding="utf-8")
 
-        extracted = {
-            "NAL.zip": [nal_path],
-            "SDF.zip": [sdf_path],
-        }
-        raw_records = connector._load_and_join(extracted)
+        raw_records = connector._load_and_join_from_paths([nal_path], sdf_path)
         results = connector.transform(raw_records)
 
         # Record A: same site and mail address -> NOT absentee
@@ -345,11 +419,7 @@ class TestTransform:
         nal_path.write_text(NAL_CONTENT, encoding="utf-8")
         sdf_path.write_text(SDF_CONTENT, encoding="utf-8")
 
-        extracted = {
-            "NAL.zip": [nal_path],
-            "SDF.zip": [sdf_path],
-        }
-        raw_records = connector._load_and_join(extracted)
+        raw_records = connector._load_and_join_from_paths([nal_path], sdf_path)
         results = connector.transform(raw_records)
 
         # Record A: homestead = "Y" -> exempt
@@ -365,15 +435,10 @@ class TestTransform:
     ) -> None:
         """transform() should produce records even without SDF sales data."""
         nal_path = tmp_path / "NAL.txt"
-        sdf_path = tmp_path / "SDF.txt"
         nal_path.write_text(NAL_CONTENT, encoding="utf-8")
-        sdf_path.write_text("", encoding="utf-8")  # Empty SDF
 
-        extracted = {
-            "NAL.zip": [nal_path],
-            "SDF.zip": [sdf_path],
-        }
-        raw_records = connector._load_and_join(extracted)
+        # Pass None for SDF path (no sales data)
+        raw_records = connector._load_and_join_from_paths([nal_path], None)
         results = connector.transform(raw_records)
 
         assert len(results) == 2
@@ -382,6 +447,22 @@ class TestTransform:
         assert rec["raw_data"]["last_sale_date"] is None
         # Assessment values should still be present
         assert rec["raw_data"]["assessed_value"] == 325000.0
+
+    def test_transform_handles_empty_sdf(
+        self, connector: LeePAConnector, tmp_path: Path
+    ) -> None:
+        """transform() handles an empty SDF file gracefully."""
+        nal_path = tmp_path / "NAL.txt"
+        sdf_path = tmp_path / "SDF.txt"
+        nal_path.write_text(NAL_CONTENT, encoding="utf-8")
+        sdf_path.write_text("", encoding="utf-8")  # Empty SDF
+
+        raw_records = connector._load_and_join_from_paths([nal_path], sdf_path)
+        results = connector.transform(raw_records)
+
+        assert len(results) == 2
+        rec = next(r for r in results if r["parcel_id"] == "012345678901234567")
+        assert rec["raw_data"]["last_sale_price"] is None
 
     def test_transform_to_source_records(
         self, connector: LeePAConnector, tmp_path: Path
@@ -392,11 +473,7 @@ class TestTransform:
         nal_path.write_text(NAL_CONTENT, encoding="utf-8")
         sdf_path.write_text(SDF_CONTENT, encoding="utf-8")
 
-        extracted = {
-            "NAL.zip": [nal_path],
-            "SDF.zip": [sdf_path],
-        }
-        raw_records = connector._load_and_join(extracted)
+        raw_records = connector._load_and_join_from_paths([nal_path], sdf_path)
         source_records = connector.to_source_records(raw_records)
 
         assert len(source_records) == 2
@@ -428,6 +505,7 @@ class TestHealthCheck:
             download_dir=tmp_path,
             config=SAMPLE_LEE_CONFIG,
             http_client=client,
+            tax_year=TEST_TAX_YEAR,
         )
         result = await conn.health_check()
         assert result is True
@@ -453,6 +531,7 @@ class TestHealthCheck:
             download_dir=tmp_path,
             config=SAMPLE_LEE_CONFIG,
             http_client=client,
+            tax_year=TEST_TAX_YEAR,
         )
         result = await conn.health_check()
         assert result is False
@@ -468,7 +547,7 @@ class TestHealthCheck:
 
         async def mixed_handler(request: httpx.Request) -> httpx.Response:
             url_str = str(request.url)
-            if "NAL.zip" in url_str:
+            if "NAL12D8.zip" in url_str:
                 return httpx.Response(200)
             # SDF returns 404
             return httpx.Response(404)
@@ -480,9 +559,37 @@ class TestHealthCheck:
             download_dir=tmp_path,
             config=SAMPLE_LEE_CONFIG,
             http_client=client,
+            tax_year=TEST_TAX_YEAR,
         )
         result = await conn.health_check()
         assert result is False
+
+        await client.aclose()
+
+    async def test_health_check_urls_match_connector(
+        self, tmp_path: Path
+    ) -> None:
+        """health_check_detailed() should check the nal_url and sdf_url."""
+        checked_urls: list[str] = []
+
+        async def capture_handler(request: httpx.Request) -> httpx.Response:
+            checked_urls.append(str(request.url))
+            return httpx.Response(200)
+
+        transport = httpx.MockTransport(capture_handler)
+        client = httpx.AsyncClient(transport=transport)
+
+        conn = LeePAConnector(
+            download_dir=tmp_path,
+            config=SAMPLE_LEE_CONFIG,
+            http_client=client,
+            tax_year=TEST_TAX_YEAR,
+        )
+        await conn.health_check_detailed()
+
+        assert len(checked_urls) == 2
+        assert any("NAL12D8.zip" in u for u in checked_urls)
+        assert any(f"SDF{TEST_TAX_YEAR}Final.TXT" in u for u in checked_urls)
 
         await client.aclose()
 

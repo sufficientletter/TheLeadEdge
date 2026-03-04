@@ -17,7 +17,7 @@ from theleadedge.main import build_parser
 
 
 def test_parser_has_all_commands() -> None:
-    """build_parser() should register all 12 CLI subcommands."""
+    """build_parser() should register all 15 CLI subcommands."""
     import argparse
 
     parser = build_parser()
@@ -43,6 +43,8 @@ def test_parser_has_all_commands() -> None:
         "data-health",
         "match-records",
         "download-pa",
+        "fetch-fsbo",
+        "fetch-alerts",
         "dashboard",
     }
     assert choices == expected
@@ -94,3 +96,17 @@ def test_match_records_command_exists() -> None:
     parser = build_parser()
     args = parser.parse_args(["match-records"])
     assert args.command == "match-records"
+
+
+def test_fetch_fsbo_command_exists() -> None:
+    """The 'fetch-fsbo' subcommand should be accepted by the parser."""
+    parser = build_parser()
+    args = parser.parse_args(["fetch-fsbo"])
+    assert args.command == "fetch-fsbo"
+
+
+def test_fetch_alerts_command_exists() -> None:
+    """The 'fetch-alerts' subcommand should be accepted by the parser."""
+    parser = build_parser()
+    args = parser.parse_args(["fetch-alerts"])
+    assert args.command == "fetch-alerts"

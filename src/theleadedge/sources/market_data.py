@@ -209,7 +209,9 @@ class RedfinMarketConnector(DataSourceConnector):
                 return results
 
             headers = header_line.split("\t")
-            header_index = {h.strip().lower(): i for i, h in enumerate(headers)}
+            # Strip surrounding quotes and whitespace, then lowercase
+            headers = [h.strip().strip('"').strip() for h in headers]
+            header_index = {h.lower(): i for i, h in enumerate(headers)}
 
             # Find the column index for 'region' (ZIP code column)
             region_idx = header_index.get("region")
@@ -225,7 +227,11 @@ class RedfinMarketConnector(DataSourceConnector):
                 if len(cols) <= region_idx:
                     continue
 
-                region = cols[region_idx].strip()
+                # Strip quotes and extract ZIP from "Zip Code: XXXXX"
+                region = cols[region_idx].strip().strip('"').strip()
+                if region.startswith("Zip Code: "):
+                    region = region[len("Zip Code: "):]
+
                 if region not in self.target_zip_codes:
                     continue
 
@@ -260,7 +266,7 @@ class RedfinMarketConnector(DataSourceConnector):
         col_map: dict[str, str] = {}
         for i, h in enumerate(headers):
             if i < len(cols):
-                col_map[h.strip().lower()] = cols[i].strip()
+                col_map[h.strip().lower()] = cols[i].strip().strip('"')
 
         period_begin = _parse_date_str(col_map.get("period_begin", ""))
         period_end = _parse_date_str(col_map.get("period_end", ""))
@@ -297,7 +303,8 @@ class RedfinMarketConnector(DataSourceConnector):
             ),
             "absorption_rate": absorption_rate,
             "sale_to_list_ratio": _parse_float(
-                col_map.get("sale_to_list", "")
+                col_map.get("avg_sale_to_list")
+                or col_map.get("sale_to_list", "")
             ),
             "price_drops_pct": _parse_float(
                 col_map.get("price_drops", "")

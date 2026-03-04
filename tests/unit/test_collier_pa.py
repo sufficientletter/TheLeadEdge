@@ -1,7 +1,8 @@
 """Unit tests for the Collier County Property Appraiser connector.
 
-Tests cover authentication, file download (mocked HTTP), CSV parsing/joining,
-absentee detection, homestead detection, and health checks.
+Tests cover authentication, file download (mocked HTTP with ZIP archives),
+CSV parsing/joining, ZIP extraction, absentee detection, homestead detection,
+health checks, and URL construction.
 
 All HTTP calls are mocked -- no real network requests are made.
 All test data is synthetic -- no real PII.
@@ -11,6 +12,7 @@ from __future__ import annotations
 
 import csv
 import io
+import zipfile
 from pathlib import Path
 from typing import Any
 
@@ -123,25 +125,39 @@ def _make_values_csv(rows: list[dict[str, str]]) -> str:
     return buf.getvalue()
 
 
+def _csv_to_zip(csv_content: str, inner_filename: str) -> bytes:
+    """Wrap a CSV string inside a ZIP archive and return the bytes."""
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr(inner_filename, csv_content)
+    return buf.getvalue()
+
+
 def _write_csv_files(
     tmp_path: Path,
     parcels: list[dict[str, str]] | None = None,
     sales: list[dict[str, str]] | None = None,
     values: list[dict[str, str]] | None = None,
-) -> None:
-    """Write CSV files to tmp_path for transform tests."""
+) -> dict[str, Path]:
+    """Write CSV files to tmp_path for _load_and_join tests.
+
+    Returns a dict mapping ZIP filenames to CSV file paths, matching the
+    format returned by ``_download_files()``.
+    """
+    paths: dict[str, Path] = {}
     if parcels is not None:
-        (tmp_path / PARCELS_FILE).write_text(
-            _make_parcels_csv(parcels), encoding="utf-8"
-        )
+        csv_path = tmp_path / "parcels_extracted.csv"
+        csv_path.write_text(_make_parcels_csv(parcels), encoding="utf-8")
+        paths[PARCELS_FILE] = csv_path
     if sales is not None:
-        (tmp_path / SALES_FILE).write_text(
-            _make_sales_csv(sales), encoding="utf-8"
-        )
+        csv_path = tmp_path / "sales_extracted.csv"
+        csv_path.write_text(_make_sales_csv(sales), encoding="utf-8")
+        paths[SALES_FILE] = csv_path
     if values is not None:
-        (tmp_path / VALUES_FILE).write_text(
-            _make_values_csv(values), encoding="utf-8"
-        )
+        csv_path = tmp_path / "values_extracted.csv"
+        csv_path.write_text(_make_values_csv(values), encoding="utf-8")
+        paths[VALUES_FILE] = csv_path
+    return paths
 
 
 @pytest.fixture
@@ -245,23 +261,58 @@ class TestAuthenticate:
         assert subdir.exists()
 
 
-class TestFetch:
-    """Tests for the fetch method (HTTP download)."""
+class TestBuildDownloadUrl:
+    """Tests for the _build_download_url static method."""
 
-    async def test_fetch_downloads_three_files(self, tmp_path: Path) -> None:
-        """fetch() should download 3 CSV files via streaming HTTP."""
+    def test_url_contains_asp_handler(self) -> None:
+        """URL should use the ASP download handler."""
+        url = CollierPAConnector._build_download_url(PARCELS_FILE)
+        assert "downloadgdfile.asp" in url
+
+    def test_url_contains_folder_name(self) -> None:
+        """URL should include the folder parameter."""
+        url = CollierPAConnector._build_download_url(PARCELS_FILE)
+        # URL-encoded "INT FILES (NEW)"
+        assert "INT+FILES" in url or "INT%20FILES" in url
+
+    def test_url_contains_filename(self) -> None:
+        """URL should include the file parameter."""
+        url = CollierPAConnector._build_download_url(PARCELS_FILE)
+        assert PARCELS_FILE in url
+
+    def test_url_for_each_file(self) -> None:
+        """Each file should produce a distinct URL."""
+        urls = {
+            CollierPAConnector._build_download_url(f)
+            for f in [PARCELS_FILE, SALES_FILE, VALUES_FILE]
+        }
+        assert len(urls) == 3
+
+
+class TestFetch:
+    """Tests for the fetch method (HTTP download with ZIP extraction)."""
+
+    async def test_fetch_downloads_and_extracts_zips(
+        self, tmp_path: Path
+    ) -> None:
+        """fetch() downloads ZIPs, extracts CSVs, returns joined records."""
         parcels_csv = _make_parcels_csv(DEFAULT_PARCELS)
         sales_csv = _make_sales_csv(DEFAULT_SALES)
         values_csv = _make_values_csv(DEFAULT_VALUES)
 
+        # Create ZIP archives wrapping the CSVs
+        parcels_zip = _csv_to_zip(parcels_csv, "Parcels.csv")
+        sales_zip = _csv_to_zip(sales_csv, "Sales.csv")
+        values_zip = _csv_to_zip(values_csv, "Values.csv")
+
         async def mock_handler(request: httpx.Request) -> httpx.Response:
             url_str = str(request.url)
             if PARCELS_FILE in url_str:
-                return httpx.Response(200, content=parcels_csv.encode("utf-8"))
+                return httpx.Response(200, content=parcels_zip)
             if SALES_FILE in url_str:
-                return httpx.Response(200, content=sales_csv.encode("utf-8"))
+                return httpx.Response(200, content=sales_zip)
             if VALUES_FILE in url_str:
-                return httpx.Response(200, content=values_csv.encode("utf-8"))
+                return httpx.Response(200, content=values_zip)
             return httpx.Response(404)
 
         transport = httpx.MockTransport(mock_handler)
@@ -275,10 +326,15 @@ class TestFetch:
         await conn.authenticate()
         raw_records = await conn.fetch()
 
-        # Should have downloaded all 3 files
+        # Should have downloaded ZIP files
         assert (tmp_path / PARCELS_FILE).exists()
         assert (tmp_path / SALES_FILE).exists()
         assert (tmp_path / VALUES_FILE).exists()
+
+        # Should have extracted CSV files
+        assert (tmp_path / "Parcels.csv").exists()
+        assert (tmp_path / "Sales.csv").exists()
+        assert (tmp_path / "Values.csv").exists()
 
         # Should return joined records (one per parcel)
         assert len(raw_records) == 2
@@ -306,6 +362,78 @@ class TestFetch:
 
         await client.aclose()
 
+    async def test_fetch_raises_on_zip_without_csv(
+        self, tmp_path: Path
+    ) -> None:
+        """fetch() should raise ValueError if ZIP contains no CSV files."""
+        # Create a ZIP with a non-CSV file inside
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, "w") as zf:
+            zf.writestr("readme.txt", "Not a CSV file")
+        bad_zip = buf.getvalue()
+
+        async def mock_handler(request: httpx.Request) -> httpx.Response:
+            return httpx.Response(200, content=bad_zip)
+
+        transport = httpx.MockTransport(mock_handler)
+        client = httpx.AsyncClient(transport=transport)
+
+        conn = CollierPAConnector(
+            download_dir=tmp_path,
+            config=SAMPLE_CONFIG,
+            http_client=client,
+        )
+        await conn.authenticate()
+
+        with pytest.raises(ValueError, match="No CSV files found"):
+            await conn.fetch()
+
+        await client.aclose()
+
+
+class TestExtractCsvFromZip:
+    """Tests for the _extract_csv_from_zip helper."""
+
+    def test_extracts_single_csv(
+        self, connector: CollierPAConnector, tmp_path: Path
+    ) -> None:
+        """Should extract a single CSV from a ZIP archive."""
+        csv_content = "col1,col2\nval1,val2\n"
+        zip_bytes = _csv_to_zip(csv_content, "data.csv")
+        zip_path = tmp_path / "test.zip"
+        zip_path.write_bytes(zip_bytes)
+
+        result = connector._extract_csv_from_zip(zip_path)
+        assert result.name == "data.csv"
+        assert result.read_text(encoding="utf-8") == csv_content
+
+    def test_extracts_first_csv_from_multi(
+        self, connector: CollierPAConnector, tmp_path: Path
+    ) -> None:
+        """Should return the first CSV when ZIP contains multiple CSVs."""
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, "w") as zf:
+            zf.writestr("alpha.csv", "a,b\n1,2\n")
+            zf.writestr("beta.csv", "c,d\n3,4\n")
+        zip_path = tmp_path / "multi.zip"
+        zip_path.write_bytes(buf.getvalue())
+
+        result = connector._extract_csv_from_zip(zip_path)
+        assert result.name == "alpha.csv"
+
+    def test_raises_on_no_csv(
+        self, connector: CollierPAConnector, tmp_path: Path
+    ) -> None:
+        """Should raise ValueError when ZIP has no CSV files."""
+        buf = io.BytesIO()
+        with zipfile.ZipFile(buf, "w") as zf:
+            zf.writestr("readme.txt", "no csv here")
+        zip_path = tmp_path / "nocsvs.zip"
+        zip_path.write_bytes(buf.getvalue())
+
+        with pytest.raises(ValueError, match="No CSV files found"):
+            connector._extract_csv_from_zip(zip_path)
+
 
 class TestTransform:
     """Tests for the transform method (CSV parsing + enrichment)."""
@@ -314,18 +442,13 @@ class TestTransform:
         self, connector: CollierPAConnector, tmp_path: Path
     ) -> None:
         """transform() should join parcels, sales, and values on PARCEL_ID."""
-        _write_csv_files(
+        paths = _write_csv_files(
             tmp_path,
             parcels=DEFAULT_PARCELS,
             sales=DEFAULT_SALES,
             values=DEFAULT_VALUES,
         )
 
-        paths = {
-            PARCELS_FILE: tmp_path / PARCELS_FILE,
-            SALES_FILE: tmp_path / SALES_FILE,
-            VALUES_FILE: tmp_path / VALUES_FILE,
-        }
         raw_records = connector._load_and_join(paths)
         results = connector.transform(raw_records)
 
@@ -344,18 +467,13 @@ class TestTransform:
         self, connector: CollierPAConnector, tmp_path: Path
     ) -> None:
         """transform() should detect absentee owners (different mail vs site)."""
-        _write_csv_files(
+        paths = _write_csv_files(
             tmp_path,
             parcels=DEFAULT_PARCELS,
             sales=DEFAULT_SALES,
             values=DEFAULT_VALUES,
         )
 
-        paths = {
-            PARCELS_FILE: tmp_path / PARCELS_FILE,
-            SALES_FILE: tmp_path / SALES_FILE,
-            VALUES_FILE: tmp_path / VALUES_FILE,
-        }
         raw_records = connector._load_and_join(paths)
         results = connector.transform(raw_records)
 
@@ -371,18 +489,13 @@ class TestTransform:
         self, connector: CollierPAConnector, tmp_path: Path
     ) -> None:
         """transform() should detect homestead exemption from HOMESTEAD field."""
-        _write_csv_files(
+        paths = _write_csv_files(
             tmp_path,
             parcels=DEFAULT_PARCELS,
             sales=DEFAULT_SALES,
             values=DEFAULT_VALUES,
         )
 
-        paths = {
-            PARCELS_FILE: tmp_path / PARCELS_FILE,
-            SALES_FILE: tmp_path / SALES_FILE,
-            VALUES_FILE: tmp_path / VALUES_FILE,
-        }
         raw_records = connector._load_and_join(paths)
         results = connector.transform(raw_records)
 
@@ -398,18 +511,13 @@ class TestTransform:
         self, connector: CollierPAConnector, tmp_path: Path
     ) -> None:
         """transform() should produce records even without sales data."""
-        _write_csv_files(
+        paths = _write_csv_files(
             tmp_path,
             parcels=DEFAULT_PARCELS,
             sales=[],  # no sales
             values=DEFAULT_VALUES,
         )
 
-        paths = {
-            PARCELS_FILE: tmp_path / PARCELS_FILE,
-            SALES_FILE: tmp_path / SALES_FILE,
-            VALUES_FILE: tmp_path / VALUES_FILE,
-        }
         raw_records = connector._load_and_join(paths)
         results = connector.transform(raw_records)
 
@@ -424,18 +532,13 @@ class TestTransform:
         self, connector: CollierPAConnector, tmp_path: Path
     ) -> None:
         """transform() should produce records even without values data."""
-        _write_csv_files(
+        paths = _write_csv_files(
             tmp_path,
             parcels=DEFAULT_PARCELS,
             sales=DEFAULT_SALES,
             values=[],  # no values
         )
 
-        paths = {
-            PARCELS_FILE: tmp_path / PARCELS_FILE,
-            SALES_FILE: tmp_path / SALES_FILE,
-            VALUES_FILE: tmp_path / VALUES_FILE,
-        }
         raw_records = connector._load_and_join(paths)
         results = connector.transform(raw_records)
 
@@ -451,18 +554,13 @@ class TestTransform:
         self, connector: CollierPAConnector, tmp_path: Path
     ) -> None:
         """to_source_records() should produce valid SourceRecord instances."""
-        _write_csv_files(
+        paths = _write_csv_files(
             tmp_path,
             parcels=DEFAULT_PARCELS,
             sales=DEFAULT_SALES,
             values=DEFAULT_VALUES,
         )
 
-        paths = {
-            PARCELS_FILE: tmp_path / PARCELS_FILE,
-            SALES_FILE: tmp_path / SALES_FILE,
-            VALUES_FILE: tmp_path / VALUES_FILE,
-        }
         raw_records = connector._load_and_join(paths)
         source_records = connector.to_source_records(raw_records)
 
@@ -502,6 +600,35 @@ class TestHealthCheck:
         assert detail["urls_checked"] == 3
         for _url, code in detail["response_codes"].items():
             assert code == 200
+
+        await client.aclose()
+
+    async def test_health_check_healthy_on_302_redirect(
+        self, tmp_path: Path
+    ) -> None:
+        """health_check() returns True when URLs return 302 (Google Drive redirect)."""
+
+        async def redirect_handler(request: httpx.Request) -> httpx.Response:
+            return httpx.Response(
+                302,
+                headers={"Location": "https://drive.google.com/uc?export=download&id=fake"},
+            )
+
+        transport = httpx.MockTransport(redirect_handler)
+        client = httpx.AsyncClient(transport=transport)
+
+        conn = CollierPAConnector(
+            download_dir=tmp_path,
+            config=SAMPLE_CONFIG,
+            http_client=client,
+        )
+        result = await conn.health_check()
+        assert result is True
+
+        detail = await conn.health_check_detailed()
+        assert detail["status"] == "healthy"
+        for _url, code in detail["response_codes"].items():
+            assert code == 302
 
         await client.aclose()
 
@@ -555,6 +682,32 @@ class TestHealthCheck:
 
         detail = await conn.health_check_detailed()
         assert detail["status"] == "unhealthy"
+
+        await client.aclose()
+
+    async def test_health_check_urls_use_asp_handler(
+        self, tmp_path: Path
+    ) -> None:
+        """Health check URLs should use the new ASP download handler."""
+        checked_urls: list[str] = []
+
+        async def capture_handler(request: httpx.Request) -> httpx.Response:
+            checked_urls.append(str(request.url))
+            return httpx.Response(200)
+
+        transport = httpx.MockTransport(capture_handler)
+        client = httpx.AsyncClient(transport=transport)
+
+        conn = CollierPAConnector(
+            download_dir=tmp_path,
+            config=SAMPLE_CONFIG,
+            http_client=client,
+        )
+        await conn.health_check_detailed()
+
+        assert len(checked_urls) == 3
+        for url in checked_urls:
+            assert "downloadgdfile.asp" in url
 
         await client.aclose()
 

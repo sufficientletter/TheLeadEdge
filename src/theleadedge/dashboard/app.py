@@ -17,6 +17,20 @@ from theleadedge.storage.database import get_engine, init_db
 
 logger = structlog.get_logger()
 
+# Module-level settings holder.  Avoids NiceGUI app.storage.general
+# serialization issues (Settings contains Path objects that are not
+# JSON-serializable via orjson).
+_settings: Settings | None = None
+
+
+def get_settings() -> Settings:
+    """Return the current application settings.
+
+    Falls back to a fresh ``Settings()`` instance when
+    ``create_app`` has not been called (e.g. during testing).
+    """
+    return _settings or Settings()
+
 
 def create_app(settings: Settings | None = None) -> None:
     """Configure the NiceGUI application.
@@ -29,13 +43,14 @@ def create_app(settings: Settings | None = None) -> None:
     settings:
         Application settings.  If None, loads from environment / .env.
     """
+    global _settings  # noqa: PLW0603
     from pathlib import Path
 
     if settings is None:
         settings = Settings()
 
-    # Store settings in app storage for access by pages
-    app.storage.general["settings"] = settings
+    # Store settings in module-level variable for access by pages
+    _settings = settings
 
     async def startup() -> None:
         """Initialize database on app startup."""
