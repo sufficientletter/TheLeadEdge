@@ -21,6 +21,7 @@ dependencies = [
     "rapidfuzz>=3.6",
     "openpyxl>=3.1",
     "apscheduler>=3.10,<4.0",
+    "nicegui>=2.0",
 ]
 
 [project.optional-dependencies]
@@ -56,6 +57,7 @@ select = ["E", "F", "I", "N", "UP", "B", "SIM", "TCH"]
 "src/theleadedge/models/*.py" = ["TCH001", "TCH003"]
 "src/theleadedge/storage/*.py" = ["TCH002", "TCH003"]
 "src/theleadedge/sources/*.py" = ["TCH003"]
+"src/theleadedge/dashboard/**/*.py" = ["TCH002", "TCH003"]
 "tests/**/*.py" = ["TCH003"]
 
 [tool.pytest.ini_options]

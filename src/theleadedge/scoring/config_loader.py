@@ -143,6 +143,38 @@ def load_scoring_config(path: Path) -> ScoringConfig:
     )
 
 
+def save_scoring_config(config: ScoringConfig, path: Path) -> None:
+    """Save scoring configuration back to a YAML file.
+
+    Preserves the original YAML structure while updating signal
+    ``base_points`` values.
+
+    Parameters
+    ----------
+    config:
+        The scoring configuration to save.
+    path:
+        Path to the YAML file.
+
+    Raises
+    ------
+    FileNotFoundError:
+        If the YAML file does not exist.
+    """
+    with open(path, encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+
+    # Build lookup from in-memory config
+    signal_map = {s.signal_type: s for s in config.signals}
+    for s_data in data.get("signals", []):
+        sig_type = s_data.get("signal_type")
+        if sig_type in signal_map:
+            s_data["base_points"] = signal_map[sig_type].base_points
+
+    with open(path, "w", encoding="utf-8") as f:
+        yaml.dump(data, f, default_flow_style=False, sort_keys=False)
+
+
 def load_feature_flags(path: Path) -> dict[str, Any]:
     """Load feature flags from a YAML file.
 

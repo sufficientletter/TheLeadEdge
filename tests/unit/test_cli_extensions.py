@@ -43,6 +43,7 @@ def test_parser_has_all_commands() -> None:
         "data-health",
         "match-records",
         "download-pa",
+        "dashboard",
     }
     assert choices == expected
 

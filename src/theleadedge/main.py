@@ -15,6 +15,7 @@ Usage:
     python -m theleadedge data-health  # Data pipeline health report
     python -m theleadedge match-records  # Process unmatched source records
     python -m theleadedge download-pa   # Download PA data (both counties)
+    python -m theleadedge dashboard  # Launch the web dashboard
 
 Each command loads settings from ``.env``, initializes the database, and
 runs the appropriate pipeline with structured logging.
@@ -630,6 +631,35 @@ async def cmd_match_records(settings: Settings) -> int:
     return 0
 
 
+async def cmd_dashboard(settings: Settings, args: argparse.Namespace) -> int:
+    """Launch the NiceGUI dashboard web server.
+
+    Parameters
+    ----------
+    settings:
+        Application settings.
+    args:
+        Parsed CLI arguments with ``host``, ``port``, and ``reload``.
+
+    Returns
+    -------
+    int
+        Exit code: 0 on success.
+    """
+    from theleadedge.dashboard.app import run_dashboard
+
+    host = args.host or settings.dashboard_host
+    port = args.port or settings.dashboard_port
+
+    run_dashboard(
+        host=host,
+        port=port,
+        reload=args.reload,
+        settings=settings,
+    )
+    return 0
+
+
 async def cmd_download_pa(settings: Settings) -> int:
     """Download Property Appraiser data for both counties.
 
@@ -774,6 +804,21 @@ def build_parser() -> argparse.ArgumentParser:
         help="Download PA data (both counties)",
     )
 
+    # Phase 3 commands
+    dashboard_parser = subparsers.add_parser(
+        "dashboard",
+        help="Launch the web dashboard",
+    )
+    dashboard_parser.add_argument(
+        "--host", default=None, help="Host to bind to (default: 0.0.0.0)"
+    )
+    dashboard_parser.add_argument(
+        "--port", type=int, default=None, help="Port to bind to (default: 8080)"
+    )
+    dashboard_parser.add_argument(
+        "--reload", action="store_true", help="Enable auto-reload for development"
+    )
+
     return parser
 
 
@@ -806,6 +851,8 @@ def cli() -> None:
         exit_code = asyncio.run(cmd_import_public_records(settings, args))
     elif args.command == "enrich":
         exit_code = asyncio.run(cmd_enrich(settings, args))
+    elif args.command == "dashboard":
+        exit_code = asyncio.run(cmd_dashboard(settings, args))
     else:
         handler = commands[args.command]
         exit_code = asyncio.run(handler(settings))

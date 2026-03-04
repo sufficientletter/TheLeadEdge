@@ -126,6 +126,11 @@ class Settings(BaseSettings):
         default_factory=lambda: PROJECT_ROOT / "config" / "feature_flags.yaml",
     )
 
+    # ── Dashboard (Phase 3) ────────────────────────────────────────────
+    dashboard_host: str = "0.0.0.0"
+    dashboard_port: int = 8080
+    dashboard_password: str = ""
+
     # ── Scheduler (Phase 2) ───────────────────────────────────────────────
     scheduler_timezone: str = "America/New_York"
 
