@@ -9,12 +9,16 @@ Usage::
 
 from .database import (
     Base,
+    FSBOListingRow,
     LeadRow,
+    MarketSnapshotRow,
+    MatchQueueRow,
     OutreachEventRow,
     PriceHistoryRow,
     PropertyRow,
     ScoreHistoryRow,
     SignalRow,
+    SourceRecordRow,
     SyncLogRow,
     drop_db,
     get_engine,
@@ -35,6 +39,10 @@ __all__ = [
     "OutreachEventRow",
     "PriceHistoryRow",
     "SyncLogRow",
+    "SourceRecordRow",
+    "MatchQueueRow",
+    "MarketSnapshotRow",
+    "FSBOListingRow",
     # Engine / session
     "get_engine",
     "get_session_factory",

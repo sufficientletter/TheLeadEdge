@@ -26,12 +26,16 @@ from sqlalchemy import desc, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from .database import (
+    FSBOListingRow,
     LeadRow,
+    MarketSnapshotRow,
+    MatchQueueRow,
     OutreachEventRow,
     PriceHistoryRow,
     PropertyRow,
     ScoreHistoryRow,
     SignalRow,
+    SourceRecordRow,
     SyncLogRow,
 )
 
@@ -111,6 +115,36 @@ class PropertyRepo:
             await self.session.flush()
             return existing, False
         row = PropertyRow(listing_key=listing_key, **kwargs)
+        self.session.add(row)
+        await self.session.flush()
+        return row, True
+
+    async def get_by_parcel_id(self, parcel_id: str) -> PropertyRow | None:
+        """Fetch a property by county parcel ID."""
+        stmt = select(PropertyRow).where(PropertyRow.parcel_id == parcel_id)
+        result = await self.session.execute(stmt)
+        return result.scalars().first()
+
+    async def get_by_zip_code(self, zip_code: str) -> Sequence[PropertyRow]:
+        """Return all properties in a ZIP code."""
+        stmt = select(PropertyRow).where(PropertyRow.zip_code == zip_code)
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
+
+    async def upsert_by_parcel_id(
+        self, parcel_id: str, **kwargs: Any
+    ) -> tuple[PropertyRow, bool]:
+        """Insert or update a property keyed on parcel_id.
+
+        Returns (row, is_new).
+        """
+        existing = await self.get_by_parcel_id(parcel_id)
+        if existing is not None:
+            for key, value in kwargs.items():
+                setattr(existing, key, value)
+            await self.session.flush()
+            return existing, False
+        row = PropertyRow(parcel_id=parcel_id, **kwargs)
         self.session.add(row)
         await self.session.flush()
         return row, True
@@ -371,3 +405,166 @@ class SyncLogRepo:
         )
         result = await self.session.execute(stmt)
         return result.scalars().first()
+
+
+# ---------------------------------------------------------------------------
+# SourceRecordRepo
+# ---------------------------------------------------------------------------
+
+
+class SourceRecordRepo:
+    """CRUD operations on the ``source_records`` table."""
+
+    def __init__(self, session: AsyncSession) -> None:
+        self.session = session
+
+    async def create(self, **kwargs: Any) -> SourceRecordRow:
+        """Insert a new source record row."""
+        row = SourceRecordRow(**kwargs)
+        self.session.add(row)
+        await self.session.flush()
+        return row
+
+    async def get_by_source_and_id(
+        self, source_name: str, source_record_id: str
+    ) -> SourceRecordRow | None:
+        """Fetch a source record by its source name and source-specific ID."""
+        stmt = select(SourceRecordRow).where(
+            SourceRecordRow.source_name == source_name,
+            SourceRecordRow.source_record_id == source_record_id,
+        )
+        result = await self.session.execute(stmt)
+        return result.scalars().first()
+
+    async def get_unmatched(self) -> Sequence[SourceRecordRow]:
+        """Return all source records not yet matched to a property."""
+        stmt = (
+            select(SourceRecordRow)
+            .where(SourceRecordRow.matched_property_id.is_(None))
+            .order_by(desc(SourceRecordRow.created_at))
+        )
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
+
+
+# ---------------------------------------------------------------------------
+# MatchQueueRepo
+# ---------------------------------------------------------------------------
+
+
+class MatchQueueRepo:
+    """CRUD operations on the ``match_queue`` table."""
+
+    def __init__(self, session: AsyncSession) -> None:
+        self.session = session
+
+    async def create(self, **kwargs: Any) -> MatchQueueRow:
+        """Insert a new match queue entry."""
+        row = MatchQueueRow(**kwargs)
+        self.session.add(row)
+        await self.session.flush()
+        return row
+
+    async def get_pending(self) -> Sequence[MatchQueueRow]:
+        """Return all pending match queue entries, highest confidence first."""
+        stmt = (
+            select(MatchQueueRow)
+            .where(MatchQueueRow.status == "pending")
+            .order_by(desc(MatchQueueRow.match_confidence))
+        )
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
+
+    async def update_status(
+        self, id: int, status: str, reviewed_at: datetime | None = None
+    ) -> None:
+        """Update the status of a match queue entry."""
+        stmt = (
+            update(MatchQueueRow)
+            .where(MatchQueueRow.id == id)
+            .values(status=status, reviewed_at=reviewed_at)
+        )
+        await self.session.execute(stmt)
+        await self.session.flush()
+
+
+# ---------------------------------------------------------------------------
+# MarketSnapshotRepo
+# ---------------------------------------------------------------------------
+
+
+class MarketSnapshotRepo:
+    """CRUD operations on the ``market_snapshots`` table."""
+
+    def __init__(self, session: AsyncSession) -> None:
+        self.session = session
+
+    async def create(self, **kwargs: Any) -> MarketSnapshotRow:
+        """Insert a new market snapshot row."""
+        row = MarketSnapshotRow(**kwargs)
+        self.session.add(row)
+        await self.session.flush()
+        return row
+
+    async def get_latest_by_zip(self, zip_code: str) -> MarketSnapshotRow | None:
+        """Return the most recent market snapshot for a ZIP code."""
+        stmt = (
+            select(MarketSnapshotRow)
+            .where(MarketSnapshotRow.zip_code == zip_code)
+            .order_by(desc(MarketSnapshotRow.period_end))
+            .limit(1)
+        )
+        result = await self.session.execute(stmt)
+        return result.scalars().first()
+
+    async def get_by_zip_and_source(
+        self, zip_code: str, source: str
+    ) -> Sequence[MarketSnapshotRow]:
+        """Return all snapshots for a ZIP and source, newest first."""
+        stmt = (
+            select(MarketSnapshotRow)
+            .where(
+                MarketSnapshotRow.zip_code == zip_code,
+                MarketSnapshotRow.source == source,
+            )
+            .order_by(desc(MarketSnapshotRow.period_end))
+        )
+        result = await self.session.execute(stmt)
+        return result.scalars().all()
+
+
+# ---------------------------------------------------------------------------
+# FSBOListingRepo
+# ---------------------------------------------------------------------------
+
+
+class FSBOListingRepo:
+    """CRUD operations on the ``fsbo_listings`` table."""
+
+    def __init__(self, session: AsyncSession) -> None:
+        self.session = session
+
+    async def create(self, **kwargs: Any) -> FSBOListingRow:
+        """Insert a new FSBO listing row."""
+        row = FSBOListingRow(**kwargs)
+        self.session.add(row)
+        await self.session.flush()
+        return row
+
+    async def get_by_source_url(self, source_url: str) -> FSBOListingRow | None:
+        """Fetch an FSBO listing by its source URL (deduplication key)."""
+        stmt = select(FSBOListingRow).where(
+            FSBOListingRow.source_url == source_url
+        )
+        result = await self.session.execute(stmt)
+        return result.scalars().first()
+
+    async def get_recent(self, limit: int = 50) -> Sequence[FSBOListingRow]:
+        """Return the most recent FSBO listings."""
+        stmt = (
+            select(FSBOListingRow)
+            .order_by(desc(FSBOListingRow.created_at))
+            .limit(limit)
+        )
+        result = await self.session.execute(stmt)
+        return result.scalars().all()

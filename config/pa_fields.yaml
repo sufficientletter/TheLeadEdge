@@ -1,0 +1,73 @@
+# Property Appraiser field mappings
+# Maps county-specific column names to internal field names.
+#
+# Each county section maps raw CSV column headers to canonical internal names
+# used by the corresponding PA connector.  Column names are case-insensitive
+# in the connector; the values here reflect the most common casing found in
+# the bulk download files.
+
+collier:
+  source_name: "collier_pa"
+
+  # Parcels CSV columns
+  parcels:
+    parcel_id: "PARCEL_ID"
+    owner_name: "OWNER_NAME"
+    site_address: "SITE_ADDR"
+    site_city: "SITE_CITY"
+    site_state: "SITE_STATE"
+    site_zip: "SITE_ZIP"
+    mail_address: "MAIL_ADDR"
+    mail_city: "MAIL_CITY"
+    mail_state: "MAIL_STATE"
+    mail_zip: "MAIL_ZIP"
+    use_code: "USE_CODE"
+
+  # Sales CSV columns
+  sales:
+    parcel_id: "PARCEL_ID"
+    sale_date: "SALE_DATE"
+    sale_price: "SALE_PRICE"
+    deed_type: "DEED_TYPE"
+    qualified: "QUALIFIED"
+
+  # Values CSV columns
+  values:
+    parcel_id: "PARCEL_ID"
+    assessed_value: "ASSESSED_VALUE"
+    market_value: "MARKET_VALUE"
+    homestead_exempt: "HOMESTEAD"
+    taxable_value: "TAXABLE_VALUE"
+
+lee:
+  source_name: "lee_pa"
+  format: "nal_fixed_width"
+
+  # NAL (Name-Address-Legal) fixed-width field positions.
+  # Each entry: field_name: [start_col, end_col, type]
+  # Columns are 0-based inclusive start, exclusive end.
+  # Types: "str" (default), "int", "float"
+  nal_fields:
+    strap: [0, 18, "str"]
+    owner_name_1: [18, 58, "str"]
+    owner_name_2: [58, 98, "str"]
+    mail_addr_1: [98, 138, "str"]
+    mail_addr_2: [138, 178, "str"]
+    mail_city: [178, 203, "str"]
+    mail_state: [203, 205, "str"]
+    mail_zip: [205, 214, "str"]
+    site_addr: [214, 254, "str"]
+    site_city: [254, 279, "str"]
+    site_zip: [279, 284, "str"]
+    use_code: [284, 288, "str"]
+    assessed_value: [288, 300, "float"]
+    homestead: [300, 301, "str"]
+    taxable_value: [301, 313, "float"]
+
+  # SDF (Sales Data File) fixed-width field positions.
+  sdf_fields:
+    strap: [0, 18, "str"]
+    sale_date: [18, 26, "str"]
+    sale_price: [26, 38, "float"]
+    deed_type: [38, 40, "str"]
+    qualified: [40, 41, "str"]

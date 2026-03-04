@@ -254,6 +254,16 @@ class IngestPipeline:
                 # first positional argument to upsert_by_listing_key.
                 prop_kwargs.pop("listing_key", None)
 
+                # Capture the previous agent key before upsert overwrites it
+                existing_row = await prop_repo.get_by_listing_key(
+                    str(listing_key)
+                )
+                previous_agent_key = (
+                    getattr(existing_row, "list_agent_key", None)
+                    if existing_row is not None
+                    else None
+                )
+
                 prop_row, is_new = await prop_repo.upsert_by_listing_key(
                     listing_key=str(listing_key),
                     **prop_kwargs,
@@ -268,6 +278,10 @@ class IngestPipeline:
                 lead_row = await lead_repo.get_by_property_id(prop_row.id)
                 if lead_row is None:
                     lead_row = await lead_repo.create(property_id=prop_row.id)
+
+                # Inject previous_agent_key for agent_churn detection
+                if not is_new and previous_agent_key:
+                    record["previous_agent_key"] = previous_agent_key
 
                 # Step 5: Run signal detection
                 signals = self.detector.detect(

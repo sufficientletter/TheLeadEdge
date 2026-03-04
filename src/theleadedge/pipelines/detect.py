@@ -1,14 +1,15 @@
-"""MLS signal detection pipeline for TheLeadEdge.
+"""Signal detection pipeline for TheLeadEdge.
 
 The ``SignalDetector`` analyzes normalized property data (from CSV import)
-and identifies behavioral signals indicating seller/buyer motivation.
+and public record / external source records to identify behavioral signals
+indicating seller/buyer motivation.
 
 Each detection rule examines specific field combinations and, when triggered,
 produces a ``SignalCreate`` object ready for persistence.  The scoring
 engine later processes these signals through decay and stacking to produce
 composite lead scores.
 
-**12 MLS signal detection rules:**
+**13 MLS signal detection rules (Phase 1 + agent_churn):**
 
 1.  ``expired_listing``         -- Recently expired (within 30 days)
 2.  ``expired_listing_stale``   -- Expired 31-90 days ago
@@ -22,6 +23,17 @@ composite lead scores.
 10. ``foreclosure_flag``        -- REO/foreclosure flag set
 11. ``short_sale_flag``         -- Short sale flag set
 12. ``absentee_owner``          -- Owner mailing address differs from property
+13. ``agent_churn``             -- Listing agent changed (detected during import)
+
+**7 public record / external source detection rules (Phase 2):**
+
+14. ``pre_foreclosure``         -- Lis pendens / pre-foreclosure filing
+15. ``tax_delinquent``          -- Tax delinquency or tax lien
+16. ``code_violation``          -- Active code enforcement violation
+17. ``probate``                 -- Probate filing associated with property
+18. ``divorce``                 -- Divorce / domestic relations filing
+19. ``vacant_property``         -- Vacant property from PA assessment data
+20. ``neighborhood_hot``        -- Hot neighborhood based on absorption rate
 
 IMPORTANT: Never log PII (addresses, owner names, phone numbers).
 """
@@ -36,6 +48,7 @@ import structlog
 from theleadedge.models.signal import SignalCreate
 
 if TYPE_CHECKING:
+    from theleadedge.models.source_record import SourceRecord
     from theleadedge.scoring.config_loader import ScoringConfig
 
 logger = structlog.get_logger()
@@ -95,6 +108,7 @@ class SignalDetector:
             self._detect_foreclosure_flag,
             self._detect_short_sale_flag,
             self._detect_absentee_owner,
+            self._detect_agent_churn,
         ]:
             result = rule(property_data, lead_id, property_id, now)
             if result is not None:
@@ -118,8 +132,24 @@ class SignalDetector:
         property_id: int,
         description: str,
         event_date: date | None = None,
+        source: str = "mls_csv",
     ) -> SignalCreate | None:
         """Build a SignalCreate using config values for the signal type.
+
+        Parameters
+        ----------
+        signal_type:
+            Signal type key matching scoring_weights.yaml entry.
+        lead_id:
+            Database ID of the lead.
+        property_id:
+            Database ID of the property.
+        description:
+            Human-readable description of the detected signal.
+        event_date:
+            Date the underlying event occurred (for decay calculations).
+        source:
+            Data source identifier (e.g. "mls_csv", "collier_pa", "redfin").
 
         Returns None if the signal type is not configured or inactive.
         """
@@ -132,7 +162,7 @@ class SignalDetector:
             signal_type=signal_type,
             signal_category=sc.category,
             description=description,
-            source="mls_csv",
+            source=source,
             event_date=event_date,
             base_points=sc.base_points,
             decay_type=sc.decay_type,
@@ -475,6 +505,299 @@ class SignalDetector:
             )
 
         return None
+
+    def _detect_agent_churn(
+        self,
+        data: dict[str, Any],
+        lead_id: int,
+        property_id: int,
+        now: datetime,
+    ) -> SignalCreate | None:
+        """Rule 13: Agent churn -- listing agent changed (detected during import).
+
+        7 base points, exponential decay.
+        This requires comparing current vs previous list_agent_key,
+        which is handled by the ingest pipeline passing ``previous_agent_key``
+        in the property data dict.
+        """
+        previous_key = data.get("previous_agent_key")
+        current_key = data.get("ListAgentKey", "")
+
+        if not previous_key or not current_key:
+            return None
+        if previous_key == current_key:
+            return None
+
+        return self._make_signal(
+            "agent_churn",
+            lead_id,
+            property_id,
+            "Listing agent changed",
+        )
+
+    # ------------------------------------------------------------------
+    # Phase 2: Public record / external source detection rules
+    # ------------------------------------------------------------------
+
+    def detect_from_source_record(
+        self,
+        record: SourceRecord,
+        lead_id: int,
+        property_id: int,
+        now: datetime,
+    ) -> list[SignalCreate]:
+        """Detect signals from a public record / external source record.
+
+        Unlike ``detect()`` which works on MLS property data dicts, this
+        method processes ``SourceRecord`` instances from public record
+        connectors.
+
+        Parameters
+        ----------
+        record:
+            SourceRecord from a public record connector.
+        lead_id:
+            Database ID of the lead.
+        property_id:
+            Database ID of the matched property.
+        now:
+            Reference timestamp.
+
+        Returns
+        -------
+        list[SignalCreate]
+            Signals detected from the source record.
+        """
+        signals: list[SignalCreate] = []
+
+        # Route to appropriate detector based on record_type
+        routing: dict[str, Any] = {
+            "lis_pendens": self._detect_pre_foreclosure,
+            "pre_foreclosure": self._detect_pre_foreclosure,
+            "tax_delinquent": self._detect_tax_delinquent,
+            "tax_lien": self._detect_tax_delinquent,
+            "code_violation": self._detect_code_violation,
+            "probate": self._detect_probate,
+            "divorce": self._detect_divorce,
+            "domestic_relations": self._detect_divorce,
+            "property_assessment": self._detect_vacant_property,
+        }
+
+        detector = routing.get(record.record_type)
+        if detector is not None:
+            result = detector(record, lead_id, property_id, now)
+            if result is not None:
+                signals.append(result)
+
+        if signals:
+            self.log.info(
+                "source_record_signals_detected",
+                lead_id=lead_id,
+                property_id=property_id,
+                record_type=record.record_type,
+                signal_count=len(signals),
+                signal_types=[s.signal_type for s in signals],
+            )
+
+        return signals
+
+    def detect_neighborhood_hot(
+        self,
+        lead_id: int,
+        property_id: int,
+        zip_code: str,
+        absorption_rate: float,
+        now: datetime,
+    ) -> SignalCreate | None:
+        """Detect hot neighborhood based on absorption rate.
+
+        5 base points, linear decay.
+        Fires when absorption rate > 20% (sellers' market threshold).
+
+        Parameters
+        ----------
+        lead_id:
+            Database ID of the lead.
+        property_id:
+            Database ID of the property.
+        zip_code:
+            ZIP code for the neighborhood.
+        absorption_rate:
+            Percentage of available inventory sold per month.
+        now:
+            Reference timestamp (unused but kept for interface consistency).
+
+        Returns
+        -------
+        SignalCreate | None
+            Signal if absorption rate exceeds threshold, else None.
+        """
+        if absorption_rate <= 20.0:
+            return None
+
+        return self._make_signal(
+            "neighborhood_hot",
+            lead_id,
+            property_id,
+            f"Hot market: {absorption_rate:.1f}% absorption rate in {zip_code}",
+            source="redfin",
+        )
+
+    def _detect_pre_foreclosure(
+        self,
+        record: SourceRecord,
+        lead_id: int,
+        property_id: int,
+        now: datetime,
+    ) -> SignalCreate | None:
+        """Lis pendens / pre-foreclosure filing detected.
+
+        20 base points, escalating decay (urgency increases as auction nears).
+        """
+        return self._make_signal(
+            "pre_foreclosure",
+            lead_id,
+            property_id,
+            f"Pre-foreclosure filing: {record.event_type or record.record_type}",
+            event_date=record.event_date,
+            source=record.source_name,
+        )
+
+    def _detect_tax_delinquent(
+        self,
+        record: SourceRecord,
+        lead_id: int,
+        property_id: int,
+        now: datetime,
+    ) -> SignalCreate | None:
+        """Tax delinquency or tax lien detected.
+
+        13 base points, linear decay.
+        """
+        amount = record.raw_data.get("amount_owed")
+        desc = "Tax delinquency detected"
+        if amount is not None:
+            if isinstance(amount, (int, float)):
+                desc = f"Tax delinquency: ${amount:,.0f} owed"
+            else:
+                desc = f"Tax delinquency: {amount} owed"
+        return self._make_signal(
+            "tax_delinquent",
+            lead_id,
+            property_id,
+            desc,
+            event_date=record.event_date,
+            source=record.source_name,
+        )
+
+    def _detect_code_violation(
+        self,
+        record: SourceRecord,
+        lead_id: int,
+        property_id: int,
+        now: datetime,
+    ) -> SignalCreate | None:
+        """Active code violation detected.
+
+        12 base points, step decay.
+        Only fires for active/open violations (check raw_data status field).
+        """
+        status = record.raw_data.get("status", "").upper()
+        # Only active/open violations are actionable
+        if status and status not in ("OPEN", "ACTIVE", "PENDING", "VIOLATION", ""):
+            return None
+
+        violation_type = record.raw_data.get("violation_type", "unspecified")
+        return self._make_signal(
+            "code_violation",
+            lead_id,
+            property_id,
+            f"Code violation: {violation_type}",
+            event_date=record.event_date,
+            source=record.source_name,
+        )
+
+    def _detect_probate(
+        self,
+        record: SourceRecord,
+        lead_id: int,
+        property_id: int,
+        now: datetime,
+    ) -> SignalCreate | None:
+        """Probate filing detected.
+
+        18 base points, linear decay. Handle with sensitivity.
+        """
+        return self._make_signal(
+            "probate",
+            lead_id,
+            property_id,
+            "Probate filing associated with property",
+            event_date=record.event_date,
+            source=record.source_name,
+        )
+
+    def _detect_divorce(
+        self,
+        record: SourceRecord,
+        lead_id: int,
+        property_id: int,
+        now: datetime,
+    ) -> SignalCreate | None:
+        """Divorce / domestic relations filing detected.
+
+        16 base points, step decay. Handle with sensitivity.
+        """
+        return self._make_signal(
+            "divorce",
+            lead_id,
+            property_id,
+            "Divorce filing associated with property",
+            event_date=record.event_date,
+            source=record.source_name,
+        )
+
+    def _detect_vacant_property(
+        self,
+        record: SourceRecord,
+        lead_id: int,
+        property_id: int,
+        now: datetime,
+    ) -> SignalCreate | None:
+        """Vacant property detection from PA assessment data.
+
+        Composite signal: !homestead + absentee + residential use code.
+        10 base points, linear decay.
+        """
+        raw = record.raw_data
+        homestead = raw.get("homestead_exempt", False)
+        is_absentee = raw.get("is_absentee", False)
+        use_code = str(raw.get("property_use_code", ""))
+
+        # Must NOT be homestead and MUST be absentee
+        if homestead or not is_absentee:
+            return None
+
+        # Residential use codes typically start with 0 or are in 0000-0999 range
+        # Common FL residential use codes: 0000-0099 (single family),
+        # 0100-0199 (multi).
+        # Accept if use code starts with "0" or is explicitly residential.
+        residential = use_code.startswith("0") or use_code in (
+            "",
+            "RESIDENTIAL",
+            "SFR",
+        )
+        if not residential:
+            return None
+
+        return self._make_signal(
+            "vacant_property",
+            lead_id,
+            property_id,
+            "Likely vacant: non-homestead absentee residential property",
+            event_date=record.event_date,
+            source=record.source_name,
+        )
 
     # ------------------------------------------------------------------
     # Helpers

@@ -1,0 +1,40 @@
+# =============================================================================
+# TheLeadEdge - Google Alerts Feed Configuration
+# =============================================================================
+# Google Alerts RSS feed URLs for real estate intelligence gathering.
+#
+# SETUP INSTRUCTIONS:
+#   1. Go to https://www.google.com/alerts
+#   2. Create alerts for each keyword set below
+#   3. Set delivery to "RSS feed" (not email)
+#   4. Copy the RSS feed URL and paste it in the 'url' field
+#
+# Each feed monitors Google for new web content matching the keywords.
+# The pipeline extracts potential addresses and property references.
+# =============================================================================
+
+feeds:
+  # --- Foreclosure Monitoring ---
+  - name: "SWFL Foreclosures"
+    url: ""  # Set your Google Alerts RSS URL here
+    keywords: ["foreclosure", "southwest florida"]
+
+  # --- General Real Estate News ---
+  - name: "SWFL Real Estate"
+    url: ""  # Set your Google Alerts RSS URL here
+    keywords: ["real estate", "naples", "cape coral"]
+
+  # --- Property Auctions ---
+  - name: "SWFL Property Auctions"
+    url: ""  # Set your Google Alerts RSS URL here
+    keywords: ["property auction", "lee county", "collier county"]
+
+  # --- Distressed Properties ---
+  - name: "SWFL Distressed Properties"
+    url: ""  # Set your Google Alerts RSS URL here
+    keywords: ["distressed property", "short sale", "southwest florida"]
+
+  # --- New Development ---
+  - name: "SWFL New Construction"
+    url: ""  # Set your Google Alerts RSS URL here
+    keywords: ["new construction", "cape coral", "fort myers"]

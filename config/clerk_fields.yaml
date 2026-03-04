@@ -1,0 +1,147 @@
+# Clerk of Court and Code Enforcement field mappings
+# Multiple aliases per internal field to handle county variations
+#
+# Each record type defines a mapping from internal field names to a list
+# of possible column header values.  The connector tries each alias in
+# order (case-insensitive) and uses the first match found in the file.
+
+lis_pendens:
+  parcel_id:
+    - "PARCEL_ID"
+    - "PARCEL"
+    - "PARCEL_NUMBER"
+    - "PARCEL_NO"
+    - "TAX_ID"
+    - "FOLIO"
+  street_address:
+    - "ADDRESS"
+    - "PROPERTY_ADDRESS"
+    - "SITE_ADDRESS"
+    - "STREET_ADDRESS"
+    - "SITE_ADDR"
+  city:
+    - "CITY"
+    - "PROPERTY_CITY"
+    - "SITE_CITY"
+  state:
+    - "STATE"
+    - "PROPERTY_STATE"
+  zip_code:
+    - "ZIP"
+    - "ZIP_CODE"
+    - "POSTAL_CODE"
+    - "SITE_ZIP"
+  event_date:
+    - "FILING_DATE"
+    - "RECORDED_DATE"
+    - "DATE_FILED"
+    - "RECORD_DATE"
+  event_type:
+    - "CASE_TYPE"
+    - "FILING_TYPE"
+    - "DOCUMENT_TYPE"
+  owner_name:
+    - "DEFENDANT"
+    - "OWNER_NAME"
+    - "OWNER"
+    - "PROPERTY_OWNER"
+    - "DEFENDANT_NAME"
+  case_number:
+    - "CASE_NUMBER"
+    - "CASE_NO"
+    - "CASE_ID"
+    - "INSTRUMENT_NO"
+
+probate:
+  parcel_id:
+    - "PARCEL_ID"
+    - "PARCEL"
+    - "TAX_ID"
+    - "FOLIO"
+  street_address:
+    - "ADDRESS"
+    - "PROPERTY_ADDRESS"
+    - "SITE_ADDRESS"
+    - "DECEDENT_ADDRESS"
+  city:
+    - "CITY"
+    - "PROPERTY_CITY"
+  zip_code:
+    - "ZIP"
+    - "ZIP_CODE"
+  event_date:
+    - "FILING_DATE"
+    - "DATE_OF_DEATH"
+    - "PROBATE_DATE"
+  owner_name:
+    - "DECEDENT"
+    - "DECEDENT_NAME"
+    - "ESTATE_OF"
+  case_number:
+    - "CASE_NUMBER"
+    - "CASE_NO"
+    - "PROBATE_CASE"
+
+divorce:
+  parcel_id:
+    - "PARCEL_ID"
+    - "PARCEL"
+    - "TAX_ID"
+  street_address:
+    - "ADDRESS"
+    - "PROPERTY_ADDRESS"
+    - "MARITAL_ADDRESS"
+  city:
+    - "CITY"
+  zip_code:
+    - "ZIP"
+    - "ZIP_CODE"
+  event_date:
+    - "FILING_DATE"
+    - "PETITION_DATE"
+    - "DATE_FILED"
+  owner_name:
+    - "PETITIONER"
+    - "PARTY_NAME"
+  case_number:
+    - "CASE_NUMBER"
+    - "CASE_NO"
+
+code_violation:
+  parcel_id:
+    - "PARCEL_ID"
+    - "PARCEL"
+    - "FOLIO"
+    - "TAX_ID"
+  street_address:
+    - "ADDRESS"
+    - "PROPERTY_ADDRESS"
+    - "VIOLATION_ADDRESS"
+    - "SITE_ADDRESS"
+  city:
+    - "CITY"
+    - "VIOLATION_CITY"
+  zip_code:
+    - "ZIP"
+    - "ZIP_CODE"
+  event_date:
+    - "VIOLATION_DATE"
+    - "INSPECTION_DATE"
+    - "ISSUED_DATE"
+  violation_type:
+    - "VIOLATION_TYPE"
+    - "VIOLATION_CODE"
+    - "CODE_SECTION"
+    - "DESCRIPTION"
+  status:
+    - "STATUS"
+    - "CASE_STATUS"
+    - "VIOLATION_STATUS"
+  compliance_date:
+    - "COMPLIANCE_DATE"
+    - "DUE_DATE"
+    - "RESOLUTION_DATE"
+  case_number:
+    - "CASE_NUMBER"
+    - "CASE_NO"
+    - "VIOLATION_NO"

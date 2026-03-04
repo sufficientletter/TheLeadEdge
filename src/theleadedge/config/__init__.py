@@ -85,6 +85,15 @@ class Settings(BaseSettings):
     fub_api_key: str = ""
     fub_base_url: str = "https://api.followupboss.com/v1"
 
+    # ── Skip Tracing (Phase 2) ────────────────────────────────────────
+    skip_trace_api_key: str = ""
+    skip_trace_base_url: str = "https://api.batchskiptracing.com/v1"
+
+    # ── Sunbiz (Phase 2) ─────────────────────────────────────────────
+    sunbiz_sftp_host: str = ""
+    sunbiz_sftp_user: str = ""
+    sunbiz_sftp_password: str = ""
+
     # ── Paths ────────────────────────────────────────────────────────────
     mls_import_dir: Path = Field(
         default_factory=lambda: PROJECT_ROOT / "data" / "mls_imports",
@@ -94,6 +103,14 @@ class Settings(BaseSettings):
     )
     config_dir: Path = Field(
         default_factory=lambda: PROJECT_ROOT / "config",
+    )
+
+    # ── Public Records Paths (Phase 2) ────────────────────────────────
+    pa_download_dir: Path = Field(
+        default_factory=lambda: PROJECT_ROOT / "data" / "pa_downloads",
+    )
+    public_records_dir: Path = Field(
+        default_factory=lambda: PROJECT_ROOT / "data" / "public_records",
     )
 
     # ── Market (loaded from market.yaml) ─────────────────────────────────
@@ -108,6 +125,9 @@ class Settings(BaseSettings):
     feature_flags_path: Path = Field(
         default_factory=lambda: PROJECT_ROOT / "config" / "feature_flags.yaml",
     )
+
+    # ── Scheduler (Phase 2) ───────────────────────────────────────────────
+    scheduler_timezone: str = "America/New_York"
 
     # ── Briefing Schedule ────────────────────────────────────────────────
     briefing_hour: int = 6

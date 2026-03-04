@@ -139,6 +139,17 @@ class PropertyRow(Base):
     is_absentee: Mapped[bool] = mapped_column(Boolean, default=False)
     is_corporate: Mapped[bool] = mapped_column(Boolean, default=False)
 
+    # Public records enrichment (Phase 2)
+    parcel_id: Mapped[str | None] = mapped_column(String(50), index=True)
+    homestead_exempt: Mapped[bool] = mapped_column(Boolean, default=False)
+    assessed_value: Mapped[float | None] = mapped_column(Float)
+    assessed_value_previous: Mapped[float | None] = mapped_column(Float)
+    last_sale_date: Mapped[datetime | None] = mapped_column(Date)
+    last_sale_price: Mapped[float | None] = mapped_column(Float)
+    property_use_code: Mapped[str | None] = mapped_column(String(20))
+    owner_name_raw: Mapped[str | None] = mapped_column(String(300))
+    mailing_address_raw: Mapped[str | None] = mapped_column(String(500))
+
     # Meta
     data_source: Mapped[str | None] = mapped_column(String(50))
     created_at: Mapped[datetime] = mapped_column(
@@ -375,6 +386,140 @@ class SyncLogRow(Base):
     started_at: Mapped[datetime] = mapped_column(DateTime)
     completed_at: Mapped[datetime | None] = mapped_column(DateTime)
     duration_ms: Mapped[int | None] = mapped_column(Integer)
+
+
+# ---------------------------------------------------------------------------
+# SourceRecordRow
+# ---------------------------------------------------------------------------
+
+
+class SourceRecordRow(Base):
+    """Persisted source record from external data connectors."""
+
+    __tablename__ = "source_records"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    source_name: Mapped[str] = mapped_column(String(50))
+    source_record_id: Mapped[str] = mapped_column(String(100))
+    record_type: Mapped[str] = mapped_column(String(50))
+
+    parcel_id: Mapped[str | None] = mapped_column(String(50), index=True)
+    street_address: Mapped[str | None] = mapped_column(String(200))
+    city: Mapped[str | None] = mapped_column(String(100))
+    state: Mapped[str] = mapped_column(String(2), default="FL")
+    zip_code: Mapped[str | None] = mapped_column(String(10))
+
+    event_date: Mapped[datetime | None] = mapped_column(Date)
+    event_type: Mapped[str | None] = mapped_column(String(50))
+    raw_data: Mapped[str | None] = mapped_column(Text)  # JSON
+
+    owner_name: Mapped[str | None] = mapped_column(String(200))
+    mailing_address: Mapped[str | None] = mapped_column(String(300))
+
+    # Matching
+    matched_property_id: Mapped[int | None] = mapped_column(
+        ForeignKey("properties.id"), index=True
+    )
+    match_method: Mapped[str | None] = mapped_column(String(30))
+    match_confidence: Mapped[float | None] = mapped_column(Float)
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now()
+    )
+
+
+# ---------------------------------------------------------------------------
+# MatchQueueRow
+# ---------------------------------------------------------------------------
+
+
+class MatchQueueRow(Base):
+    """Low-confidence matches queued for manual review."""
+
+    __tablename__ = "match_queue"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    source_record_id: Mapped[int] = mapped_column(
+        ForeignKey("source_records.id"), index=True
+    )
+    suggested_property_id: Mapped[int | None] = mapped_column(
+        ForeignKey("properties.id")
+    )
+    match_confidence: Mapped[float] = mapped_column(Float, default=0.0)
+    match_method: Mapped[str | None] = mapped_column(String(30))
+    status: Mapped[str] = mapped_column(
+        String(20), default="pending"
+    )  # pending, approved, rejected
+    reviewed_at: Mapped[datetime | None] = mapped_column(DateTime)
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now()
+    )
+
+
+# ---------------------------------------------------------------------------
+# MarketSnapshotRow
+# ---------------------------------------------------------------------------
+
+
+class MarketSnapshotRow(Base):
+    """Market data snapshot for a ZIP code (from Redfin, etc.)."""
+
+    __tablename__ = "market_snapshots"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    zip_code: Mapped[str] = mapped_column(String(10), index=True)
+    source: Mapped[str] = mapped_column(String(50))  # "redfin"
+    period_start: Mapped[datetime | None] = mapped_column(Date)
+    period_end: Mapped[datetime | None] = mapped_column(Date)
+
+    median_sale_price: Mapped[float | None] = mapped_column(Float)
+    median_list_price: Mapped[float | None] = mapped_column(Float)
+    median_dom: Mapped[int | None] = mapped_column(Integer)
+    homes_sold: Mapped[int | None] = mapped_column(Integer)
+    new_listings: Mapped[int | None] = mapped_column(Integer)
+    inventory: Mapped[int | None] = mapped_column(Integer)
+    months_of_supply: Mapped[float | None] = mapped_column(Float)
+    absorption_rate: Mapped[float | None] = mapped_column(Float)
+    sale_to_list_ratio: Mapped[float | None] = mapped_column(Float)
+    price_drops_pct: Mapped[float | None] = mapped_column(Float)
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now()
+    )
+
+
+# ---------------------------------------------------------------------------
+# FSBOListingRow
+# ---------------------------------------------------------------------------
+
+
+class FSBOListingRow(Base):
+    """FSBO listing detected from Craigslist, Zillow, etc."""
+
+    __tablename__ = "fsbo_listings"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    source: Mapped[str] = mapped_column(String(50))  # "craigslist", "zillow"
+    source_url: Mapped[str | None] = mapped_column(String(500))
+    title: Mapped[str | None] = mapped_column(String(300))
+
+    street_address: Mapped[str | None] = mapped_column(String(200))
+    city: Mapped[str | None] = mapped_column(String(100))
+    state: Mapped[str] = mapped_column(String(2), default="FL")
+    zip_code: Mapped[str | None] = mapped_column(String(10))
+
+    asking_price: Mapped[float | None] = mapped_column(Float)
+    latitude: Mapped[float | None] = mapped_column(Float)
+    longitude: Mapped[float | None] = mapped_column(Float)
+
+    matched_property_id: Mapped[int | None] = mapped_column(
+        ForeignKey("properties.id"), index=True
+    )
+    posted_at: Mapped[datetime | None] = mapped_column(DateTime)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, server_default=func.now()
+    )
 
 
 # ---------------------------------------------------------------------------

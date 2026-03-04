@@ -26,6 +26,7 @@ from .property import (
 )
 from .score import ScoreHistory, ScoreResult
 from .signal import Signal, SignalConfig, SignalCreate
+from .source_record import SourceRecord
 
 __all__ = [
     # Enums
@@ -56,4 +57,6 @@ __all__ = [
     # Lead
     "Lead",
     "LeadCreate",
+    # Source Record
+    "SourceRecord",
 ]

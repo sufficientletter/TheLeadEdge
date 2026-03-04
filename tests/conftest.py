@@ -5,20 +5,24 @@ Provides:
 - Test Settings with FL defaults
 - Scoring configuration loaded from real YAML
 - Fixed timestamps for deterministic tests
+- Phase 2 helper factories for PropertyRow, LeadRow, and SourceRecord
 """
 
 from __future__ import annotations
 
 from datetime import datetime, timedelta
 from pathlib import Path
+from typing import Any
 
 import pytest
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from theleadedge.config import Settings
+from theleadedge.models.source_record import SourceRecord
 from theleadedge.scoring.config_loader import ScoringConfig, load_scoring_config
-from theleadedge.storage.database import Base
+from theleadedge.storage.database import Base, LeadRow, PropertyRow
+from theleadedge.utils.address import normalize_address
 
 
 @pytest_asyncio.fixture(loop_scope="session")
@@ -88,3 +92,102 @@ def one_month_ago(now) -> datetime:
 def three_months_ago(now) -> datetime:
     """Ninety days before the fixed timestamp."""
     return now - timedelta(days=90)
+
+
+# ---------------------------------------------------------------------------
+# Phase 2 Fixtures — SourceRecord, PropertyRow, LeadRow helpers
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture
+def source_record_factory():
+    """Factory function for creating SourceRecord instances."""
+
+    def _make(
+        source_name: str = "collier_pa",
+        source_record_id: str = "SR001",
+        record_type: str = "property_assessment",
+        parcel_id: str | None = None,
+        street_address: str | None = None,
+        city: str | None = "Naples",
+        state: str = "FL",
+        zip_code: str | None = "34102",
+        event_date: Any = None,
+        event_type: str | None = None,
+        raw_data: dict[str, Any] | None = None,
+        owner_name: str | None = None,
+        mailing_address: str | None = None,
+    ) -> SourceRecord:
+        return SourceRecord(
+            source_name=source_name,
+            source_record_id=source_record_id,
+            record_type=record_type,
+            parcel_id=parcel_id,
+            street_address=street_address,
+            city=city,
+            state=state,
+            zip_code=zip_code,
+            event_date=event_date,
+            event_type=event_type,
+            raw_data=raw_data or {},
+            owner_name=owner_name,
+            mailing_address=mailing_address,
+        )
+
+    return _make
+
+
+@pytest.fixture
+def make_property_row():
+    """Helper to create a PropertyRow in the session."""
+
+    async def _make(session: AsyncSession, **kwargs: Any) -> PropertyRow:
+        defaults: dict[str, Any] = {
+            "address": "100 MAIN ST",
+            "city": "Naples",
+            "state": "FL",
+            "zip_code": "34102",
+            "data_source": "mls_csv",
+        }
+        defaults.update(kwargs)
+
+        # Auto-set address_normalized
+        if "address_normalized" not in defaults:
+            defaults["address_normalized"] = normalize_address(
+                defaults["address"],
+                defaults.get("city", ""),
+                defaults.get("state", "FL"),
+                defaults.get("zip_code", ""),
+            )
+
+        row = PropertyRow(**defaults)
+        session.add(row)
+        await session.flush()
+        return row
+
+    return _make
+
+
+@pytest.fixture
+def make_lead_row():
+    """Helper to create a LeadRow in the session."""
+
+    async def _make(
+        session: AsyncSession, property_id: int, **kwargs: Any
+    ) -> LeadRow:
+        defaults: dict[str, Any] = {
+            "property_id": property_id,
+            "status": "new",
+            "is_active": True,
+            "current_score": 0.0,
+            "tier": "D",
+            "signal_count": 0,
+        }
+        defaults.update(kwargs)
+
+        row = LeadRow(**defaults)
+        session.add(row)
+        await session.flush()
+        return row
+
+    return _make

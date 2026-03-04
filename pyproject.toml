@@ -17,9 +17,16 @@ dependencies = [
     "pyyaml>=6.0",
     "python-dotenv>=1.0",
     "structlog>=24.1",
+    "feedparser>=6.0",
+    "rapidfuzz>=3.6",
+    "openpyxl>=3.1",
+    "apscheduler>=3.10,<4.0",
 ]
 
 [project.optional-dependencies]
+remote = [
+    "asyncssh>=2.14",
+]
 dev = [
     "pytest>=8.0",
     "pytest-asyncio>=0.23",
@@ -48,6 +55,8 @@ select = ["E", "F", "I", "N", "UP", "B", "SIM", "TCH"]
 [tool.ruff.lint.per-file-ignores]
 "src/theleadedge/models/*.py" = ["TCH001", "TCH003"]
 "src/theleadedge/storage/*.py" = ["TCH002", "TCH003"]
+"src/theleadedge/sources/*.py" = ["TCH003"]
+"tests/**/*.py" = ["TCH003"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

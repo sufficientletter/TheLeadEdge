@@ -23,6 +23,7 @@ from theleadedge.models.lead import Lead, LeadCreate
 from theleadedge.models.property import Property, PropertyCreate
 from theleadedge.models.score import ScoreHistory, ScoreResult
 from theleadedge.models.signal import Signal, SignalCreate
+from theleadedge.models.source_record import SourceRecord
 
 
 class PropertyFactory(factory.Factory):
@@ -172,3 +173,19 @@ class ScoreHistoryFactory(factory.Factory):
     signal_count = 3
     change_reason = "New signal: expired_listing"
     calculated_at = factory.LazyFunction(datetime.utcnow)
+
+
+class SourceRecordFactory(factory.Factory):
+    """Factory for SourceRecord model instances."""
+
+    class Meta:
+        model = SourceRecord
+
+    source_name = "collier_pa"
+    source_record_id = factory.Sequence(lambda n: f"SR{n:06d}")
+    record_type = "property_assessment"
+    parcel_id = factory.Sequence(lambda n: f"00{n:08d}")
+    street_address = factory.Sequence(lambda n: f"{300 + n} PALM BLVD")
+    city = "Naples"
+    state = "FL"
+    zip_code = "34102"
