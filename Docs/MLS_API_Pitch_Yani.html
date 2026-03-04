@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Lead Edge - MLS API Access: Your Competitive Advantage</title>
+<style>
+  :root {
+    --navy-900: #0f1b2d;
+    --navy-800: #1a2744;
+    --navy-700: #1a365d;
+    --navy-600: #2b4c7e;
+    --navy-500: #2b6cb0;
+    --navy-400: #4299e1;
+    --navy-300: #63b3ed;
+    --navy-200: #bee3f8;
+    --navy-100: #ebf8ff;
+    --white: #ffffff;
+    --gray-50: #f8fafc;
+    --gray-100: #f1f5f9;
+    --gray-200: #e2e8f0;
+    --gray-300: #cbd5e1;
+    --gray-400: #94a3b8;
+    --gray-500: #64748b;
+    --gray-600: #475569;
+    --gray-700: #334155;
+    --gray-800: #1e293b;
+    --green-100: #dcfce7;
+    --green-500: #22c55e;
+    --green-600: #16a34a;
+    --green-700: #15803d;
+    --orange-100: #ffedd5;
+    --orange-500: #f97316;
+    --orange-600: #ea580c;
+    --red-100: #fee2e2;
+    --red-500: #ef4444;
+    --red-600: #dc2626;
+    --accent: #e8a838;
+    --accent-light: #f5d08c;
+    --accent-dark: #b07d1a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    color: var(--gray-700);
+    background-color: var(--gray-100);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .top-bar {
+    height: 4px;
+    background: linear-gradient(90deg, var(--navy-700), var(--navy-500), var(--accent), var(--navy-500), var(--navy-700));
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* Header */
+  .header {
+    background: linear-gradient(135deg, var(--navy-900) 0%, var(--navy-700) 100%);
+    padding: 48px 0 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(232,168,56,0.08) 0%, transparent 70%);
+  }
+
+  .header-badge {
+    display: inline-block;
+    background: rgba(232,168,56,0.15);
+    border: 1px solid rgba(232,168,56,0.3);
+    border-radius: 20px;
+    padding: 4px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent-light);
+    margin-bottom: 16px;
+  }
+
+  .header h1 {
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 8px;
+    position: relative;
+  }
+
+  .header h1 span {
+    color: var(--accent);
+  }
+
+  .header .subtitle {
+    font-size: 18px;
+    color: var(--navy-200);
+    font-weight: 300;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* Main Content */
+  .main {
+    padding: 40px 0 60px;
+  }
+
+  /* Personal intro */
+  .intro-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 32px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    border-left: 4px solid var(--accent);
+  }
+
+  .intro-card p {
+    font-size: 17px;
+    line-height: 1.8;
+    color: var(--gray-700);
+  }
+
+  .intro-card .name {
+    font-weight: 700;
+    color: var(--navy-700);
+  }
+
+  /* Section cards */
+  .section {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .section-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+
+  .icon-blue { background: var(--navy-100); }
+  .icon-green { background: var(--green-100); }
+  .icon-orange { background: var(--orange-100); }
+  .icon-red { background: var(--red-100); }
+
+  .section h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--navy-800);
+  }
+
+  .section h3 {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--navy-700);
+    margin: 20px 0 10px;
+  }
+
+  .section p {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--gray-600);
+    margin-bottom: 12px;
+  }
+
+  /* Problem / Solution callouts */
+  .problem-box {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 16px 0;
+  }
+
+  .problem-box .label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--red-600);
+    margin-bottom: 6px;
+  }
+
+  .problem-box p {
+    color: #7f1d1d;
+    margin-bottom: 0;
+  }
+
+  .solution-box {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 16px 0;
+  }
+
+  .solution-box .label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--green-700);
+    margin-bottom: 6px;
+  }
+
+  .solution-box p {
+    color: #14532d;
+    margin-bottom: 0;
+  }
+
+  /* Benefit cards */
+  .benefits-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  @media (max-width: 600px) {
+    .benefits-grid { grid-template-columns: 1fr; }
+  }
+
+  .benefit-card {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: 10px;
+    padding: 20px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .benefit-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+
+  .benefit-card .emoji {
+    font-size: 28px;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .benefit-card .title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--navy-800);
+    margin-bottom: 4px;
+  }
+
+  .benefit-card .desc {
+    font-size: 13px;
+    color: var(--gray-500);
+    line-height: 1.5;
+  }
+
+  /* Comparison table */
+  .compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+
+  .compare-table thead th {
+    background: var(--navy-700);
+    color: var(--white);
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+  }
+
+  .compare-table thead th:first-child {
+    border-radius: 8px 0 0 0;
+  }
+
+  .compare-table thead th:last-child {
+    border-radius: 0 8px 0 0;
+  }
+
+  .compare-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--gray-200);
+    vertical-align: top;
+  }
+
+  .compare-table tr:last-child td:first-child {
+    border-radius: 0 0 0 8px;
+  }
+
+  .compare-table tr:last-child td:last-child {
+    border-radius: 0 0 8px 0;
+  }
+
+  .compare-table .old { color: var(--red-600); }
+  .compare-table .new { color: var(--green-700); font-weight: 600; }
+
+  .compare-table tbody tr:hover {
+    background: var(--gray-50);
+  }
+
+  /* ROI calculator */
+  .roi-card {
+    background: linear-gradient(135deg, var(--navy-800) 0%, var(--navy-700) 100%);
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 24px;
+    color: var(--white);
+    box-shadow: 0 4px 20px rgba(15,27,45,0.3);
+  }
+
+  .roi-card h2 {
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+
+  .roi-card .subtitle {
+    color: var(--navy-200);
+    font-size: 15px;
+    margin-bottom: 24px;
+  }
+
+  .roi-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .roi-row:last-child {
+    border-bottom: none;
+  }
+
+  .roi-label {
+    font-size: 15px;
+    color: var(--navy-200);
+  }
+
+  .roi-value {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--white);
+  }
+
+  .roi-highlight {
+    background: rgba(232,168,56,0.15);
+    border: 1px solid rgba(232,168,56,0.3);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .roi-highlight .label {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent-light);
+  }
+
+  .roi-highlight .amount {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  /* Steps */
+  .steps {
+    margin: 20px 0;
+    counter-reset: step;
+  }
+
+  .step {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+
+  .step::before {
+    counter-increment: step;
+    content: counter(step);
+    width: 36px;
+    height: 36px;
+    background: var(--navy-700);
+    color: var(--white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .step-content {
+    flex: 1;
+  }
+
+  .step-content .step-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--navy-800);
+    margin-bottom: 4px;
+  }
+
+  .step-content .step-desc {
+    font-size: 14px;
+    color: var(--gray-500);
+    line-height: 1.6;
+  }
+
+  .step-content .step-detail {
+    font-size: 13px;
+    color: var(--gray-400);
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    margin-top: 4px;
+  }
+
+  /* Callout / CTA */
+  .cta-card {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
+    margin: 32px 0;
+    box-shadow: 0 4px 20px rgba(217,119,6,0.3);
+  }
+
+  .cta-card h2 {
+    color: var(--white);
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+
+  .cta-card p {
+    color: rgba(255,255,255,0.9);
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+
+  .cta-phone {
+    display: inline-block;
+    background: var(--white);
+    color: var(--navy-800);
+    font-size: 22px;
+    font-weight: 700;
+    padding: 12px 32px;
+    border-radius: 8px;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+
+  .cta-phone .label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--gray-400);
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  /* Quote block */
+  .quote-block {
+    border-left: 3px solid var(--accent);
+    padding: 16px 20px;
+    margin: 20px 0;
+    background: #fffbeb;
+    border-radius: 0 8px 8px 0;
+  }
+
+  .quote-block p {
+    font-style: italic;
+    color: var(--gray-700);
+    font-size: 15px;
+    margin-bottom: 0;
+  }
+
+  /* FAQ */
+  .faq-item {
+    margin-bottom: 16px;
+  }
+
+  .faq-q {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--navy-800);
+    margin-bottom: 4px;
+  }
+
+  .faq-a {
+    font-size: 14px;
+    color: var(--gray-600);
+    line-height: 1.7;
+  }
+
+  /* Footer */
+  .footer {
+    background: var(--navy-900);
+    padding: 32px 0;
+    text-align: center;
+    color: var(--gray-400);
+    font-size: 13px;
+  }
+
+  .footer .brand {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  /* Highlight pill */
+  .pill {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .pill-green { background: var(--green-100); color: var(--green-700); }
+  .pill-orange { background: var(--orange-100); color: var(--orange-600); }
+
+  /* Timeline comparison visual */
+  .timeline-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  @media (max-width: 600px) {
+    .timeline-compare { grid-template-columns: 1fr; }
+  }
+
+  .timeline-box {
+    border-radius: 10px;
+    padding: 20px;
+  }
+
+  .timeline-box.old {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+  }
+
+  .timeline-box.new {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+  }
+
+  .timeline-box .tl-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .timeline-box.old .tl-label { color: var(--red-600); }
+  .timeline-box.new .tl-label { color: var(--green-700); }
+
+  .tl-step {
+    font-size: 13px;
+    padding: 4px 0;
+    color: var(--gray-600);
+  }
+
+  .tl-step .time {
+    font-weight: 700;
+    color: var(--gray-800);
+  }
+
+  /* Stat row */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 20px 0;
+  }
+
+  @media (max-width: 600px) {
+    .stat-row { grid-template-columns: 1fr; }
+  }
+
+  .stat-card {
+    text-align: center;
+    padding: 20px;
+    background: var(--gray-50);
+    border-radius: 10px;
+    border: 1px solid var(--gray-200);
+  }
+
+  .stat-number {
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--navy-700);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    font-size: 13px;
+    color: var(--gray-500);
+    font-weight: 500;
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar"></div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="container">
+    <div class="header-badge">The Lead Edge</div>
+    <h1>Unlock Your <span>Unfair Advantage</span></h1>
+    <p class="subtitle">How MLS API access turns your data into deals &mdash; automatically, every single morning</p>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+<div class="container">
+
+<!-- Personal intro -->
+<div class="intro-card">
+  <p>
+    <span class="name">Yani,</span> right now we've built something powerful &mdash; a system that can scan every listing in Southwest Florida and surface the leads most likely to turn into deals, scored and ranked, delivered to your inbox before your first cup of coffee.
+  </p>
+  <p>
+    But there's one thing holding it back: we're feeding it data manually. Every time you export a CSV from Matrix, that's time you could be on the phone closing. The MLS API eliminates that bottleneck entirely &mdash; and it costs less than one dinner at The Bay House.
+  </p>
+</div>
+
+<!-- THE PROBLEM -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon icon-red">&#9200;</div>
+    <h2>The Manual Export Problem</h2>
+  </div>
+
+  <p>Right now, to keep The Lead Edge fed with fresh data, you have to:</p>
+
+  <div class="problem-box">
+    <div class="label">Current Process (Manual)</div>
+    <p>Log into Matrix &rarr; run saved searches &rarr; export CSVs &rarr; save to the right folder &rarr; wait for import &rarr; repeat tomorrow. If you skip a day, you miss leads. If you're showing houses all day, the data goes stale.</p>
+  </div>
+
+  <p>Every hour a listing expires or gets a price reduction and you don't know about it, a competitor could already be on the phone with that seller.</p>
+
+  <div class="solution-box">
+    <div class="label">With API Access (Automatic)</div>
+    <p>The system pulls fresh data directly from the MLS every 30 minutes &mdash; no exports, no folders, no manual steps. You wake up, open the briefing, and every expired listing, price drop, and motivated seller signal from the last 24 hours is already scored and waiting for you.</p>
+  </div>
+</div>
+
+<!-- SPEED COMPARISON -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon icon-orange">&#9889;</div>
+    <h2>Speed Wins Deals</h2>
+  </div>
+
+  <p>In SWFLA, the agent who calls first gets the listing. Here's what the difference looks like:</p>
+
+  <div class="timeline-compare">
+    <div class="timeline-box old">
+      <div class="tl-label">Without API &mdash; Manual</div>
+      <div class="tl-step"><span class="time">7:00 PM</span> &mdash; Listing expires on MLS</div>
+      <div class="tl-step"><span class="time">Next morning</span> &mdash; You log in, run search</div>
+      <div class="tl-step"><span class="time">20 min later</span> &mdash; Export CSV, import</div>
+      <div class="tl-step"><span class="time">30 min later</span> &mdash; System processes data</div>
+      <div class="tl-step"><span class="time">~9:00 AM</span> &mdash; You see the lead</div>
+      <div class="tl-step" style="color: var(--red-600); font-weight: 600;">14+ hours after expiration</div>
+    </div>
+    <div class="timeline-box new">
+      <div class="tl-label">With API &mdash; Automatic</div>
+      <div class="tl-step"><span class="time">7:00 PM</span> &mdash; Listing expires on MLS</div>
+      <div class="tl-step"><span class="time">7:05 PM</span> &mdash; API detects the change</div>
+      <div class="tl-step"><span class="time">7:06 PM</span> &mdash; Scored and classified</div>
+      <div class="tl-step"><span class="time">6:30 AM</span> &mdash; In your morning briefing</div>
+      <div class="tl-step"><span class="time">6:35 AM</span> &mdash; You're on the phone</div>
+      <div class="tl-step" style="color: var(--green-700); font-weight: 600;">First call of the day</div>
+    </div>
+  </div>
+
+  <div class="quote-block">
+    <p>The average expired listing receives 5-15 calls within the first 48 hours. The agent who calls in the first 2 hours has a 3x higher conversion rate than the agent who calls on day two.</p>
+  </div>
+</div>
+
+<!-- BENEFITS -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon icon-green">&#10004;</div>
+    <h2>What You Get for $500/year</h2>
+  </div>
+
+  <div class="benefits-grid">
+    <div class="benefit-card">
+      <span class="emoji">&#127793;</span>
+      <div class="title">Zero Manual Work</div>
+      <div class="desc">No more CSV exports. No more logging into Matrix just to feed the system. Data flows automatically, 24/7.</div>
+    </div>
+    <div class="benefit-card">
+      <span class="emoji">&#9201;</span>
+      <div class="title">5-Minute Data</div>
+      <div class="desc">Listing changes appear in The Lead Edge within 5 minutes of hitting the MLS. Price drops, expirations, status changes &mdash; instantly.</div>
+    </div>
+    <div class="benefit-card">
+      <span class="emoji">&#128200;</span>
+      <div class="title">Deeper Data</div>
+      <div class="desc">The API gives access to fields that CSV exports don't include &mdash; price change history, cumulative days on market, listing modification timestamps.</div>
+    </div>
+    <div class="benefit-card">
+      <span class="emoji">&#127919;</span>
+      <div class="title">Never Miss a Lead</div>
+      <div class="desc">Even when you're at showings all day, the system is scanning. Every expired, withdrawn, price-reduced, and back-on-market listing is captured.</div>
+    </div>
+    <div class="benefit-card">
+      <span class="emoji">&#128736;</span>
+      <div class="title">Smarter Scoring</div>
+      <div class="desc">With real-time data, lead scores update continuously. A listing that just dropped price today ranks higher than one from last week.</div>
+    </div>
+    <div class="benefit-card">
+      <span class="emoji">&#128640;</span>
+      <div class="title">Scale Without Effort</div>
+      <div class="desc">Monitor all 52 SWFLA ZIP codes across Lee and Collier counties simultaneously. No saved search is too big, no market area too wide.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ROI -->
+<div class="roi-card">
+  <h2>The Math That Matters</h2>
+  <p class="subtitle">What does one extra deal a year look like versus the cost?</p>
+
+  <div class="roi-row">
+    <span class="roi-label">API access cost (Year 1)</span>
+    <span class="roi-value">$500</span>
+  </div>
+  <div class="roi-row">
+    <span class="roi-label">API access cost (Year 2+)</span>
+    <span class="roi-value">$250/year</span>
+  </div>
+  <div class="roi-row">
+    <span class="roi-label">Average SWFLA home sale price</span>
+    <span class="roi-value">~$450,000</span>
+  </div>
+  <div class="roi-row">
+    <span class="roi-label">Your commission on one deal (3%)</span>
+    <span class="roi-value">$13,500</span>
+  </div>
+  <div class="roi-row">
+    <span class="roi-label">After broker split (~70/30)</span>
+    <span class="roi-value">~$9,450</span>
+  </div>
+
+  <div class="roi-highlight">
+    <span class="label">One extra deal pays for the API for...</span>
+    <span class="amount">19 years</span>
+  </div>
+</div>
+
+<!-- WHAT IT LOOKS LIKE -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon icon-blue">&#128202;</div>
+    <h2>Before vs. After</h2>
+  </div>
+
+  <table class="compare-table">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Manual CSV (Now)</th>
+        <th>MLS API (After)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Data freshness</strong></td>
+        <td class="old">Whenever you export</td>
+        <td class="new">Every 5 minutes</td>
+      </tr>
+      <tr>
+        <td><strong>Your daily effort</strong></td>
+        <td class="old">15-20 min exporting</td>
+        <td class="new">Zero &mdash; fully automatic</td>
+      </tr>
+      <tr>
+        <td><strong>Coverage gaps</strong></td>
+        <td class="old">Missed if you skip a day</td>
+        <td class="new">Never misses a listing</td>
+      </tr>
+      <tr>
+        <td><strong>Data fields</strong></td>
+        <td class="old">Limited to CSV columns</td>
+        <td class="new">Full RESO data dictionary</td>
+      </tr>
+      <tr>
+        <td><strong>Price history</strong></td>
+        <td class="old">Current price only</td>
+        <td class="new">Full change history</td>
+      </tr>
+      <tr>
+        <td><strong>Weekends &amp; vacations</strong></td>
+        <td class="old">System goes dark</td>
+        <td class="new">Runs 24/7/365</td>
+      </tr>
+      <tr>
+        <td><strong>Scaling to new ZIPs</strong></td>
+        <td class="old">More saved searches</td>
+        <td class="new">One query covers all</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- WHAT YOU NEED TO DO -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon icon-orange">&#128222;</div>
+    <h2>What You Need to Do</h2>
+  </div>
+
+  <p>This is a <strong>one-time setup</strong>. Once it's done, the system runs itself forever. Here are the steps:</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-content">
+        <div class="step-title">Call NABOR</div>
+        <div class="step-desc">Call 239-597-1666 and say: <em>"I'd like to set up a back-office data feed through the RESO Web API for my internal market analysis tool. Can you walk me through the application?"</em></div>
+        <div class="step-detail">Estimated time: 10-minute phone call</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-content">
+        <div class="step-title">Fill Out the Application</div>
+        <div class="step-desc">They'll send you a form or direct you to the Trestle registration portal. You'll need your MLS member ID and a description of the tool &mdash; Trevor can help you with the wording.</div>
+        <div class="step-detail">Estimated time: 15 minutes</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-content">
+        <div class="step-title">Sign the Data License Agreement</div>
+        <div class="step-desc">Standard agreement that says you'll use the data for your own real estate business. This is normal &mdash; every broker with a website has one of these.</div>
+        <div class="step-detail">Estimated time: Read and sign, 10 minutes</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-content">
+        <div class="step-title">Pay the Fee</div>
+        <div class="step-desc">$250 one-time setup + $250 annual license = $500 for the first year. After that, just $250/year (less than $21/month).</div>
+        <div class="step-detail">That's less than your monthly Zillow Premier Agent lead cost for a single ZIP code</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-content">
+        <div class="step-title">Send the Credentials to Trevor</div>
+        <div class="step-desc">Once approved (usually within 5 business days), you'll receive a Client ID and Client Secret. Text or email them to Trevor &mdash; he'll plug them into the system and everything goes live.</div>
+        <div class="step-detail">Estimated time: 2 minutes to forward</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="solution-box">
+    <div class="label">Total Time Investment</div>
+    <p>About 30 minutes of your time, and the system feeds itself automatically from that day forward. No more CSV exports. Ever.</p>
+  </div>
+</div>
+
+<!-- WHAT WE'RE BUILDING -->
+<div class="section" style="border: 2px solid var(--accent); border-radius: 12px;">
+  <div class="section-header">
+    <div class="section-icon" style="background: linear-gradient(135deg, var(--accent), var(--accent-dark)); color: white;">&#9733;</div>
+    <h2>What We're Building For You</h2>
+  </div>
+
+  <p>Yani, this isn't just a data connection. The API is the foundation that powers an entire lead intelligence system custom-built for your business. Here's everything The Lead Edge does for you once it's connected:</p>
+
+  <h3 style="margin-top: 24px; color: var(--accent-dark);">&#127775; Your Morning Briefing &mdash; Every Day at 6:30 AM</h3>
+  <p>Before you even get to the office, a polished email lands in your inbox with the hottest leads of the day &mdash; scored, ranked, and ready to call. No searching. No digging. Just open and dial.</p>
+
+  <h3 style="color: var(--accent-dark);">&#128270; 20 Lead Signals We Track For You</h3>
+  <p>The system watches for <strong>20 different motivation signals</strong> across every listing in Lee and Collier counties. These aren't random leads &mdash; they're properties where the data says the seller is likely motivated:</p>
+
+  <div class="benefits-grid" style="margin: 16px 0;">
+    <div class="benefit-card">
+      <div class="title">Expired Listings</div>
+      <div class="desc">Listings that just fell off the market. The seller still wants to sell &mdash; they just need the right agent.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="title">Price Reductions</div>
+      <div class="desc">Sellers who just dropped their price are signaling urgency. We catch every one within minutes.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="title">High Days on Market</div>
+      <div class="desc">Listings sitting too long get frustrated sellers. We flag them before competitors notice.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="title">Withdrawn &amp; Relisted</div>
+      <div class="desc">When a listing disappears and comes back, something changed. We track the pattern.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="title">Back on Market</div>
+      <div class="desc">Deals that fell through &mdash; sellers are frustrated and ready for a reliable buyer or agent.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="title">Vacant Properties</div>
+      <div class="desc">Empty homes cost money every month. Those owners are motivated to move fast.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="title">Multiple Price Drops</div>
+      <div class="desc">When a seller has cut their price 2, 3, or 4 times, they're desperate. We stack those signals together.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="title">Overpriced Listings</div>
+      <div class="desc">We compare list price to market comps. Properties priced 15%+ above market are headed for trouble.</div>
+    </div>
+  </div>
+
+  <p style="font-size: 13px; color: var(--gray-400); text-align: center;"><em>...plus 12 more signals including FSBO detection, relocation keywords, estate sales, investor flips, and seasonal patterns</em></p>
+
+  <h3 style="color: var(--accent-dark);">&#127942; Smart Lead Scoring &mdash; Your Leads, Ranked</h3>
+  <p>Every lead gets a score from 0-100 based on how many signals are stacked together. A listing that's expired AND had 3 price drops AND has been on market 180+ days scores much higher than a simple price reduction. You always know which leads to call first.</p>
+
+  <div class="stat-row">
+    <div class="stat-card" style="border-top: 3px solid #ef4444;">
+      <div class="stat-number" style="color: #ef4444;">Tier 1</div>
+      <div class="stat-label">Hot Leads (80-100)<br>Call immediately</div>
+    </div>
+    <div class="stat-card" style="border-top: 3px solid #f97316;">
+      <div class="stat-number" style="color: #f97316;">Tier 2</div>
+      <div class="stat-label">Warm Leads (60-79)<br>Call this week</div>
+    </div>
+    <div class="stat-card" style="border-top: 3px solid #eab308;">
+      <div class="stat-number" style="color: #eab308;">Tier 3</div>
+      <div class="stat-label">Watch List (40-59)<br>Monitor closely</div>
+    </div>
+  </div>
+
+  <h3 style="color: var(--accent-dark);">&#128506; Full Southwest Florida Coverage</h3>
+  <p>We monitor <strong>52 ZIP codes</strong> across both Lee and Collier counties &mdash; from Marco Island to North Fort Myers, Cape Coral to Bonita Springs. Every neighborhood. Every listing type. Every price point. If something moves in SWFLA, we see it.</p>
+
+  <h3 style="color: var(--accent-dark);">&#128640; What's Coming Next</h3>
+  <p>Once the API is live, here's what we unlock:</p>
+  <div style="margin: 12px 0 0 8px;">
+    <p style="margin-bottom: 8px;"><strong>&#10003; Live Dashboard</strong> &mdash; A private web dashboard where you can browse, filter, and manage all your leads in one place. Search by ZIP, by signal type, by score. Click a lead and see everything about it instantly.</p>
+    <p style="margin-bottom: 8px;"><strong>&#10003; CRM Integration</strong> &mdash; Automatically push hot leads into Follow Up Boss with the right tags, action plans, and contact info already filled in. No copy-pasting between systems.</p>
+    <p style="margin-bottom: 8px;"><strong>&#10003; Market Intelligence</strong> &mdash; Neighborhood-level trend reports. Which ZIPs are heating up? Where are listings expiring fastest? Where are price cuts accelerating? You'll know before anyone else.</p>
+    <p style="margin-bottom: 0;"><strong>&#10003; Predictive Scoring</strong> &mdash; As we collect data over time, the system learns which signals actually lead to closings in YOUR market, and it gets smarter and more accurate every month.</p>
+  </div>
+
+  <div class="quote-block" style="margin-top: 24px;">
+    <p>The $500 doesn't just buy an API key. It buys the foundation of an entire lead generation machine that works for you 24 hours a day, 7 days a week &mdash; while you're showing houses, while you're at dinner, while you're sleeping. Your competitors are still manually searching Matrix every morning. You won't have to.</p>
+  </div>
+</div>
+
+<!-- FAQ -->
+<div class="section">
+  <div class="section-header">
+    <div class="section-icon icon-blue">&#10067;</div>
+    <h2>Quick Questions</h2>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">Is this allowed by the MLS?</div>
+    <div class="faq-a">100% yes. Back-office data feeds are explicitly authorized by NAR policy (Statement 8.7) and supported by NABOR. Every major brokerage uses them for their CRM and analytics tools. Your data stays internal &mdash; it's never displayed publicly.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">Will other agents see my data or know I'm using this?</div>
+    <div class="faq-a">No. This is a private, back-office connection between your MLS account and our system. No one else can see your queries or your lead scores. It's your competitive intelligence, invisible to everyone else.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">What if I cancel my MLS membership?</div>
+    <div class="faq-a">If your membership lapses, the API access stops automatically. There are no long-term contracts &mdash; it's just an annual license tied to your MLS membership.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">Can I still use the CSV exports too?</div>
+    <div class="faq-a">Yes. The system supports both. The API just means you don't <em>have</em> to do manual exports anymore. If you ever want to run a special one-off search and export it, that still works.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">What's "Trestle"?</div>
+    <div class="faq-a">Trestle is the data platform made by CoreLogic &mdash; the same company that runs Matrix (what you log into every day to search listings). Think of it as the "back door" to Matrix that lets software pull data automatically instead of you clicking around manually.</div>
+  </div>
+
+  <div class="faq-item">
+    <div class="faq-q">$500 feels like a lot...</div>
+    <div class="faq-a">It's $1.37/day. That's less than a coffee at Starbucks. And after Year 1, it drops to $250/year &mdash; 68 cents a day. One single deal from a lead this system surfaces pays for the API for nearly two decades. The question isn't whether you can afford it &mdash; it's whether you can afford to let competitors get to those expired listings first.</div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-card">
+  <h2>Ready to Flip the Switch?</h2>
+  <p>One phone call. That's all it takes to go from manual exports to a fully automated lead machine that never sleeps.</p>
+  <a href="tel:2395971666" class="cta-phone">
+    <span class="label">Call NABOR</span>
+    (239) 597-1666
+  </a>
+</div>
+
+<!-- FINAL NOTE -->
+<div class="intro-card" style="border-left-color: var(--navy-500);">
+  <p>
+    Yani, we've already built the engine. The scoring is done. The signal detection is done. The morning briefing is done. This is the last piece &mdash; the fuel line that makes it all run on autopilot.
+  </p>
+  <p>
+    Every day without the API is a day where an expired listing or a frustrated FSBO seller might have been your next closing. Let's not leave deals on the table.
+  </p>
+  <p style="margin-bottom: 0; margin-top: 16px; font-weight: 600; color: var(--navy-700);">
+    &mdash; Trevor
+  </p>
+</div>
+
+</div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="container">
+    <div class="brand">The Lead Edge</div>
+    <p>Data-driven lead generation for Southwest Florida</p>
+    <p style="margin-top: 8px; font-size: 11px; color: var(--gray-500);">Prepared March 2026</p>
+  </div>
+</div>
+
+</body>
+</html>

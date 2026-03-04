@@ -1,7 +1,16 @@
 {
   "permissions": {
     "allow": [
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(\"C:/ClaudeProjects/TheLeadEdge/.env.example\":*)",
+      "Bash(test:*)",
+      "Bash(python:*)",
+      "Bash(source:*)",
+      "Bash(.venv/Scripts/python:*)",
+      "Bash(.venv/Scripts/pip list:*)",
+      "Bash(.venv/Scripts/ruff check:*)",
+      "Bash(.venv/Scripts/python.exe:*)",
+      "Bash(rm:*)"
     ]
   }
 }
